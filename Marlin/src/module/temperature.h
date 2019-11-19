@@ -292,6 +292,10 @@ class Temperature {
       static uint8_t chamberfan_speed;
     #endif
 
+    #if ENABLED(EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE)
+      static uint8_t extruder_auto_fan_speed;
+    #endif
+
     #if ENABLED(FAN_SOFT_PWM)
       static uint8_t soft_pwm_amount_fan[FAN_COUNT],
                      soft_pwm_count_fan[FAN_COUNT];

@@ -124,6 +124,10 @@ Temperature thermalManager;
   uint8_t Temperature::chamberfan_speed; // = 0
 #endif
 
+#if ENABLED(EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE)
+  uint8_t Temperature::extruder_auto_fan_speed = EXTRUDER_AUTO_FAN_SPEED;
+#endif
+
 #if FAN_COUNT > 0
 
   uint8_t Temperature::fan_speed[FAN_COUNT]; // = { 0 }
@@ -682,29 +686,29 @@ int16_t Temperature::getHeaterPower(const heater_ind_t heater_id) {
         #endif
         default:
           #if ENABLED(AUTO_POWER_E_FANS)
-            autofan_speed[realFan] = fan_on ? EXTRUDER_AUTO_FAN_SPEED : 0;
+            autofan_speed[realFan] = fan_on ? extruder_auto_fan_speed : 0;
           #endif
           break;
       }
 
       switch (f) {
         #if HAS_AUTO_FAN_0
-          case 0: _UPDATE_AUTO_FAN(E0, fan_on, EXTRUDER_AUTO_FAN_SPEED); break;
+          case 0: _UPDATE_AUTO_FAN(E0, fan_on, extruder_auto_fan_speed); break;
         #endif
         #if HAS_AUTO_FAN_1
-          case 1: _UPDATE_AUTO_FAN(E1, fan_on, EXTRUDER_AUTO_FAN_SPEED); break;
+          case 1: _UPDATE_AUTO_FAN(E1, fan_on, extruder_auto_fan_speed); break;
         #endif
         #if HAS_AUTO_FAN_2
-          case 2: _UPDATE_AUTO_FAN(E2, fan_on, EXTRUDER_AUTO_FAN_SPEED); break;
+          case 2: _UPDATE_AUTO_FAN(E2, fan_on, extruder_auto_fan_speed); break;
         #endif
         #if HAS_AUTO_FAN_3
-          case 3: _UPDATE_AUTO_FAN(E3, fan_on, EXTRUDER_AUTO_FAN_SPEED); break;
+          case 3: _UPDATE_AUTO_FAN(E3, fan_on, extruder_auto_fan_speed); break;
         #endif
         #if HAS_AUTO_FAN_4
-          case 4: _UPDATE_AUTO_FAN(E4, fan_on, EXTRUDER_AUTO_FAN_SPEED); break;
+          case 4: _UPDATE_AUTO_FAN(E4, fan_on, extruder_auto_fan_speed); break;
         #endif
         #if HAS_AUTO_FAN_5
-          case 5: _UPDATE_AUTO_FAN(E5, fan_on, EXTRUDER_AUTO_FAN_SPEED); break;
+          case 5: _UPDATE_AUTO_FAN(E5, fan_on, extruder_auto_fan_speed); break;
         #endif
         #if HAS_AUTO_CHAMBER_FAN && !AUTO_CHAMBER_IS_E
           case CHAMBER_FAN_INDEX: _UPDATE_AUTO_FAN(CHAMBER, fan_on, CHAMBER_AUTO_FAN_SPEED); break;
@@ -1521,7 +1525,7 @@ void Temperature::updateTemperaturesFromRawValues() {
   #define SET_FAST_PWM_FREQ(P) NOOP
 #endif
 #define INIT_FAN_PIN(P) do{ _INIT_FAN_PIN(P); SET_FAST_PWM_FREQ(P); }while(0)
-#if EXTRUDER_AUTO_FAN_SPEED != 255
+#if EXTRUDER_AUTO_FAN_SPEED != 255 || ENABLED(EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE)
   #define INIT_E_AUTO_FAN_PIN(P) do{ if (P == FAN1_PIN || P == FAN2_PIN) { SET_PWM(P); SET_FAST_PWM_FREQ(FAST_PWM_FAN_FREQUENCY); } else SET_OUTPUT(P); }while(0)
 #else
   #define INIT_E_AUTO_FAN_PIN(P) SET_OUTPUT(P)

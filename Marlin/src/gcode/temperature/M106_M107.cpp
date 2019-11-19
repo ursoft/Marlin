@@ -64,6 +64,13 @@ void GcodeSuite::M106() {
 
     thermalManager.set_fan_speed(p, s);
   }
+#if ENABLED(EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE)
+  if (p == _CNT_P) {
+    uint16_t s = parser.ushortval('S', EXTRUDER_AUTO_FAN_SPEED);
+    NOMORE(s, 255U);
+    thermalManager.extruder_auto_fan_speed = (uint8_t)s;
+  }
+#endif
 }
 
 /**
