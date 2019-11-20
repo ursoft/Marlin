@@ -1,4 +1,8 @@
-﻿# Marlin 3D Printer Firmware
+# Замечание от ursoft
+Данный форк сделан 19.11.2019 и служит для отражения конфигурации и программных улучшений к принтеру [Ulti Steel](http://ulti-steel.ru/).
+По мере разработки (в отличие от выглядящего не сильно активным форка [BIGTREETECH-SKR-V1.3](https://github.com/bigtreetech/BIGTREETECH-SKR-V1.3)) сюда будут интегрироваться изменения источника - но это зависит от того, увижу ли я здесь активность от владельцев Ulti Steel и его производителей. Добро пожаловать.
+
+# Marlin 3D Printer Firmware
 
 [![Build Status](https://travis-ci.org/MarlinFirmware/Marlin.svg?branch=bugfix-2.0.x)](https://travis-ci.org/MarlinFirmware/Marlin)
 ![GitHub](https://img.shields.io/github/license/marlinfirmware/marlin.svg)
