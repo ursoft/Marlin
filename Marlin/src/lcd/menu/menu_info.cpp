@@ -247,11 +247,11 @@ void menu_info_board() {
   void menu_info_printer() {
     if (ui.use_click()) return ui.go_back();
     START_SCREEN();
-    STATIC_ITEM_P(PSTR(MSG_MARLIN), SS_CENTER|SS_INVERT);       // Marlin
-    STATIC_ITEM_P(PSTR(SHORT_BUILD_VERSION));                   // x.x.x-Branch
-    STATIC_ITEM_P(PSTR(STRING_DISTRIBUTION_DATE));              // YYYY-MM-DD HH:MM
-    STATIC_ITEM_P(PSTR(MACHINE_NAME));                          // My3DPrinter
-    STATIC_ITEM_P(PSTR(WEBSITE_URL));                           // www.my3dprinter.com
+    STATIC_ITEM_P(PSTR(MACHINE_NAME));                       // My3DPrinter
+    STATIC_ITEM_P(PSTR(DETAILED_BUILD_VERSION));             // Branch-x.x.x.build (User)
+    STATIC_ITEM_P(PSTR(STRING_BUILD_DATE));                  // YYYY-MM-DD HH:MM
+    STATIC_ITEM_P(PSTR(SOURCE_CODE_URL));                    // www.my3dprinter.com
+    STATIC_ITEM_P(PSTR(MSG_MARLIN " @ " STRING_DISTRIBUTION_DATE), SS_CENTER|SS_INVERT);    // Marlin YYYY-MM-DD
     char buffer[21];
     VALUE_ITEM_P(MSG_INFO_EXTRUDERS, STRINGIFY(EXTRUDERS), SS_CENTER); // Extruders: 2
     #if ENABLED(AUTO_BED_LEVELING_3POINT)

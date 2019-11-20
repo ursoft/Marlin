@@ -28,7 +28,7 @@
 /**
  * Marlin release version identifier
  */
-#define SHORT_BUILD_VERSION "bugfix-2.0.x.1" //last is build No
+#define SHORT_BUILD_VERSION "bf-2.0.x.1" //last is build No
 
 /**
  * Verbose version identifier which should contain a reference to the location
@@ -41,6 +41,8 @@
 #else
  #define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " (Github)"
 #endif
+
+#define STRING_BUILD_DATE __DATE__ " " __TIME__
 
 /**
  * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
@@ -60,7 +62,7 @@
  * has a distinct Github fork— the Source Code URL should just be the main
  * Marlin repository.
  */
-#define SOURCE_CODE_URL "https://github.com/ursoft/Marlin"
+#define SOURCE_CODE_URL "https://git.io/Je6Lj = https://github.com/ursoft/Marlin"
 
 /**
  * Default generic printer UUID.
