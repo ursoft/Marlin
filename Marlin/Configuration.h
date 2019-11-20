@@ -36,6 +36,22 @@
  * Advanced settings can be found in Configuration_adv.h
  *
  */
+#ifndef URSOFT
+ #define URSOFT 1
+ #define ILMEN 2
+ //TODO: #define NEWUSER 3
+#endif
+
+/* User specific setting example (ensure set PLATFORMIO_BUILD_FLAGS=-DGITHUB_USER=YOURLOGIN):
+#if (GITHUB_USER==URSOFT)
+ #define SOME_PARAMETER SOME_URSOFT_VALUE
+#elif (GITHUB_USER==ILMEN)
+ #define SOME_PARAMETER SOME_ILMEN_VALUE
+#else
+ #define SOME_PARAMETER SOME_COMMON_VALUE
+#endif
+*/
+
 #define CONFIGURATION_H_VERSION 020000
 
 //===========================================================================

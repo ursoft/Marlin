@@ -34,7 +34,13 @@
  * Verbose version identifier which should contain a reference to the location
  * from where the binary was downloaded or the source code was compiled.
  */
-//#define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " (Github)"
+#if (GITHUB_USER==URSOFT)
+ #define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " (ursoft)"
+#elif (GITHUB_USER==ILMEN)
+ #define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " (ilmen)"
+#else
+ #define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " (Github)"
+#endif
 
 /**
  * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
