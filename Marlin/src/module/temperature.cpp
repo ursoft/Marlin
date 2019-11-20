@@ -673,6 +673,9 @@ int16_t Temperature::getHeaterPower(const heater_ind_t heater_id) {
         WRITE(P##_AUTO_FAN_PIN, D);                      \
     }while(0)
 
+#ifndef EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE
+  #define extruder_auto_fan_speed EXTRUDER_AUTO_FAN_SPEED
+#endif
     uint8_t fanDone = 0;
     for (uint8_t f = 0; f < COUNT(fanBit); f++) {
       const uint8_t realFan = pgm_read_byte(&fanBit[f]);
