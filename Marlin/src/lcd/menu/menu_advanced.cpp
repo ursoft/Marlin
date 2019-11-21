@@ -196,7 +196,10 @@ void menu_cancelobject();
         autotune_temp[e]
       #endif
     );
+    lcd_enqueue_one_now("M117 PID Autotune started");
     lcd_enqueue_one_now(cmd);
+    lcd_enqueue_one_now("M117 PID Autotune done");
+    MarlinUI::return_to_status();
   }
 
 #endif // PID_AUTOTUNE_MENU

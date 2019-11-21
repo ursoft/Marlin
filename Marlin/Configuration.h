@@ -458,6 +458,15 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
+#if (GITHUB_USER==URSOFT) // I have PTFE tube and magnetic bed
+ #define HEATER_0_MAXTEMP 240
+ #define HEATER_1_MAXTEMP 240
+ #define HEATER_2_MAXTEMP 240
+ #define HEATER_3_MAXTEMP 240
+ #define HEATER_4_MAXTEMP 240
+ #define HEATER_5_MAXTEMP 240
+ #define BED_MAXTEMP      90
+#else
 #define HEATER_0_MAXTEMP 275
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
@@ -465,6 +474,7 @@
 #define HEATER_4_MAXTEMP 275
 #define HEATER_5_MAXTEMP 275
 #define BED_MAXTEMP      150
+#endif
 
 //===========================================================================
 //============================= PID Settings ================================
@@ -477,8 +487,8 @@
 #define PID_MAX BANG_MAX // Limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #define PID_K1 0.95      // Smoothing factor within any PID loop
 #if ENABLED(PIDTEMP)
-  //#define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of PROGMEM)
-  //#define PID_AUTOTUNE_MENU     // Add PID auto-tuning to the "Advanced Settings" menu. (~250 bytes of PROGMEM)
+  #define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of PROGMEM)
+  #define PID_AUTOTUNE_MENU     // Add PID auto-tuning to the "Advanced Settings" menu. (~250 bytes of PROGMEM)
   //#define PID_DEBUG             // Sends debug data to the serial port.
   //#define PID_OPENLOOP 1        // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
   //#define SLOW_PWM_HEATERS      // PWM with very low frequency (roughly 0.125Hz=8s) and minimum state time of approximately 1s useful for heaters driven by a relay
@@ -489,10 +499,17 @@
 
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 
+  // Ulti Steel
+#if (GITHUB_USER==URSOFT)
+ #define DEFAULT_Kp 26.47
+ #define DEFAULT_Ki 3.12
+ #define DEFAULT_Kd 56.17
+#else
   // Ultimaker
   #define DEFAULT_Kp 22.2
   #define DEFAULT_Ki 1.08
   #define DEFAULT_Kd 114
+#endif
 
   // MakerGear
   //#define DEFAULT_Kp 7.0
@@ -1451,13 +1468,22 @@
 
 // Preheat Constants
 #define PREHEAT_1_LABEL       "PLA"
+#if (GITHUB_USER==URSOFT)
+ #define PREHEAT_1_TEMP_HOTEND 210
+#else
 #define PREHEAT_1_TEMP_HOTEND 190
+#endif
 #define PREHEAT_1_TEMP_BED     60
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
+#if (GITHUB_USER==URSOFT)
+ #define PREHEAT_2_LABEL       "SBS"
+ #define PREHEAT_2_TEMP_BED    80
+#else
 #define PREHEAT_2_LABEL       "ABS"
+ #define PREHEAT_2_TEMP_BED    90
+#endif
 #define PREHEAT_2_TEMP_HOTEND 230
-#define PREHEAT_2_TEMP_BED    90
 #define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
 /**
