@@ -137,9 +137,13 @@ void menu_media() {
 
   START_MENU();
   #if ENABLED(SD_MENU_MEDIA_SHOW_LAST_PRINT_DURATION)
-    char msg_main[21+5] = "Main|";
-    duration_t(print_job_timer.duration()).toString(msg_main+5);
-    MENU_ITEM_P(back, msg_main);
+    if(print_job_timer.duration()) { 
+      char msg_main[21+5] = "Main|";
+      duration_t(print_job_timer.duration()).toString(msg_main+5);
+      MENU_ITEM_P(back, msg_main);
+    } else {
+      BACK_ITEM(MSG_MAIN);
+    }
   #else
     BACK_ITEM(MSG_MAIN);
   #endif
