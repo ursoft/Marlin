@@ -946,7 +946,7 @@
   #define SDCARD_RATHERRECENTFIRST
 
   //#define SD_MENU_CONFIRM_START             // Confirm the selected SD file before printing
-
+  #define SD_SHOW_FILES_ON_MEDIA_INSERTED   // https://github.com/ursoft/Marlin/issues/3
   //#define MENU_ADDAUTOSTART               // Add a menu option to run auto#.g files
 
   #define EVENT_GCODE_SD_STOP "G28XY"       // G-code to run on Stop Print (e.g., "G28XY" or "G27")

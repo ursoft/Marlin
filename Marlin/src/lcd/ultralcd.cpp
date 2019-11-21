@@ -851,8 +851,15 @@ void MarlinUI::update() {
         card.mount();
         if (old_sd_status == 2)
           card.beginautostart();  // Initial boot
-        else
+        else {
           set_status_P(GET_TEXT(MSG_MEDIA_INSERTED));
+#if ENABLED(SD_SHOW_FILES_ON_MEDIA_INSERTED)
+          if(on_status_screen() && !printer_busy()) {
+            quick_feedback();
+            goto_screen(menu_media, ENCODER_STEPS_PER_MENU_ITEM); // select top file
+          }
+#endif
+        }
       }
       #if PIN_EXISTS(SD_DETECT)
         else {
