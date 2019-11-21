@@ -153,7 +153,7 @@ void GcodeSuite::M701() {
 void GcodeSuite::M702() {
   xyz_pos_t park_point = NOZZLE_PARK_POINT;
 
-  #if ENABLED(NO_MOTION_BEFORE_HOMING)
+  #if EITHER(NO_MOTION_BEFORE_HOMING, UNKNOWN_Z_NO_RAISE)
     // Don't raise Z if the machine isn't homed
     if (axes_need_homing()) park_point.z = 0;
   #endif
