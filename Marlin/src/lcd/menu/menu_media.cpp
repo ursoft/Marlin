@@ -120,6 +120,11 @@ class MenuItem_sdfolder : public MenuItem_sdbase {
     }
 };
 
+#if ENABLED(SD_MENU_MEDIA_SHOW_LAST_PRINT_DURATION)
+ #include "../../libs/duration_t.h"
+ #include "../../module/printcounter.h"
+#endif
+
 void menu_media() {
   ui.encoder_direction_menus();
 
@@ -131,7 +136,13 @@ void menu_media() {
   #endif
 
   START_MENU();
-  BACK_ITEM(MSG_MAIN);
+  #if ENABLED(SD_MENU_MEDIA_SHOW_LAST_PRINT_DURATION)
+    char msg_main[21+5] = "Main|";
+    duration_t(print_job_timer.duration()).toString(msg_main+5);
+    MENU_ITEM_P(back, msg_main);
+  #else
+    BACK_ITEM(MSG_MAIN);
+  #endif
   if (card.flag.workDirIsRoot) {
     #if !PIN_EXISTS(SD_DETECT)
       ACTION_ITEM(MSG_REFRESH, []{ encoderTopLine = 0; card.mount(); });
