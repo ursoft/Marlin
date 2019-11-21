@@ -501,8 +501,16 @@ void MarlinUI::draw_kill_screen() {
 // Homed but unknown... '123' <-> '   '.
 // Homed and known, display constantly.
 //
+#if ENABLED(LCD_SHOW_ENDSTOPS_STATUS)
+ #include "../../module/endstops.h"
+#endif
+
 FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const bool blink) {
+#if ENABLED(LCD_SHOW_ENDSTOPS_STATUS)
+  lcd_put_wchar((endstops.axis_min(axis) ? 'x' : 'X') + uint8_t(axis));
+#else
   lcd_put_wchar('X' + uint8_t(axis));
+#endif
   if (blink)
     lcd_put_u8str(value);
   else {

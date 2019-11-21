@@ -631,6 +631,7 @@
 //===========================================================================
 
 // @section homing
+#define LCD_SHOW_ENDSTOPS_STATUS
 
 // Specify here all the endstop connectors that are connected to any endstop or probe.
 // Almost all printers will be using one per axis. Probes will use one or more of the

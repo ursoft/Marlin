@@ -154,6 +154,9 @@ class Endstops {
     #endif
 
     static void resync();
+#if ENABLED(LCD_SHOW_ENDSTOPS_STATUS)
+    static bool axis_min(AxisEnum ax);
+#endif
 
     // Debugging of endstops
     #if ENABLED(PINS_DEBUGGING)

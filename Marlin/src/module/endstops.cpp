@@ -396,6 +396,27 @@ static void print_es_state(const bool is_hit, PGM_P const label=nullptr) {
   SERIAL_EOL();
 }
 
+#if ENABLED(LCD_SHOW_ENDSTOPS_STATUS)
+bool Endstops::axis_min(AxisEnum ax) {
+  bool ret;
+  switch(ax) {
+    case X_AXIS:
+      ret = READ(X_MIN_PIN) != X_MIN_ENDSTOP_INVERTING;
+      break;
+    case Y_AXIS:
+      ret = READ(Y_MIN_PIN) != Y_MIN_ENDSTOP_INVERTING;
+      break;
+    case Z_AXIS:
+      ret = READ(Z_MIN_PIN) != Z_MIN_ENDSTOP_INVERTING;
+      break;
+    default:
+      ret = false;
+      break;
+  }
+  return ret;
+}
+#endif
+
 void _O2 Endstops::report_states() {
   #if ENABLED(BLTOUCH)
     bltouch._set_SW_mode();
