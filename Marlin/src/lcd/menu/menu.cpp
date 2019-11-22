@@ -263,6 +263,33 @@ void MarlinUI::goto_screen(screenFunc_t screen, const uint16_t encoder/*=0*/, co
             #endif
           ;
         }
+        #if ENABLED(LONGCLICK_FOR_IDLE)
+        else if(!printer_busy()) {
+          void _lcd_preheat(const int16_t endnum, const int16_t temph, const int16_t tempb, const uint8_t fan);
+          static millis_t tone_expire_ms;
+          tone_expire_ms = millis() + 1700;
+          buzzer.tone(700, 20);
+          while(!ELAPSED(millis(), tone_expire_ms)) { buzzer.tick(); delay(10); watchdog_clear_timeout_flag(); }
+          if(BUTTON_PRESSED(ENC)) {
+            if(!card.on_event("long_cli.g")) {
+              tone_expire_ms = millis() + 600;
+              buzz(300, 20);
+              while(!ELAPSED(millis(), tone_expire_ms)) { buzzer.tick(); delay(10); watchdog_clear_timeout_flag(); }
+              if(Temperature::degTargetHotend(0) || Temperature::degTargetBed()) {
+                  thermalManager.zero_fan_speeds();
+                  thermalManager.disable_all_heaters();
+                  ui.set_status("Cooling @ long click");
+              } else {
+                  tone_expire_ms = millis() + 600;
+                  buzz(300, 20);
+                  while(!ELAPSED(millis(), tone_expire_ms)) { buzzer.tick(); delay(10);  watchdog_clear_timeout_flag(); }
+                  _lcd_preheat(0, ui.preheat_hotend_temp[0], ui.preheat_bed_temp[0], ui.preheat_fan_speed[0]);
+                  ui.set_status("Heating @ long click");
+              }
+            }
+          }
+        }
+        #endif
         #if ENABLED(MOVE_Z_WHEN_IDLE)
           else {
             move_menu_scale = MOVE_Z_IDLE_MULTIPLICATOR;

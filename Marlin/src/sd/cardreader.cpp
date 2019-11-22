@@ -574,13 +574,33 @@ void CardReader::write_command(char * const buf) {
   if (file.writeError) SERIAL_ERROR_MSG(MSG_SD_ERR_WRITE_TO_FILE);
 }
 
+// https://github.com/ursoft/Marlin/issues/6
+#if ENABLED(LONGCLICK_FOR_IDLE)
+bool CardReader::on_event(const char *file_name81) {
+  if(!flag.sdprinting) {
+    if (!isMounted()) mount();
+    if (isMounted()) {
+      dir_t p;
+      root.rewind();
+      while (root.readDir(&p, nullptr) > 0) {
+        for (int8_t i = (int8_t)strlen((char*)p.name); i--;) p.name[i] = tolower(p.name[i]);
+        if (p.name[8] == 'g' && strncmp((char*)p.name, file_name81, 8) == 0 && file_name81[9] == 'g') {
+          openAndPrintFile(file_name81);
+          return true;
+        } //else SERIAL_ECHOLN((char*)p.name);
+      }
+    } else SERIAL_ECHOLN("on_event !Mounted");
+  } else SERIAL_ECHOLN("on_event sdprinting");
+  return false;
+}
+#endif
+
 //
 // Run the next autostart file. Called:
 // - On boot after successful card init
 // - After finishing the previous autostart file
 // - From the LCD command to run the autostart file
 //
-
 void CardReader::checkautostart() {
 
   if (autostart_index < 0 || flag.sdprinting) return;

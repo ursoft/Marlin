@@ -166,6 +166,9 @@ public:
       next_sd_report_ms = millis() + 1000UL * v;
     }
   #endif
+  #if ENABLED(LONGCLICK_FOR_IDLE)
+    static bool on_event(const char *file_name81);
+  #endif
 
 private:
   //
