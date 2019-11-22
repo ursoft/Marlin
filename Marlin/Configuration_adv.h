@@ -1365,7 +1365,11 @@
  * See http://marlinfw.org/docs/features/lin_advance.html for full instructions.
  * Mention @Sebastianv650 on GitHub to alert the author of any issues.
  */
-#define LIN_ADVANCE
+#if (GITHUB_USER==URSOFT)
+ #define LIN_ADVANCE
+#else
+ //#define LIN_ADVANCE //conflicts with stealthChop (UltiSteel stock) mode of TMC2208 (E stops extruding at ~10 layer)
+#endif
 #if ENABLED(LIN_ADVANCE)
   //#define EXTRA_LIN_ADVANCE_K // Enable for second linear advance constants
   #define LIN_ADVANCE_K 0       // Unit: mm compression per 1mm/s extruder speed
