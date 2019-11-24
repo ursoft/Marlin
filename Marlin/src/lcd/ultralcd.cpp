@@ -558,7 +558,27 @@ void MarlinUI::status_screen() {
   #endif
 
   #if ENABLED(ULTIPANEL_FEEDMULTIPLY)
-
+  #if ENABLED(FEEDRATE_CHANGE_ONLY_WHILE_PRINT)
+    if(!printer_busy()) {
+      if(int16_t(encoderPosition) > ENCODER_FEEDRATE_DEADZONE) { // sd card listing
+        encoderPosition = 0;
+        if(CardReader::isMounted()) {
+          goto_screen(menu_media);
+          return;
+        } else { //useful actions1
+          void menu_change_filament();
+          goto_screen(menu_change_filament);
+          return;
+        }
+      } else if(int16_t(encoderPosition) < -ENCODER_FEEDRATE_DEADZONE) { //useful actions2
+          encoderPosition = 0;
+          goto_screen(menu_move);
+          return;
+      }
+    } else {
+  #else
+    {
+  #endif //!FEEDRATE_CHANGE_ONLY_WHILE_PRINT
     const int16_t old_frm = feedrate_percentage;
           int16_t new_frm = old_frm + int16_t(encoderPosition);
 
@@ -590,7 +610,7 @@ void MarlinUI::status_screen() {
         }
       #endif
     }
-
+  }
   #endif // ULTIPANEL_FEEDMULTIPLY
 
   draw_status_screen();
