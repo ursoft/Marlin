@@ -540,7 +540,7 @@
  * heater. If your configuration is significantly different than this and you don't understand
  * the issues involved, don't use bed PID until someone else verifies that your hardware works.
  */
-#define PIDTEMPBED
+//#define PIDTEMPBED
 
 //#define BED_LIMIT_SWITCHING
 
@@ -557,9 +557,9 @@
   //#define PID_BED_DEBUG // Sends debug data to the serial port.
 
   //UltiSteel ursoft
-  #define DEFAULT_bedKp 32.95
-  #define DEFAULT_bedKi 5.77
-  #define DEFAULT_bedKd 125.32
+  #define DEFAULT_bedKp 31.29
+  #define DEFAULT_bedKi 6.03
+  #define DEFAULT_bedKd 108.27
 
   //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
@@ -586,7 +586,7 @@
  * *** IT IS HIGHLY RECOMMENDED TO LEAVE THIS OPTION ENABLED! ***
  */
 #define PREVENT_COLD_EXTRUSION
-#define EXTRUDE_MINTEMP 170
+#define EXTRUDE_MINTEMP 185
 
 /**
  * Prevent a single extrusion longer than EXTRUDE_MAXLENGTH.
