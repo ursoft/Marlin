@@ -1368,7 +1368,7 @@
  * Mention @Sebastianv650 on GitHub to alert the author of any issues.
  */
 #if (GITHUB_USER==URSOFT)
- #define LIN_ADVANCE
+ //#define LIN_ADVANCE
 #else
  //#define LIN_ADVANCE //conflicts with stealthChop (UltiSteel stock) mode of TMC2208 (E stops extruding at ~10 layer)
 #endif
