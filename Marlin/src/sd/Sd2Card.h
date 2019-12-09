@@ -158,6 +158,9 @@ public:
   bool writeData(const uint8_t* src);
   bool writeStart(uint32_t blockNumber, const uint32_t eraseCount);
   bool writeStop();
+#if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+  bool isOnBoard() { return chipSelectPin_ == SS_PIN_OB; }
+#endif
 
 private:
   uint8_t chipSelectPin_,

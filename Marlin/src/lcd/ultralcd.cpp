@@ -344,8 +344,15 @@ void MarlinUI::init() {
     #if PIN_EXISTS(SD_DETECT)
       SET_INPUT_PULLUP(SD_DETECT_PIN);
     #endif
+    #ifdef SD_DETECT_PIN_OB
+      SET_INPUT_PULLUP(SD_DETECT_PIN_OB);
+    #endif
     #if ENABLED(INIT_SDCARD_ON_BOOT)
-      lcd_sd_status = 2; // UNKNOWN
+      #ifdef SD_DETECT_PIN_OB
+        lcd_sd_status = 2; // if only internal sd card on boot up, do not mount it
+      #else
+        lcd_sd_status = 255; // UNKNOWN
+      #endif
     #endif
   #endif
 
@@ -562,7 +569,9 @@ void MarlinUI::status_screen() {
     if(!printer_busy()) {
       if(int16_t(encoderPosition) > ENCODER_FEEDRATE_DEADZONE) { // sd card listing
         encoderPosition = 0;
-        if(CardReader::isMounted()) {
+        if(IS_SD_INSERTED()) {
+          if(!card.isMounted())
+            card.mount();
           goto_screen(menu_media);
           return;
         } else { //useful actions1
@@ -883,12 +892,12 @@ void MarlinUI::update() {
       if (sd_status) {
         safe_delay(500); // Some boards need a delay to get settled
         card.mount();
-        if (old_sd_status == 2)
+        if (old_sd_status == 255)
           card.beginautostart();  // Initial boot
         else {
           set_status_P(GET_TEXT(MSG_MEDIA_INSERTED));
 #if ENABLED(SD_SHOW_FILES_ON_MEDIA_INSERTED)
-          if(on_status_screen() && !printer_busy()) {
+          if(on_status_screen() && !printer_busy() && card.get_num_Files() > 0) {
             quick_feedback();
             goto_screen(menu_media, ENCODER_STEPS_PER_MENU_ITEM); // select top file
           }
@@ -898,7 +907,7 @@ void MarlinUI::update() {
       #if PIN_EXISTS(SD_DETECT)
         else {
           card.release();
-          if (old_sd_status != 2) {
+          if (old_sd_status != 255) {
             set_status_P(GET_TEXT(MSG_MEDIA_REMOVED));
             #if HAS_LCD_MENU
               return_to_status();

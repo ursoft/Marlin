@@ -123,7 +123,7 @@ void HAL_init() {
   delay(1000);                              // Give OS time to notice
   USB_Connect(TRUE);
 
-  #if !BOTH(SHARED_SD_CARD, INIT_SDCARD_ON_BOOT) && DISABLED(NO_SD_HOST_DRIVE)
+  #if (!BOTH(SHARED_SD_CARD, INIT_SDCARD_ON_BOOT) && DISABLED(NO_SD_HOST_DRIVE)) || SD_CONNECTION_IS(LCD_AND_ONBOARD)
     MSC_SD_Init(0);                         // Enable USB SD card access
   #endif
 
@@ -158,10 +158,17 @@ void HAL_idletask() {
     // the disk if Marlin has it mounted. Unfortunately there is currently no way
     // to unmount the disk from the LCD menu.
     // if (IS_SD_PRINTING() || IS_SD_FILE_OPEN())
-    if (card.isMounted())
-      MSC_Aquire_Lock();
-    else
-      MSC_Release_Lock();
+    #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+      if (card.isMountedOnBoard())
+        MSC_Aquire_Lock(); // no onboard for usb
+      else
+        MSC_Release_Lock(); // onboard for usb
+     #else
+      if (card.isMounted())
+        MSC_Aquire_Lock();
+      else
+        MSC_Release_Lock();
+    #endif
   #endif
   // Perform USB stack housekeeping
   MSC_RunDeferredCommands();
