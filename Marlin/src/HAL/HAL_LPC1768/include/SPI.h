@@ -174,9 +174,18 @@ class SPIClass {
     }
 };
 
-SPIClass<> SPI;
+SPIClass<> SPI_LCD;
 #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
 SPIClass<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB, 1> SPI_OB;
 #endif
 
+#else
+class SPIClass {
+public:
+    void begin();
+    void beginTransaction(SPISettings cfg);
+    void endTransaction();
+    uint8_t transfer(uint8_t B);
+    uint16_t transfer16(uint16_t data);
+} SPI;
 #endif
