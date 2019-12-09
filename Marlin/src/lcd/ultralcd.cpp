@@ -765,7 +765,21 @@ void MarlinUI::quick_feedback(const bool clear_buttons/*=true*/) {
 
 LCDViewAction MarlinUI::lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW;
 
+#if ENABLED(HOST_PROMPT_REINIT_DISPLAY)
+  extern bool need_reinit_display;
+#endif
+
 void MarlinUI::update() {
+  #if ENABLED(HOST_PROMPT_REINIT_DISPLAY)
+    if(need_reinit_display) {
+      need_reinit_display = false;
+      quick_feedback();
+      init_lcd();
+      return_to_status();
+      refresh();
+      return;
+    }
+  #endif
 
   static uint16_t max_display_update_time = 0;
   static millis_t next_lcd_update_ms;

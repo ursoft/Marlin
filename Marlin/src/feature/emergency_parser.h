@@ -145,6 +145,9 @@ public:
         switch (c) {
           case ' ': break;
           case 'S': state = EP_M876S; break;
+          #if ENABLED(HOST_PROMPT_REINIT_DISPLAY)
+            case '\n': host_reinit_display(); state = EP_RESET; break;
+          #endif
           default:  state = EP_IGNORE; break;
         }
         break;

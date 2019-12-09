@@ -1464,7 +1464,7 @@
 //
 // M100 Free Memory Watcher
 //
-//#define M100_FREE_MEMORY_WATCHER    // Add M100 (Free Memory Watcher) to debug memory usage
+#define M100_FREE_MEMORY_WATCHER    // Add M100 (Free Memory Watcher) to debug memory usage
 
 //
 // G20/G21 Inch mode support
@@ -1483,7 +1483,7 @@
 #if (GITHUB_USER==URSOFT)
  #define PREHEAT_1_TEMP_HOTEND 200
 #else
-#define PREHEAT_1_TEMP_HOTEND 190
+ #define PREHEAT_1_TEMP_HOTEND 190
 #endif
 #define PREHEAT_1_TEMP_BED     60
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
@@ -1492,7 +1492,7 @@
  #define PREHEAT_2_LABEL       "SBS"
  #define PREHEAT_2_TEMP_BED    80
 #else
-#define PREHEAT_2_LABEL       "ABS"
+ #define PREHEAT_2_LABEL       "ABS"
  #define PREHEAT_2_TEMP_BED    90
 #endif
 #define PREHEAT_2_TEMP_HOTEND 230

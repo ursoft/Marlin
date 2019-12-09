@@ -100,6 +100,14 @@ void host_action(const char * const pstr, const bool eol) {
     SERIAL_EOL();
   }
 
+  #if ENABLED(HOST_PROMPT_REINIT_DISPLAY)
+    bool need_reinit_display = false;
+    void host_reinit_display() {
+      need_reinit_display = true;
+      say_m876_response("host_reinit_display");
+    }
+  #endif
+
   void host_response_handler(const uint8_t response) {
     #ifdef DEBUG_HOST_ACTIONS
       SERIAL_ECHOLNPAIR("M876 Handle Reason: ", host_prompt_reason);
