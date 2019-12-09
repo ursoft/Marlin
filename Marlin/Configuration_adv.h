@@ -1153,8 +1153,9 @@
      *           LCD - Use the SD drive in the external LCD controller.
      *       ONBOARD - Use the SD drive on the control board. (No SD_DETECT_PIN. M21 to init.)
      *  CUSTOM_CABLE - Use a custom cable to access the SD (as defined in a pins file).
+     * LCD_AND_ONBOARD - https://github.com/ursoft/Marlin/issues/5
      *
-     * :[ 'LCD', 'ONBOARD', 'CUSTOM_CABLE' ]
+     * :[ 'LCD', 'ONBOARD', 'CUSTOM_CABLE', 'LCD_AND_ONBOARD' ]
      */
     #define SDCARD_CONNECTION LCD_AND_ONBOARD
   #endif
