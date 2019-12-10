@@ -580,8 +580,9 @@ void CardReader::write_command(char * const buf) {
 // https://github.com/ursoft/Marlin/issues/6
 #if ENABLED(LONGCLICK_FOR_IDLE)
 bool CardReader::on_event(const char *file_name81) {
+  bool wasNotMounted = !isMounted();
   if(!flag.sdprinting) {
-    if (!isMounted()) mount();
+    if (wasNotMounted) mount();
     if (isMounted()) {
       dir_t p;
       root.rewind();
@@ -592,6 +593,11 @@ bool CardReader::on_event(const char *file_name81) {
           return true;
         } //else SERIAL_ECHOLN((char*)p.name);
       }
+      if (wasNotMounted 
+        #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+           && !IS_EXT_SD_INSERTED()
+        #endif
+      ) release();
     } else SERIAL_ECHOLN("on_event !Mounted");
   } else SERIAL_ECHOLN("on_event sdprinting");
   return false;
