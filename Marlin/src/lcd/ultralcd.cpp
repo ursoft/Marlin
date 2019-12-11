@@ -570,7 +570,8 @@ void MarlinUI::status_screen() {
   #if ENABLED(ULTIPANEL_FEEDMULTIPLY)
   #if ENABLED(FEEDRATE_CHANGE_ONLY_WHILE_PRINT)
     if(!printer_busy()) {
-      if(int16_t(encoderPosition) > ENCODER_FEEDRATE_DEADZONE) { // sd card listing
+      if(int16_t(encoderPosition) > 0) { // sd card listing
+        quick_feedback();
         encoderPosition = 0;
         if(IS_SD_INSERTED()) {
           if(!card.isMounted())
@@ -582,9 +583,10 @@ void MarlinUI::status_screen() {
           goto_screen(menu_change_filament);
           return;
         }
-      } else if(int16_t(encoderPosition) < -ENCODER_FEEDRATE_DEADZONE) { //useful actions2
+      } else if(int16_t(encoderPosition) < 0) { //useful actions2
           encoderPosition = 0;
-          goto_screen(menu_move);
+          void menu_user();
+          goto_screen(menu_user);
           return;
       }
     } else {
@@ -782,18 +784,18 @@ LCDViewAction MarlinUI::lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW;
 #endif
 
 void MarlinUI::update() {
+  static uint16_t max_display_update_time = 0;
   #if ENABLED(HOST_PROMPT_REINIT_DISPLAY)
     if(need_reinit_display) {
       need_reinit_display = false;
       quick_feedback();
-      init_lcd();
-      return_to_status();
-      refresh();
+      SERIAL_ECHOLNPAIR("max_display_update_time=", max_display_update_time, " lcd_status_update_delay=", lcd_status_update_delay);
+      SERIAL_EOL();
+      //max_display_update_time = 0;
+      //lcd_status_update_delay = 1;
       return;
     }
   #endif
-
-  static uint16_t max_display_update_time = 0;
   static millis_t next_lcd_update_ms;
   millis_t ms = millis();
 
@@ -1018,7 +1020,7 @@ void MarlinUI::update() {
           + 3
         #endif
       ;
-      max_display_update_time--;
+      max_display_update_time -= max_display_update_time / 10;
       refresh(LCDVIEW_REDRAW_NOW);
     }
 
