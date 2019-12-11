@@ -455,7 +455,7 @@ void PrintJobRecovery::resume() {
   #if POWER_LOSS_PURGE_LEN
     //sprintf_P(cmd, PSTR("G1 E%d F3000"), POWER_LOSS_PURGE_LEN);
     //gcode.process_subcommands_now(cmd);
-    gcode.process_subcommands_now_P(PSTR("G1 E" STRINGIFY(POWER_LOSS_PURGE_LEN) " F3000"));
+    gcode.process_subcommands_now_P(PSTR("G1 E" STRINGIFY(POWER_LOSS_PURGE_LEN) " F200"));
   #endif
 
   // Restore the feedrate
