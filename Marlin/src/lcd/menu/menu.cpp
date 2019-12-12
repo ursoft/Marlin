@@ -147,8 +147,13 @@ void MenuEditItemBase::edit_screen(strfunc_t strfunc, loadfunc_t loadfunc) {
   #if ENABLED(TOUCH_BUTTONS)
     ui.repeat_delay = BUTTON_DELAY_EDIT;
   #endif
-  if (int32_t(ui.encoderPosition) < 0) ui.encoderPosition = 0;
-  if (int32_t(ui.encoderPosition) > maxEditValue) ui.encoderPosition = maxEditValue;
+  #if ENABLED(WRAP_EDITORS)
+    if (int32_t(ui.encoderPosition) < 0) ui.encoderPosition = maxEditValue;
+    if (int32_t(ui.encoderPosition) > maxEditValue) ui.encoderPosition = 0;
+  #else
+    if (int32_t(ui.encoderPosition) < 0) ui.encoderPosition = 0;
+    if (int32_t(ui.encoderPosition) > maxEditValue) ui.encoderPosition = maxEditValue;
+  #endif
   if (ui.should_draw())
     draw_edit_screen(strfunc(ui.encoderPosition + minEditValue));
   if (ui.lcd_clicked || (liveEdit && ui.should_draw())) {

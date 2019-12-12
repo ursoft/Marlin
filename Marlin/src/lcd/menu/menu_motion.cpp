@@ -423,6 +423,10 @@ void menu_motion() {
     }
     #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
       editable.decimal = planner.z_fade_height;
+      #ifdef LEVELING_FADE_HEIGHT_DEFAULT
+      if(editable.decimal == 0)
+        editable.decimal = LEVELING_FADE_HEIGHT_DEFAULT;
+      #endif
       EDIT_ITEM_FAST(float3, MSG_Z_FADE_HEIGHT, &editable.decimal, 0, 100, []{ set_z_fade_height(editable.decimal); });
     #endif
 

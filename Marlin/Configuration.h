@@ -1231,7 +1231,7 @@
   // at which point movement will be level to the machine's XY plane.
   // The height can be set with M420 Z<height>
   #define ENABLE_LEVELING_FADE_HEIGHT
-
+  #define LEVELING_FADE_HEIGHT_DEFAULT 10
   // For Cartesian machines, instead of dividing moves on mesh boundaries,
   // split up moves into short segments like a Delta. This follows the
   // contours of the bed more closely than edge-to-edge straight moves.
@@ -1723,6 +1723,7 @@
  *  Reversed Menu Navigation only?    Enable REVERSE_MENU_DIRECTION.
  *  Reversed Value Editing only?      Enable BOTH options.
  */
+#define WRAP_EDITORS // Easy access to far values https://github.com/ursoft/Marlin/issues/8
 
 //
 // This option reverses the encoder direction everywhere.
