@@ -791,9 +791,8 @@ void MarlinUI::update() {
       quick_feedback();
       SERIAL_ECHOLNPAIR("max_display_update_time=", max_display_update_time, " lcd_status_update_delay=", lcd_status_update_delay);
       SERIAL_EOL();
-      //max_display_update_time = 0;
-      //lcd_status_update_delay = 1;
-      return;
+      max_display_update_time = 0;
+      lcd_status_update_delay = 1;
     }
   #endif
   static millis_t next_lcd_update_ms;
