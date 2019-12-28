@@ -182,3 +182,4 @@ cmake-build-*
 #Python
 __pycache__
 SyncOnboard/packages/
+SyncOnboard/SyncOnboard.csproj.user

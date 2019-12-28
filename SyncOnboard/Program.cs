@@ -1,14 +1,18 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 
 namespace SyncOnboard
 {
     class Program {
-        static string SourcePath, DestinationPath, ComPort;
+        static string SourcePath, DestinationPath, ComPort, OctoprintApiKey;
         const string Extension = "gcode";
         static void Main(string[] args) {
             // Create a new FileSystemWatcher and set its properties.
@@ -19,6 +23,7 @@ namespace SyncOnboard
                 DestinationPath = args.Count() > 1 ? args[1] : @"h:\";
                 Console.WriteLine($"Watch destination: {DestinationPath}");
                 ComPort = args.Count() > 2 ? args[2] : @"COM6";
+                OctoprintApiKey = args.Count() > 3 ? args[3] : @"SecretApiKey";
 
                 // Watch for changes in LastAccess and renaming of files.
                 watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName;
@@ -51,13 +56,53 @@ namespace SyncOnboard
             Console.WriteLine($"Exception: {ex}");
             Console.ResetColor();
         }
-
+        private static bool IsDirectoryWritable(string dirPath) {
+            try {
+                using (FileStream fs = File.Create(
+                    Path.Combine(
+                        dirPath,
+                        Path.GetRandomFileName()
+                    ),
+                    1,
+                    FileOptions.DeleteOnClose)
+                )
+                { }
+                return true;
+            } catch {
+                    return false;
+            }
+        }
+        private static readonly HttpClient client = new HttpClient();
         private static void EnsureDestination() {
             while(true) {
                 try { 
                     var dst = new DirectoryInfo(DestinationPath);
-                    if (dst.Exists)
+                    if (dst.Exists && IsDirectoryWritable(DestinationPath) && dst.GetFiles("firmware.cur").Length == 1)
                         return;
+                    using (var key = Registry.CurrentUser.OpenSubKey("Network\\" + DestinationPath[0])) {
+                        if (key != null) {
+                            var server = key.GetValue("RemotePath").ToString().Replace(@"\\", "http://").Replace(@"\usb", "/api/printer/sd");
+                            if (client.DefaultRequestHeaders.Count() == 0)
+                                client.DefaultRequestHeaders.Add("X-Api-Key", OctoprintApiKey);
+                            //Octoprint M22
+                            Console.Write($"EnsureDestination: {server} M22...");
+                            do {
+                                var content = new StringContent("{\"command\":\"release\"}", Encoding.UTF8, "application/json");
+                                var response = client.PostAsync(server, content);
+                                if (response.Wait(5000)) {
+                                    if (response.Result.StatusCode == HttpStatusCode.NoContent)
+                                        break;
+                                    else
+                                        Console.Write(response.Result.StatusCode);
+                                } else throw new Exception("Http timeout trying Octoprint M22");
+                                Console.Write(".");
+                            } while (true);
+                            Console.WriteLine($"OK. Pause 5 sec...");
+                            Thread.Sleep(5000);
+                            break;
+                        }
+                    }
+                    // Local COM port M22
                     Console.Write($"EnsureDestination: {ComPort} M22");
                     using (var mySerialPort = new SerialPort(ComPort, 250000)) {
                         mySerialPort.Open();
@@ -102,8 +147,7 @@ namespace SyncOnboard
         }
 
         private static bool SyncTo(FileInfo sf, FileInfo df) {
-            if (!df.Exists || sf.LastWriteTimeUtc > df.LastWriteTimeUtc)
-            {
+            if (!df.Exists || Math.Abs((sf.LastWriteTimeUtc - df.LastWriteTimeUtc).TotalSeconds) > 2) {
                 Console.Write($"Syncing {SimplifyPath(sf.FullName)} to {SimplifyPath(df.FullName)}...");
                 SafeCopyTo(sf, df, true);
                 Console.WriteLine("OK");
