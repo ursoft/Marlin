@@ -212,6 +212,9 @@ void CardReader::selectByName(SdFile dir, const char * const match) {
     if (is_dir_or_gcode(p)) {
       createFilename(filename, p);
       if (strcasecmp(match, filename) == 0) return;
+#ifdef LONG_FILENAME_OVERRIDE_SHORT
+      if (*longFilename && strcasecmp(match, longFilename) == 0) return;
+#endif
     }
   }
 }
@@ -253,9 +256,14 @@ void CardReader::printListing(SdFile parent, const char * const prepend/*=nullpt
       // close() is done automatically by destructor of SdFile
     }
     else if (is_dir_or_gcode(p)) {
+#if ENABLED(LONG_FILENAME_OVERRIDE_SHORT)
+      if (prepend) SERIAL_ECHO(prepend);
+      SERIAL_ECHO(*longFilename ? longFilename : filename);
+#else
       createFilename(filename, p);
       if (prepend) SERIAL_ECHO(prepend);
       SERIAL_ECHO(filename);
+#endif
       SERIAL_CHAR(' ');
       SERIAL_ECHOLN(p.fileSize);
     }
@@ -469,7 +477,7 @@ void announceOpen(const uint8_t doing, const char * const path) {
 //   - 2 : Resuming from a sub-procedure
 //
 void CardReader::openFileRead(char * const path, const uint8_t subcall_type/*=0*/) {
-  if (!isMounted()) return;
+  if (!isMounted()) mount();
 
   switch (subcall_type) {
     case 0:      // Starting a new print. "Now fresh file: ..."
@@ -507,16 +515,22 @@ void CardReader::openFileRead(char * const path, const uint8_t subcall_type/*=0*
   stopSDPrint();
 
   SdFile *curDir;
-  const char * const fname = diveToFile(curDir, path);
+  const char *fname = diveToFile(curDir, path);
   if (!fname) return;
 
+#if ENABLED(LONG_FILENAME_OVERRIDE_SHORT)
+    selectFileByName(fname);
+    fname = filename;
+#endif
   if (file.open(curDir, fname, O_READ)) {
     filesize = file.fileSize();
     sdpos = 0;
     SERIAL_ECHOLNPAIR(MSG_SD_FILE_OPENED, fname, MSG_SD_SIZE, filesize);
     SERIAL_ECHOLNPGM(MSG_SD_FILE_SELECTED);
 
+#ifndef LONG_FILENAME_OVERRIDE_SHORT
     selectFileByName(fname);
+#endif
     ui.set_status(longFilename[0] ? longFilename : fname);
   }
   else

@@ -99,7 +99,7 @@ namespace SyncOnboard
                             } while (true);
                             Console.WriteLine($"OK. Pause 5 sec...");
                             Thread.Sleep(5000);
-                            break;
+                            continue;
                         }
                     }
                     // Local COM port M22
