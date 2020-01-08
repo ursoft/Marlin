@@ -26,6 +26,7 @@
 
 #include "../gcode.h"
 #include "../../sd/cardreader.h"
+#include "../../lcd/ultralcd.h"
 
 /**
  * M21: Init SD Card
@@ -36,10 +37,13 @@ void GcodeSuite::M21() { card.mount(); }
  * M22: Release SD Card
  */
 void GcodeSuite::M22() { 
-    if(card.isPrinting())
+    if(card.isPrinting()) {
       SERIAL_ERROR_MSG("No M22 while print");
-    else
-      card.release(); 
+    } else {
+      card.release();
+      void menu_media();
+      if(MarlinUI::currentScreen == menu_media) MarlinUI::return_to_status();
+    }
 }
 
 #endif // SDSUPPORT
