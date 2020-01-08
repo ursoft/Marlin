@@ -422,7 +422,7 @@ bool pause_print(const float &retract, const xyz_pos_t &park_point, const float 
       }
     #endif
 
-    return false; // unable to reach safe temperature
+    //return false; // unable to reach safe temperature, but need pause
   }
 
   // Indicate that the printer is paused
