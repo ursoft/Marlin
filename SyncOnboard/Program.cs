@@ -85,7 +85,7 @@ namespace SyncOnboard
                             if (client.DefaultRequestHeaders.Count() == 0)
                                 client.DefaultRequestHeaders.Add("X-Api-Key", OctoprintApiKey);
                             //Octoprint M22
-                            Console.Write($"EnsureDestination: {server} M22...");
+                            Console.Write($"EnsureDestination: {server} M22:");
                             do {
                                 var content = new StringContent("{\"command\":\"release\"}", Encoding.UTF8, "application/json");
                                 var response = client.PostAsync(server, content);
@@ -103,15 +103,21 @@ namespace SyncOnboard
                         }
                     }
                     // Local COM port M22
-                    Console.Write($"EnsureDestination: {ComPort} M22");
-                    using (var mySerialPort = new SerialPort(ComPort, 250000)) {
-                        mySerialPort.Open();
+                    Console.Write($"EnsureDestination: {ComPort} M22:");
+                    using (var mySerialPort = new SerialPort(ComPort, 250000, Parity.None, 8, StopBits.One)) {
                         mySerialPort.ReadTimeout = 1000;
+                        mySerialPort.DtrEnable = true;
+                        mySerialPort.Open();
                         byte[] data = Encoding.ASCII.GetBytes("M22\r\n");
                         var before = mySerialPort.ReadExisting();
                         mySerialPort.Write(data, 0, data.Length);
-                        var after = mySerialPort.ReadExisting();
-                        Console.WriteLine($".{before}.{after} OK. Pause 5 sec...");
+                        var after = mySerialPort.ReadExisting().Replace("\n", "<cr>");
+                        if (before.Length + after.Length > 0) {
+                            Console.ForegroundColor = (after == "ok<cr>") ? ConsoleColor.Green : ConsoleColor.Red;
+                            Console.Write($".{before}.{after}");
+                            Console.ResetColor(); 
+                        }
+                        Console.WriteLine($". Pause 5 sec...");
                         Thread.Sleep(5000);
                     }
                 } catch(Exception ex) { 
