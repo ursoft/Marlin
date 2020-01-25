@@ -215,21 +215,29 @@ void menu_main() {
     if (card_detected) {
       if (!card_open) {
         MENU_ITEM(gcode,
-          #if PIN_EXISTS(SD_DETECT)
-            MSG_CHANGE_MEDIA, M21_STR
+          #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+              MSG_RELEASE_MEDIA, PSTR("M22")
           #else
-            MSG_RELEASE_MEDIA, PSTR("M22")
+            #if PIN_EXISTS(SD_DETECT)
+              MSG_CHANGE_MEDIA, M21_STR
+            #else
+              MSG_RELEASE_MEDIA, PSTR("M22")
+            #endif
           #endif
         );
         SUBMENU(MSG_MEDIA_MENU, menu_media);
       }
     }
     else {
-      #if PIN_EXISTS(SD_DETECT)
-        ACTION_ITEM(MSG_NO_MEDIA, nullptr);
+      #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+          GCODES_ITEM(MSG_INIT_MEDIA, M21_STR);
       #else
-        GCODES_ITEM(MSG_INIT_MEDIA, M21_STR);
-        ACTION_ITEM(MSG_MEDIA_RELEASED, nullptr);
+        #if PIN_EXISTS(SD_DETECT)
+          GCODES_ITEM(MSG_NO_MEDIA, M21_STR);
+        #else
+          GCODES_ITEM(MSG_INIT_MEDIA, M21_STR);
+          ACTION_ITEM(MSG_MEDIA_RELEASED, nullptr);
+        #endif
       #endif
     }
 

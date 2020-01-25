@@ -29,8 +29,21 @@
  */
 
 #include "../inc/MarlinConfig.h"
+#if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+ #define NEED_SPI_TEMPLATE_CLASS
+#endif
+#include <SPI.h>
 
 #if ENABLED(SDSUPPORT) && NONE(USB_FLASH_DRIVE_SUPPORT, SDIO_SUPPORT)
+
+#if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+ #define spiSend(P) (isOnBoard() ? SPI_OB.spiSend(P) : SPI_LCD.spiSend(P))
+ #define spiRead(P1, P2) (isOnBoard() ? SPI_OB.spiRead(P1, P2) : SPI_LCD.spiRead(P1, P2))
+ #define spiInit(P) (isOnBoard() ? SPI_OB.spiInit(P) : SPI_LCD.spiInit(P))
+ #define spiRec() (isOnBoard() ? SPI_OB.spiRec() : SPI_LCD.spiRec())
+ #define spiBegin() (isOnBoard() ? SPI_OB.spiBegin() : SPI_LCD.spiBegin())
+ #define spiSendBlock(P1, P2) (isOnBoard() ? SPI_OB.spiSendBlock(P1, P2) : SPI_LCD.spiSendBlock(P1, P2))
+#endif
 
 /* Enable FAST CRC computations - You can trade speed for FLASH space if
  * needed by disabling the following define */

@@ -70,6 +70,9 @@ public:
 
   static void mount();
   static void release();
+#if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+  static bool isMountedOnBoard() { return flag.mounted && sd2card.isOnBoard(); }
+#endif
   static inline bool isMounted() { return flag.mounted; }
   static void ls();
 
@@ -281,7 +284,12 @@ private:
   #if ENABLED(SD_DETECT_INVERTED)
     #define IS_SD_INSERTED()  READ(SD_DETECT_PIN)
   #else
-    #define IS_SD_INSERTED() !READ(SD_DETECT_PIN)
+    #ifdef SD_DETECT_PIN_OB
+      #define IS_SD_INSERTED() ((READ(SD_DETECT_PIN)?0:1)+(READ(SD_DETECT_PIN_OB)?0:2))
+      #define IS_EXT_SD_INSERTED() !READ(SD_DETECT_PIN)
+    #else
+      #define IS_SD_INSERTED() !READ(SD_DETECT_PIN)
+    #endif
   #endif
 #else
   // No card detect line? Assume the card is inserted.

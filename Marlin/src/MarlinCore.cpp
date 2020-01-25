@@ -943,7 +943,10 @@ void setup() {
   #endif
 
   #if ENABLED(SDSUPPORT)
-    card.mount(); // Mount the SD card before settings.first_load
+    #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+      if(IS_EXT_SD_INSERTED()) //auto mount only if LCD card presents
+    #endif
+        card.mount(); // Mount the SD card before settings.first_load
   #endif
 
   // Load data from EEPROM if available (or use defaults)

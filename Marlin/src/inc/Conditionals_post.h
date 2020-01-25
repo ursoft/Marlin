@@ -1776,6 +1776,9 @@
   #if ENABLED(BLTOUCH) && !defined(BLTOUCH_DELAY)
     #define BLTOUCH_DELAY 500
   #endif
+  #if SD_CONNECTION_IS(LCD_AND_ONBOARD) && DISABLED(NO_SD_HOST_DRIVE)
+    #define SHARED_SD_CARD
+  #endif
 #endif
 
 #ifndef __SAM3X8E__ //todo: hal: broken hal encapsulation
