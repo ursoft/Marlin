@@ -243,9 +243,9 @@ namespace Language_sk {
   PROGMEM Language_Str MSG_BED                             = _UxGT("Podložka");
   PROGMEM Language_Str MSG_CHAMBER                         = _UxGT("Komora");
   PROGMEM Language_Str MSG_FAN_SPEED                       = _UxGT("Rýchlosť vent.");
-  PROGMEM Language_Str MSG_FAN_SPEED_N                     = _UxGT("Rýchlosť vent. =");
+  PROGMEM Language_Str MSG_FAN_SPEED_N                     = _UxGT("Rýchlosť vent. ~");
   PROGMEM Language_Str MSG_EXTRA_FAN_SPEED                 = _UxGT("Rýchlosť ex. vent.");
-  PROGMEM Language_Str MSG_EXTRA_FAN_SPEED_N               = _UxGT("Rýchlosť ex. vent. =");
+  PROGMEM Language_Str MSG_EXTRA_FAN_SPEED_N               = _UxGT("Rýchlosť ex. vent. ~");
   PROGMEM Language_Str MSG_FLOW                            = _UxGT("Prietok");
   PROGMEM Language_Str MSG_FLOW_N                          = _UxGT("Prietok ~");
   PROGMEM Language_Str MSG_CONTROL                         = _UxGT("Ovládanie");
@@ -314,7 +314,7 @@ namespace Language_sk {
   PROGMEM Language_Str MSG_MEDIA_UPDATE                    = _UxGT("Aktualizovať z SD");
   PROGMEM Language_Str MSG_RESET_PRINTER                   = _UxGT("Reštart. tlačiar.");
   PROGMEM Language_Str MSG_REFRESH                         = LCD_STR_REFRESH  _UxGT("Obnoviť");
-  PROGMEM Language_Str MSG_WATCH                           = _UxGT("Info. obrazovka");
+  PROGMEM Language_Str MSG_INFO_SCREEN                     = _UxGT("Info. obrazovka");
   PROGMEM Language_Str MSG_PREPARE                         = _UxGT("Príprava tlače");
   PROGMEM Language_Str MSG_TUNE                            = _UxGT("Doladenie tlače");
   PROGMEM Language_Str MSG_START_PRINT                     = _UxGT("Spustiť tlač");

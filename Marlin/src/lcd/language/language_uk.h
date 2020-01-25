@@ -92,7 +92,7 @@ namespace Language_uk {
   PROGMEM Language_Str MSG_NOZZLE_N                        = _UxGT("Сопло ~");
   PROGMEM Language_Str MSG_BED                             = _UxGT("Стіл");
   PROGMEM Language_Str MSG_FAN_SPEED                       = _UxGT("Охолодж.");
-  PROGMEM Language_Str MSG_FAN_SPEED_N                     = _UxGT("Охолодж. =");
+  PROGMEM Language_Str MSG_FAN_SPEED_N                     = _UxGT("Охолодж. ~");
   PROGMEM Language_Str MSG_FLOW                            = _UxGT("Потік");
   PROGMEM Language_Str MSG_FLOW_N                          = _UxGT("Потік ~");
   PROGMEM Language_Str MSG_CONTROL                         = _UxGT("Налаштування");
@@ -149,7 +149,7 @@ namespace Language_uk {
   PROGMEM Language_Str MSG_LOAD_EEPROM                     = _UxGT("Зчитати з ПЗП");
   PROGMEM Language_Str MSG_RESTORE_FAILSAFE                = _UxGT("Відновити базові");
   PROGMEM Language_Str MSG_REFRESH                         = LCD_STR_REFRESH  _UxGT("Поновити");
-  PROGMEM Language_Str MSG_WATCH                           = _UxGT("Інформація");
+  PROGMEM Language_Str MSG_INFO_SCREEN                     = _UxGT("Інформація");
   PROGMEM Language_Str MSG_PREPARE                         = _UxGT("Підготувати");
   PROGMEM Language_Str MSG_TUNE                            = _UxGT("Підлаштування");
   PROGMEM Language_Str MSG_PAUSE_PRINT                     = _UxGT("Призупинити друк");

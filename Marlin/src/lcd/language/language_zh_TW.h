@@ -187,9 +187,9 @@ namespace Language_zh_TW {
   PROGMEM Language_Str MSG_NOZZLE_N                        = " " LCD_STR_THERMOMETER _UxGT(" 噴嘴 ~");
   PROGMEM Language_Str MSG_BED                             = " " LCD_STR_THERMOMETER _UxGT(" 熱床");     //"Bed"
   PROGMEM Language_Str MSG_FAN_SPEED                       = _UxGT("風扇速率");     //"Fan speed"
-  PROGMEM Language_Str MSG_FAN_SPEED_N                     = _UxGT("風扇速率 =");
+  PROGMEM Language_Str MSG_FAN_SPEED_N                     = _UxGT("風扇速率 ~");
   PROGMEM Language_Str MSG_EXTRA_FAN_SPEED                 = _UxGT("額外風扇速率");     // "Extra fan speed"
-  PROGMEM Language_Str MSG_EXTRA_FAN_SPEED_N               = _UxGT("額外風扇速率 =");
+  PROGMEM Language_Str MSG_EXTRA_FAN_SPEED_N               = _UxGT("額外風扇速率 ~");
   PROGMEM Language_Str MSG_FLOW                            = _UxGT("擠出速率");
   PROGMEM Language_Str MSG_FLOW_N                          = _UxGT("擠出速率 ~");     //"Flow"
   PROGMEM Language_Str MSG_CONTROL                         = _UxGT("控制");     //"Control"
@@ -251,7 +251,7 @@ namespace Language_zh_TW {
   PROGMEM Language_Str MSG_RESTORE_FAILSAFE                = _UxGT("恢復安全值");     //"Restore failsafe"
   PROGMEM Language_Str MSG_INIT_EEPROM                     = _UxGT("初始化設置");     // "Initialize EEPROM"
   PROGMEM Language_Str MSG_REFRESH                         = LCD_STR_REFRESH  _UxGT("刷新");     //"Refresh"
-  PROGMEM Language_Str MSG_WATCH                           = _UxGT("資訊界面");     //"Info screen"
+  PROGMEM Language_Str MSG_INFO_SCREEN                     = _UxGT("資訊界面");     //"Info screen"
   PROGMEM Language_Str MSG_PREPARE                         = _UxGT("準備");     //"Prepare"
   PROGMEM Language_Str MSG_TUNE                            = _UxGT("調整");     //"Tune"
   PROGMEM Language_Str MSG_PAUSE_PRINT                     = _UxGT("暫停列印");     //"Pause print"
