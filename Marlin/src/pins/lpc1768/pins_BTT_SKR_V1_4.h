@@ -21,52 +21,44 @@
  */
 #pragma once
 
-#define BOARD_INFO_NAME "BIGTREE SKR 1.4"
-
-//
-// SD Connection
-//
-#ifndef SDCARD_CONNECTION
-  #define SDCARD_CONNECTION LCD
+#ifndef MCU_LPC1768
+  #error "Oops! Make sure you have the LPC1768 environment selected in your IDE."
 #endif
+
+#define BOARD_INFO_NAME "BIGTREE SKR 1.3"
+
+// Ignore temp readings during development.
+//#define BOGUS_TEMPERATURE_GRACE_PERIOD 2000
 
 //
 // Servos
 //
-#define SERVO0_PIN         P2_00
+#ifndef SERVO0_PIN
+  #define SERVO0_PIN       P2_00
+#endif
 
 //
 // Limit Switches
 //
-#define X_STOP_PIN         P1_29
-#define Y_STOP_PIN         P1_28
-#define Z_STOP_PIN         P1_27
+#define X_MIN_PIN          P1_29
+#define X_MAX_PIN          P1_28
+#define Y_MIN_PIN          P1_27
+#define Y_MAX_PIN          P1_26
+#define Z_MIN_PIN          P1_25
+#define Z_MAX_PIN          P1_24
 
 //
 // Z Probe (when not Z_MIN_PIN)
 //
 #ifndef Z_MIN_PROBE_PIN
-  #define Z_MIN_PROBE_PIN  P0_10
+  #define Z_MIN_PROBE_PIN  P1_24
 #endif
 
 //
 // Filament Runout Sensor
 //
-#define FIL_RUNOUT_PIN     P1_26
-#define FIL_RUNOUT2_PIN    P1_25
-
-//
-// Power Supply Control
-//
-#ifndef PS_ON_PIN
-  #define PS_ON_PIN        P1_00
-#endif
-
-//
-// Power Loss Detection
-//
-#ifndef POWER_LOSS_PIN
-  #define POWER_LOSS_PIN   P1_00
+#ifndef FIL_RUNOUT_PIN
+  #define FIL_RUNOUT_PIN   P1_28
 #endif
 
 //
@@ -76,51 +68,43 @@
 #define X_DIR_PIN          P2_06
 #define X_ENABLE_PIN       P2_01
 #ifndef X_CS_PIN
-  #define X_CS_PIN         P1_10
+  #define X_CS_PIN         P1_17
 #endif
 
 #define Y_STEP_PIN         P0_19
 #define Y_DIR_PIN          P0_20
 #define Y_ENABLE_PIN       P2_08
 #ifndef Y_CS_PIN
-  #define Y_CS_PIN         P1_09
+  #define Y_CS_PIN         P1_15
 #endif
 
 #define Z_STEP_PIN         P0_22
 #define Z_DIR_PIN          P2_11
 #define Z_ENABLE_PIN       P0_21
 #ifndef Z_CS_PIN
-  #define Z_CS_PIN         P1_08
+  #define Z_CS_PIN         P1_10
 #endif
 
 #define E0_STEP_PIN        P2_13
 #define E0_DIR_PIN         P0_11
 #define E0_ENABLE_PIN      P2_12
 #ifndef E0_CS_PIN
-  #define E0_CS_PIN        P1_04
+  #define E0_CS_PIN        P1_08
 #endif
 
-#define E1_STEP_PIN        P1_15
-#define E1_DIR_PIN         P1_14
-#define E1_ENABLE_PIN      P1_16
+#define E1_STEP_PIN        P0_01
+#define E1_DIR_PIN         P0_00
+#define E1_ENABLE_PIN      P0_10
 #ifndef E1_CS_PIN
   #define E1_CS_PIN        P1_01
 #endif
-
-#define TEMP_1_PIN         P0_23_A0   // A2 (T2) - (69) - TEMP_1_PIN
-#define TEMP_BED_PIN       P0_25_A2   // A0 (T0) - (67) - TEMP_BED_PIN
-
-//
-// Include common SKR pins
-//
-#include "pins_BTT_SKR.h"
 
 //
 // Software SPI pins for TMC2130 stepper drivers
 //
 #if ENABLED(TMC_USE_SW_SPI)
   #ifndef TMC_SW_MOSI
-    #define TMC_SW_MOSI    P1_17
+    #define TMC_SW_MOSI    P4_28
   #endif
   #ifndef TMC_SW_MISO
     #define TMC_SW_MISO    P0_05
@@ -152,22 +136,22 @@
   //
   // Software serial
   //
-  #define X_SERIAL_TX_PIN  P1_10
-  #define X_SERIAL_RX_PIN  P1_10
+  #define X_SERIAL_TX_PIN  P4_29
+  #define X_SERIAL_RX_PIN  P1_17
 
-  #define Y_SERIAL_TX_PIN  P1_09
-  #define Y_SERIAL_RX_PIN  P1_09
+  #define Y_SERIAL_TX_PIN  P1_16
+  #define Y_SERIAL_RX_PIN  P1_15
 
-  #define Z_SERIAL_TX_PIN  P1_08
-  #define Z_SERIAL_RX_PIN  P1_08
+  #define Z_SERIAL_TX_PIN  P1_14
+  #define Z_SERIAL_RX_PIN  P1_10
 
-  #define E0_SERIAL_TX_PIN P1_04
-  #define E0_SERIAL_RX_PIN P1_04
+  #define E0_SERIAL_TX_PIN P1_09
+  #define E0_SERIAL_RX_PIN P1_08
 
-  #define E1_SERIAL_TX_PIN P1_01
+  #define E1_SERIAL_TX_PIN P1_04
   #define E1_SERIAL_RX_PIN P1_01
 
-  #define Z2_SERIAL_TX_PIN P1_01
+  #define Z2_SERIAL_TX_PIN P1_04
   #define Z2_SERIAL_RX_PIN P1_01
 
   // Reduce baud rate to improve software serial reliability
@@ -175,10 +159,33 @@
 #endif
 
 //
-// SD Connection
+// Temperature Sensors
+//  3.3V max when defined as an analog input
 //
-#if SD_CONNECTION_IS(LCD)
-  #define SS_PIN           P0_16
+#define TEMP_BED_PIN       P0_23_A0   // A0 (T0) - (67) - TEMP_BED_PIN
+#define TEMP_0_PIN         P0_24_A1   // A1 (T1) - (68) - TEMP_0_PIN
+#define TEMP_1_PIN         P0_25_A2   // A2 (T2) - (69) - TEMP_1_PIN
+
+//
+// Heaters / Fans
+//
+#ifndef HEATER_0_PIN
+  #define HEATER_0_PIN     P2_07
+#endif
+#if HOTENDS == 1
+  #ifndef FAN1_PIN
+    #define FAN1_PIN       P2_04
+  #endif
+#else
+  #ifndef HEATER_1_PIN
+    #define HEATER_1_PIN   P2_04
+  #endif
+#endif
+#ifndef FAN_PIN
+  #define FAN_PIN          P2_03
+#endif
+#ifndef HEATER_BED_PIN
+  #define HEATER_BED_PIN   P2_05
 #endif
 
 /**
@@ -192,6 +199,7 @@
  *              EXP2                                              EXP1
  */
 #if HAS_SPI_LCD
+  #define BEEPER_PIN       P1_30   // (37) not 5V tolerant
   #define BTN_ENC          P0_28   // (58) open-drain
 
   #if ENABLED(CR10_STOCKDISPLAY)
@@ -245,10 +253,10 @@
     #else // !FYSETC_MINI_12864
 
       #if ENABLED(MKS_MINI_12864)
-        #define DOGLCD_CS   P1_21
-        #define DOGLCD_A0   P1_22
-        #define DOGLCD_SCK  P0_15
-        #define DOGLCD_MOSI P0_18
+        #define DOGLCD_CS    P1_21
+        #define DOGLCD_A0    P1_22
+        #define DOGLCD_SCK   P0_15
+        #define DOGLCD_MOSI  P0_18
         #define FORCE_SOFT_SPI
       #endif
 
@@ -265,10 +273,29 @@
 #endif // HAS_SPI_LCD
 
 //
-// Neopixel LED
+// SD Support
 //
-#ifndef NEOPIXEL_PIN
-  #define NEOPIXEL_PIN      P1_24
+
+#ifndef SDCARD_CONNECTION
+  #define SDCARD_CONNECTION LCD
+#endif
+
+#define ONBOARD_SD_CS_PIN  P0_06   // Chip select for "System" SD card
+
+#if SD_CONNECTION_IS(LCD)
+  #define SCK_PIN          P0_15
+  #define MISO_PIN         P0_17
+  #define MOSI_PIN         P0_18
+  #define SS_PIN           P0_16
+#elif SD_CONNECTION_IS(ONBOARD)
+  #undef SD_DETECT_PIN
+  #define SD_DETECT_PIN    P0_27
+  #define SCK_PIN          P0_07
+  #define MISO_PIN         P0_08
+  #define MOSI_PIN         P0_09
+  #define SS_PIN           ONBOARD_SD_CS_PIN
+#elif SD_CONNECTION_IS(CUSTOM_CABLE)
+  #error "No custom SD drive cable defined for this board."
 #endif
 
 /**

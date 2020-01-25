@@ -27,25 +27,8 @@
  *
  * This file is part of the Arduino Sd2Card Library
  */
-#define NEED_SPICLASS
-#include "../inc/MarlinConfig.h"
-#include <SPI.h>
 
-#if SD_CONNECTION_IS(LCD_AND_ONBOARD)
-#define spiSend(P) (isOnBoard() ? SPI_OB.spiSend(P) : SPI.spiSend(P))
-#define spiRead(P1, P2) (isOnBoard() ? SPI_OB.spiRead(P1, P2) : SPI.spiRead(P1, P2))
-#define spiInit(P) (isOnBoard() ? SPI_OB.spiInit(P) : SPI.spiInit(P))
-#define spiRec() (isOnBoard() ? SPI_OB.spiRec() : SPI.spiRec())
-#define spiBegin() (isOnBoard() ? SPI_OB.spiBegin() : SPI.spiBegin())
-#define spiSendBlock(P1, P2) (isOnBoard() ? SPI_OB.spiSendBlock(P1, P2) : SPI.spiSendBlock(P1, P2))
-#else
-#define spiSend SPI.spiSend
-#define spiRead SPI.spiRead
-#define spiInit SPI.spiInit
-#define spiRec SPI.spiRec
-#define spiBegin SPI.spiBegin
-#define spiSendBlock SPI.spiSendBlock
-#endif
+#include "../inc/MarlinConfig.h"
 
 #if ENABLED(SDSUPPORT) && NONE(USB_FLASH_DRIVE_SUPPORT, SDIO_SUPPORT)
 

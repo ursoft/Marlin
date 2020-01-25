@@ -366,9 +366,6 @@ void CardReader::mount() {
   if (root.isOpen()) root.close();
 
   if (!sd2card.init(SPI_SPEED, SDSS)
-    #if defined(SS_PIN_OB) && (SS_PIN_OB != SDSS)
-      && !sd2card.init(SPI_SPEED, SS_PIN_OB)
-    #endif
     #if defined(LCD_SDSS) && (LCD_SDSS != SDSS)
       && !sd2card.init(SPI_SPEED, LCD_SDSS)
     #endif
@@ -677,11 +674,6 @@ void CardReader::checkautostart() {
       }
     }
   }
-  #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
-    if(isMounted() && !IS_EXT_SD_INSERTED()) {
-      release();
-    }
-  #endif
   autostart_index = -1;
 }
 

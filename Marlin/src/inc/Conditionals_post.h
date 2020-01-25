@@ -1779,9 +1779,6 @@
   #if DISABLED(SHARED_SD_CARD)
     #define INIT_SDCARD_ON_BOOT
   #endif
-  #if SD_CONNECTION_IS(LCD_AND_ONBOARD) && DISABLED(NO_SD_HOST_DRIVE)
-    #define SHARED_SD_CARD
-  #endif
 #endif
 
 #if !NUM_SERIAL

@@ -104,14 +104,7 @@ void PrintJobRecovery::check() {
     if (!card.isMounted()) card.mount();
     if (card.isMounted()) {
       load();
-      if (!valid()) {
-        purge();
-        #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
-          if(!IS_EXT_SD_INSERTED()) //no LCD SD card
-            card.release();
-        #endif
-        return;
-      }
+      if (!valid()) return purge();
       queue.inject_P(PSTR("M1000 S"));
     }
   }

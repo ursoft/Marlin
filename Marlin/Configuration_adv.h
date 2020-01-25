@@ -1160,7 +1160,7 @@
      *
      * :[ 'LCD', 'ONBOARD', 'CUSTOM_CABLE', 'LCD_AND_ONBOARD' ]
      */
-    #define SDCARD_CONNECTION LCD_AND_ONBOARD
+    //#define SDCARD_CONNECTION LCD
   #endif
 
 #endif // SDSUPPORT
