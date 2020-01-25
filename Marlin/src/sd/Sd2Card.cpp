@@ -32,26 +32,19 @@
 #include <SPI.h>
 
 #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
-#define spiSend(P) (isOnBoard() ? SPI_OB.spiSend(P) : SPI_LCD.spiSend(P))
-#define spiRead(P1, P2) (isOnBoard() ? SPI_OB.spiRead(P1, P2) : SPI_LCD.spiRead(P1, P2))
-#define spiInit(P) (isOnBoard() ? SPI_OB.spiInit(P) : SPI_LCD.spiInit(P))
-#define spiRec() (isOnBoard() ? SPI_OB.spiRec() : SPI_LCD.spiRec())
-#define spiBegin() (isOnBoard() ? SPI_OB.spiBegin() : SPI_LCD.spiBegin())
-#define spiSendBlock(P1, P2) (isOnBoard() ? SPI_OB.spiSendBlock(P1, P2) : SPI_LCD.spiSendBlock(P1, P2))
-#elif SD_CONNECTION_IS(LCD)
-#define spiSend SPI_LCD.spiSend
-#define spiRead SPI_LCD.spiRead
-#define spiInit SPI_LCD.spiInit
-#define spiRec SPI_LCD.spiRec
-#define spiBegin SPI_LCD.spiBegin
-#define spiSendBlock SPI_LCD.spiSendBlock
-#elif SD_CONNECTION_IS(ONBOARD)
-#define spiSend SPI_OB.spiSend
-#define spiRead SPI_OB.spiRead
-#define spiInit SPI_OB.spiInit
-#define spiRec SPI_OB.spiRec
-#define spiBegin SPI_OB.spiBegin
-#define spiSendBlock SPI_OB.spiSendBlock
+#define spiSend(P) (isOnBoard() ? SPI_OB.spiSend(P) : SPI.spiSend(P))
+#define spiRead(P1, P2) (isOnBoard() ? SPI_OB.spiRead(P1, P2) : SPI.spiRead(P1, P2))
+#define spiInit(P) (isOnBoard() ? SPI_OB.spiInit(P) : SPI.spiInit(P))
+#define spiRec() (isOnBoard() ? SPI_OB.spiRec() : SPI.spiRec())
+#define spiBegin() (isOnBoard() ? SPI_OB.spiBegin() : SPI.spiBegin())
+#define spiSendBlock(P1, P2) (isOnBoard() ? SPI_OB.spiSendBlock(P1, P2) : SPI.spiSendBlock(P1, P2))
+#else
+#define spiSend SPI.spiSend
+#define spiRead SPI.spiRead
+#define spiInit SPI.spiInit
+#define spiRec SPI.spiRec
+#define spiBegin SPI.spiBegin
+#define spiSendBlock SPI.spiSendBlock
 #endif
 
 #if ENABLED(SDSUPPORT) && NONE(USB_FLASH_DRIVE_SUPPORT, SDIO_SUPPORT)
