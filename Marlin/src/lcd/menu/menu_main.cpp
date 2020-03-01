@@ -90,17 +90,6 @@ void menu_main() {
     #endif
   ;
 
-  #if ENABLED(ADVANCED_PAUSE_FEATURE)
-    #if E_STEPPERS == 1 && DISABLED(FILAMENT_LOAD_UNLOAD_GCODES)
-      if (thermalManager.targetHotEnoughToExtrude(active_extruder))
-        GCODES_ITEM(MSG_FILAMENTCHANGE, PSTR("M600 B0"));
-      else
-        SUBMENU(MSG_FILAMENTCHANGE, []{ _menu_temp_filament_op(PAUSE_MODE_CHANGE_FILAMENT, 0); });
-    #else
-      SUBMENU(MSG_FILAMENTCHANGE, menu_change_filament);
-    #endif
-  #endif
-
   if (busy) {
     #if MACHINE_CAN_PAUSE
       ACTION_ITEM(MSG_PAUSE_PRINT, ui.pause_print);
@@ -180,6 +169,17 @@ void menu_main() {
       SUBMENU_P(PSTR(CUSTOM_USER_MENU_TITLE), menu_user);
     #else
       SUBMENU(MSG_USER_MENU, menu_user);
+    #endif
+  #endif
+
+  #if ENABLED(ADVANCED_PAUSE_FEATURE)
+    #if E_STEPPERS == 1 && DISABLED(FILAMENT_LOAD_UNLOAD_GCODES)
+      if (thermalManager.targetHotEnoughToExtrude(active_extruder))
+        GCODES_ITEM(MSG_FILAMENTCHANGE, PSTR("M600 B0"));
+      else
+        SUBMENU(MSG_FILAMENTCHANGE, []{ _menu_temp_filament_op(PAUSE_MODE_CHANGE_FILAMENT, 0); });
+    #else
+      SUBMENU(MSG_FILAMENTCHANGE, menu_change_filament);
     #endif
   #endif
 
