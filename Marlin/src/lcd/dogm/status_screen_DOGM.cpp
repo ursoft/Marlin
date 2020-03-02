@@ -37,6 +37,7 @@
 
 #include "../../module/motion.h"
 #include "../../module/temperature.h"
+#include "../../module/planner.h"
 
 #if ENABLED(FILAMENT_LCD_DISPLAY)
   #include "../../feature/filwidth.h"
@@ -280,6 +281,13 @@ FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, cons
       u8g.drawBox(tx, 20 - 2, 2, 2);
       u8g.setColorIndex(1); // restore black on white
     }
+    #if HAS_LEVELING
+      if(planner.leveling_active) { 
+        if(blink) u8g.setColorIndex(0); // set to white on black
+        u8g.drawHLine(STATUS_BED_X + 3, STATUS_HEATERS_Y + 10, STATUS_BED_WIDTH - 3);
+        if(blink) u8g.setColorIndex(1); // restore black on white
+      }
+    #endif
 
   }
 
