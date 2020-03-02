@@ -179,7 +179,11 @@ public:
   static inline void set_white() { set_color(LEDColorWhite()); }
 
   #if ENABLED(LED_COLOR_PRESETS)
+   #ifdef NEOPIXEL_EEPROM_STORE_HACK
+    static LEDColor defaultLEDColor;
+   #else
     static const LEDColor defaultLEDColor;
+   #endif
     static inline void set_default()  { set_color(defaultLEDColor); }
     static inline void set_red()      { set_color(LEDColorRed()); }
     static inline void set_orange()   { set_color(LEDColorOrange()); }

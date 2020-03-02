@@ -43,7 +43,10 @@
 #endif
 
 #if ENABLED(LED_COLOR_PRESETS)
-  const LEDColor LEDLights::defaultLEDColor = MakeLEDColor(
+  #ifndef NEOPIXEL_EEPROM_STORE_HACK
+   const 
+  #endif
+   LEDColor LEDLights::defaultLEDColor = MakeLEDColor(
     LED_USER_PRESET_RED,
     LED_USER_PRESET_GREEN,
     LED_USER_PRESET_BLUE,

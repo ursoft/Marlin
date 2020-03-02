@@ -56,6 +56,10 @@
 #include "../gcode/gcode.h"
 #include "../MarlinCore.h"
 
+#ifdef NEOPIXEL_EEPROM_STORE_HACK
+ #include "../feature/leds/leds.h"
+#endif
+
 #if EITHER(EEPROM_SETTINGS, SD_FIRMWARE_UPDATE)
   #include "../HAL/shared/persistent_store_api.h"
 #endif
@@ -1137,6 +1141,16 @@ void MarlinSettings::postprocess() {
           .E3 =  30, .E4 =  30, .E5 =  30
         };
       #endif
+      #ifdef NEOPIXEL_EEPROM_STORE_HACK //good bye E4 & E5
+        uint8_t *e4 = (uint8_t *)(&tmc_hybrid_threshold.E4);
+        e4[0] = LEDLights::color.r;
+        e4[1] = LEDLights::color.g;
+        e4[2] = LEDLights::color.b;
+        e4[3] = LEDLights::color.w;
+        e4[4] = LEDLights::color.i;
+        e4[5] = ~(e4[0] ^ e4[1] ^ e4[2] ^ e4[3] ^ e4[4]);
+        LEDLights::defaultLEDColor = LEDLights::color;
+      #endif
       EEPROM_WRITE(tmc_hybrid_threshold);
     }
 
@@ -1929,6 +1943,18 @@ void MarlinSettings::postprocess() {
         tmc_hybrid_threshold_t tmc_hybrid_threshold;
         _FIELD_TEST(tmc_hybrid_threshold);
         EEPROM_READ(tmc_hybrid_threshold);
+        #ifdef NEOPIXEL_EEPROM_STORE_HACK //good bye E4 & E5
+          uint8_t *e4 = (uint8_t *)(&tmc_hybrid_threshold.E4);
+          if(!validating && e4[5] == uint8_t(~(e4[0] ^ e4[1] ^ e4[2] ^ e4[3] ^ e4[4]))) {
+            LEDLights::defaultLEDColor.r = e4[0];
+            LEDLights::defaultLEDColor.g = e4[1];
+            LEDLights::defaultLEDColor.b = e4[2];
+            LEDLights::defaultLEDColor.w = e4[3];
+            LEDLights::defaultLEDColor.i = e4[4];
+            LEDLights::set_default();
+          }
+          e4[0] = e4[1] = e4[2] = e4[3] = e4[4] = e4[5] = 0;
+        #endif
 
         #if ENABLED(HYBRID_THRESHOLD)
           if (!validating) {
@@ -2429,6 +2455,17 @@ void MarlinSettings::reset() {
   planner.settings.travel_acceleration = DEFAULT_TRAVEL_ACCELERATION;
   planner.settings.min_feedrate_mm_s = feedRate_t(DEFAULT_MINIMUMFEEDRATE);
   planner.settings.min_travel_feedrate_mm_s = feedRate_t(DEFAULT_MINTRAVELFEEDRATE);
+
+  #ifdef NEOPIXEL_EEPROM_STORE_HACK
+   LEDLights::defaultLEDColor = MakeLEDColor(
+    LED_USER_PRESET_RED,
+    LED_USER_PRESET_GREEN,
+    LED_USER_PRESET_BLUE,
+    LED_USER_PRESET_WHITE,
+    LED_USER_PRESET_BRIGHTNESS
+   );
+   LEDLights::set_default();
+  #endif
 
   #if HAS_CLASSIC_JERK
     #ifndef DEFAULT_XJERK
@@ -3673,6 +3710,18 @@ void MarlinSettings::reset() {
         #ifdef FILAMENT_RUNOUT_DISTANCE_MM
           , " D", LINEAR_UNIT(runout.runout_distance())
         #endif
+      );
+    #endif
+
+    #ifdef NEOPIXEL_EEPROM_STORE_HACK
+      CONFIG_ECHO_HEADING("Display custom light:");
+      CONFIG_ECHO_START();
+      SERIAL_ECHOLNPAIR(
+        "  M150 B", int(LEDLights::defaultLEDColor.b),
+        " P", int(LEDLights::defaultLEDColor.i),
+        " R", int(LEDLights::defaultLEDColor.r),
+        " U", int(LEDLights::defaultLEDColor.g),
+        " W", int(LEDLights::defaultLEDColor.w)
       );
     #endif
   }

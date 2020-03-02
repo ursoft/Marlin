@@ -2264,6 +2264,7 @@
 // Support for Adafruit Neopixel LED driver
 #if (GITHUB_USER==URSOFT)
  #define NEOPIXEL_LED
+ #define NEOPIXEL_EEPROM_STORE_HACK // store user color to EERPOM (unused area) // https://github.com/ursoft/Marlin/issues/33
 #endif
 #if ENABLED(NEOPIXEL_LED)
   #define NEOPIXEL_TYPE   NEO_GRBW // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
