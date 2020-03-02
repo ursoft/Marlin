@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -30,10 +30,6 @@
 
 #include "../inc/MarlinConfig.h"
 
-#if HAS_BED_PROBE
-  #include "probe.h"
-#endif
-
 #if IS_SCARA
   #include "scara.h"
 #endif
@@ -58,12 +54,18 @@ FORCE_INLINE bool homing_needed() {
 }
 
 // Error margin to work around float imprecision
-constexpr float slop = 0.0001;
+constexpr float fslop = 0.0001;
 
 extern bool relative_mode;
 
 extern xyze_pos_t current_position,  // High-level current tool position
                   destination;       // Destination for a move
+
+// G60/G61 Position Save and Return
+#if SAVED_POSITIONS
+  extern uint8_t saved_slots[(SAVED_POSITIONS + 7) >> 3];
+  extern xyz_pos_t stored_position[SAVED_POSITIONS];
+#endif
 
 // Scratch space for a cartesian result
 extern xyz_pos_t cartes;
@@ -300,7 +302,7 @@ void homeaxis(const AxisEnum axis);
   // Return true if the given point is within the printable area
   inline bool position_is_reachable(const float &rx, const float &ry, const float inset=0) {
     #if ENABLED(DELTA)
-      return HYPOT2(rx, ry) <= sq(DELTA_PRINTABLE_RADIUS - inset + slop);
+      return HYPOT2(rx, ry) <= sq(DELTA_PRINTABLE_RADIUS - inset + fslop);
     #elif IS_SCARA
       const float R2 = HYPOT2(rx - SCARA_OFFSET_X, ry - SCARA_OFFSET_Y);
       return (
@@ -316,66 +318,23 @@ void homeaxis(const AxisEnum axis);
     return position_is_reachable(pos.x, pos.y, inset);
   }
 
-  #if HAS_BED_PROBE
-
-    #if HAS_PROBE_XY_OFFSET
-
-      // Return true if the both nozzle and the probe can reach the given point.
-      // Note: This won't work on SCARA since the probe offset rotates with the arm.
-      inline bool position_is_reachable_by_probe(const float &rx, const float &ry) {
-        return position_is_reachable(rx - probe_offset.x, ry - probe_offset.y)
-               && position_is_reachable(rx, ry, ABS(MIN_PROBE_EDGE));
-      }
-
-    #else
-
-      FORCE_INLINE bool position_is_reachable_by_probe(const float &rx, const float &ry) {
-        return position_is_reachable(rx, ry, MIN_PROBE_EDGE);
-      }
-
-    #endif
-
-  #endif // HAS_BED_PROBE
-
 #else // CARTESIAN
 
   // Return true if the given position is within the machine bounds.
   inline bool position_is_reachable(const float &rx, const float &ry) {
-    if (!WITHIN(ry, Y_MIN_POS - slop, Y_MAX_POS + slop)) return false;
+    if (!WITHIN(ry, Y_MIN_POS - fslop, Y_MAX_POS + fslop)) return false;
     #if ENABLED(DUAL_X_CARRIAGE)
       if (active_extruder)
-        return WITHIN(rx, X2_MIN_POS - slop, X2_MAX_POS + slop);
+        return WITHIN(rx, X2_MIN_POS - fslop, X2_MAX_POS + fslop);
       else
-        return WITHIN(rx, X1_MIN_POS - slop, X1_MAX_POS + slop);
+        return WITHIN(rx, X1_MIN_POS - fslop, X1_MAX_POS + fslop);
     #else
-      return WITHIN(rx, X_MIN_POS - slop, X_MAX_POS + slop);
+      return WITHIN(rx, X_MIN_POS - fslop, X_MAX_POS + fslop);
     #endif
   }
   inline bool position_is_reachable(const xy_pos_t &pos) { return position_is_reachable(pos.x, pos.y); }
 
-  #if HAS_BED_PROBE
-
-    /**
-     * Return whether the given position is within the bed, and whether the nozzle
-     * can reach the position required to put the probe at the given position.
-     *
-     * Example: For a probe offset of -10,+10, then for the probe to reach 0,0 the
-     *          nozzle must be be able to reach +10,-10.
-     */
-    inline bool position_is_reachable_by_probe(const float &rx, const float &ry) {
-      return position_is_reachable(rx - probe_offset_xy.x, ry - probe_offset_xy.y)
-          && WITHIN(rx, probe_min_x() - slop, probe_max_x() + slop)
-          && WITHIN(ry, probe_min_y() - slop, probe_max_y() + slop);
-    }
-
-  #endif // HAS_BED_PROBE
-
 #endif // CARTESIAN
-
-#if !HAS_BED_PROBE
-  FORCE_INLINE bool position_is_reachable_by_probe(const float &rx, const float &ry) { return position_is_reachable(rx, ry); }
-#endif
-FORCE_INLINE bool position_is_reachable_by_probe(const xy_pos_t &pos) { return position_is_reachable_by_probe(pos.x, pos.y); }
 
 /**
  * Duplication mode

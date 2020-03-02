@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -67,6 +67,8 @@
  * G34  - Z Stepper automatic alignment using probe: I<iterations> T<accuracy> A<amplification> (Requires Z_STEPPER_AUTO_ALIGN)
  * G38  - Probe in any direction using the Z_MIN_PROBE (Requires G38_PROBE_TARGET)
  * G42  - Coordinated move to a mesh point (Requires MESH_BED_LEVELING, AUTO_BED_LEVELING_BLINEAR, or AUTO_BED_LEVELING_UBL)
+ * G60  - Save current position. (Requires SAVED_POSITIONS)
+ * G61  - Apply/restore saved coordinates. (Requires SAVED_POSITIONS)
  * G76  - Calibrate first layer temperature offsets. (Requires PROBE_TEMP_COMPENSATION)
  * G80  - Cancel current motion mode (Requires GCODE_MOTION_MODES)
  * G90  - Use Absolute Coordinates
@@ -349,6 +351,18 @@ public:
     process_subcommands_now_P(G28_STR);
   }
 
+  #if HAS_AUTO_REPORTING || ENABLED(HOST_KEEPALIVE_FEATURE)
+    static bool autoreport_paused;
+    static inline bool set_autoreport_paused(const bool p) {
+      const bool was = autoreport_paused;
+      autoreport_paused = p;
+      return was;
+    }
+  #else
+    static constexpr bool autoreport_paused = false;
+    static inline bool set_autoreport_paused(const bool) { return false; }
+  #endif
+
   #if ENABLED(HOST_KEEPALIVE_FEATURE)
     /**
      * States for managing Marlin and host communication
@@ -469,6 +483,11 @@ private:
 
   #if ENABLED(PROBE_TEMP_COMPENSATION)
     static void G76();
+  #endif
+
+  #if SAVED_POSITIONS
+    static void G60();
+    static void G61();
   #endif
 
   #if ENABLED(GCODE_MOTION_MODES)

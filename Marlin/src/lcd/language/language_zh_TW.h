@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -199,14 +199,6 @@ namespace Language_zh_TW {
   PROGMEM Language_Str MSG_AUTOTEMP                        = _UxGT("自動控溫");     //"Autotemp"
   PROGMEM Language_Str MSG_LCD_ON                          = _UxGT("開");     //"On"
   PROGMEM Language_Str MSG_LCD_OFF                         = _UxGT("關");     //"Off"
-  PROGMEM Language_Str MSG_PID_P                           = _UxGT("PID-P");     //"PID-P"
-  PROGMEM Language_Str MSG_PID_P_E                         = _UxGT("PID-P *");
-  PROGMEM Language_Str MSG_PID_I                           = _UxGT("PID-I");     //"PID-I"
-  PROGMEM Language_Str MSG_PID_I_E                         = _UxGT("PID-I *");
-  PROGMEM Language_Str MSG_PID_D                           = _UxGT("PID-D");     //"PID-D"
-  PROGMEM Language_Str MSG_PID_D_E                         = _UxGT("PID-D *");
-  PROGMEM Language_Str MSG_PID_C                           = _UxGT("PID-C");     //"PID-C"
-  PROGMEM Language_Str MSG_PID_C_E                         = _UxGT("PID-C *");
   PROGMEM Language_Str MSG_SELECT                          = _UxGT("選擇");     //"Select"
   PROGMEM Language_Str MSG_SELECT_E                        = _UxGT("選擇 *");
   PROGMEM Language_Str MSG_ACC                             = _UxGT("加速度");     //"Accel" acceleration
@@ -248,7 +240,7 @@ namespace Language_zh_TW {
   PROGMEM Language_Str MSG_CONTRAST                        = _UxGT("LCD對比度");     //"LCD contrast"
   PROGMEM Language_Str MSG_STORE_EEPROM                    = _UxGT("保存設置");     //"Store memory"
   PROGMEM Language_Str MSG_LOAD_EEPROM                     = _UxGT("載入設置");     //"Load memory"
-  PROGMEM Language_Str MSG_RESTORE_FAILSAFE                = _UxGT("恢復安全值");     //"Restore failsafe"
+  PROGMEM Language_Str MSG_RESTORE_DEFAULTS                = _UxGT("恢復安全值");     //"Restore Defaults"
   PROGMEM Language_Str MSG_INIT_EEPROM                     = _UxGT("初始化設置");     // "Initialize EEPROM"
   PROGMEM Language_Str MSG_REFRESH                         = LCD_STR_REFRESH  _UxGT("刷新");     //"Refresh"
   PROGMEM Language_Str MSG_INFO_SCREEN                     = _UxGT("資訊界面");     //"Info screen"
@@ -282,7 +274,7 @@ namespace Language_zh_TW {
   PROGMEM Language_Str MSG_FILAMENTUNLOAD                  = _UxGT("卸載絲料");     // "Unload filament"
   PROGMEM Language_Str MSG_FILAMENTUNLOAD_E                = _UxGT("卸載絲料 *");     // "Unload filament"
   PROGMEM Language_Str MSG_FILAMENTUNLOAD_ALL              = _UxGT("卸載全部");     // "Unload All"
-  PROGMEM Language_Str MSG_INIT_MEDIA                      = _UxGT("初始化記憶卡");     //"Init. SD card"
+  PROGMEM Language_Str MSG_ATTACH_MEDIA                    = _UxGT("初始化記憶卡");     //"Init. SD card"
   PROGMEM Language_Str MSG_CHANGE_MEDIA                    = _UxGT("更換記憶卡");     //"Change SD card"
   PROGMEM Language_Str MSG_ZPROBE_OUT                      = _UxGT("Z探針在熱床之外");     //"Z probe out. bed" Z probe is not within the physical limits
   PROGMEM Language_Str MSG_SKEW_FACTOR                     = _UxGT("偏斜因數");     // "Skew Factor"

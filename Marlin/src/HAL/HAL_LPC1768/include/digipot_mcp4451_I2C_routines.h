@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -33,6 +33,7 @@
 #include <lpc17xx_i2c.h>
 #include <lpc17xx_pinsel.h>
 #include <lpc17xx_libcfg_default.h>
+#include "i2c_util.h"
 
 uint8_t digipot_mcp4451_start(uint8_t sla);
 uint8_t digipot_mcp4451_send_byte(uint8_t data);

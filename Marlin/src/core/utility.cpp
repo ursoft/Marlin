@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -34,6 +34,18 @@ void safe_delay(millis_t ms) {
   delay(ms);
   thermalManager.manage_heater(); // This keeps us safe if too many small safe_delay() calls are made
 }
+
+// A delay to provide brittle hosts time to receive bytes
+#if ENABLED(SERIAL_OVERRUN_PROTECTION)
+
+  #include "../gcode/gcode.h" // for set_autoreport_paused
+
+  void serial_delay(const millis_t ms) {
+    const bool was = gcode.set_autoreport_paused(true);
+    safe_delay(ms);
+    gcode.set_autoreport_paused(was);
+  }
+#endif
 
 #if ENABLED(DEBUG_LEVELING_FEATURE)
 
@@ -83,42 +95,42 @@ void safe_delay(millis_t ms) {
     #if HAS_BED_PROBE
 
       #if !HAS_PROBE_XY_OFFSET
-        SERIAL_ECHOPAIR("Probe Offset X0 Y0 Z", probe_offset.z, " (");
+        SERIAL_ECHOPAIR("Probe Offset X0 Y0 Z", probe.offset.z, " (");
       #else
-        SERIAL_ECHOPAIR_P(PSTR("Probe Offset X"), probe_offset.x, SP_Y_STR, probe_offset.y, SP_Z_STR, probe_offset.z);
-        if (probe_offset.x > 0)
+        SERIAL_ECHOPAIR_P(PSTR("Probe Offset X"), probe.offset_xy.x, SP_Y_STR, probe.offset_xy.y, SP_Z_STR, probe.offset.z);
+        if (probe.offset_xy.x > 0)
           SERIAL_ECHOPGM(" (Right");
-        else if (probe_offset.x < 0)
+        else if (probe.offset_xy.x < 0)
           SERIAL_ECHOPGM(" (Left");
-        else if (probe_offset.y != 0)
+        else if (probe.offset_xy.y != 0)
           SERIAL_ECHOPGM(" (Middle");
         else
           SERIAL_ECHOPGM(" (Aligned With");
 
-        if (probe_offset.y > 0) {
+        if (probe.offset_xy.y > 0) {
           #if IS_SCARA
             SERIAL_ECHOPGM("-Distal");
           #else
             SERIAL_ECHOPGM("-Back");
           #endif
         }
-        else if (probe_offset.y < 0) {
+        else if (probe.offset_xy.y < 0) {
           #if IS_SCARA
             SERIAL_ECHOPGM("-Proximal");
           #else
             SERIAL_ECHOPGM("-Front");
           #endif
         }
-        else if (probe_offset.x != 0)
+        else if (probe.offset_xy.x != 0)
           SERIAL_ECHOPGM("-Center");
 
         SERIAL_ECHOPGM(" & ");
 
       #endif
 
-      if (probe_offset.z < 0)
+      if (probe.offset.z < 0)
         SERIAL_ECHOPGM("Below");
-      else if (probe_offset.z > 0)
+      else if (probe.offset.z > 0)
         SERIAL_ECHOPGM("Above");
       else
         SERIAL_ECHOPGM("Same Z as");
@@ -127,17 +139,17 @@ void safe_delay(millis_t ms) {
     #endif
 
     #if HAS_ABL_OR_UBL
-      SERIAL_ECHOLNPGM("Auto Bed Leveling: "
-        #if ENABLED(AUTO_BED_LEVELING_LINEAR)
-          "LINEAR"
-        #elif ENABLED(AUTO_BED_LEVELING_BILINEAR)
-          "BILINEAR"
-        #elif ENABLED(AUTO_BED_LEVELING_3POINT)
-          "3POINT"
-        #elif ENABLED(AUTO_BED_LEVELING_UBL)
-          "UBL"
-        #endif
-      );
+      SERIAL_ECHOPGM("Auto Bed Leveling: ");
+      #if ENABLED(AUTO_BED_LEVELING_LINEAR)
+        SERIAL_ECHOLNPGM("LINEAR");
+      #elif ENABLED(AUTO_BED_LEVELING_BILINEAR)
+        SERIAL_ECHOLNPGM("BILINEAR");
+      #elif ENABLED(AUTO_BED_LEVELING_3POINT)
+        SERIAL_ECHOLNPGM("3POINT");
+      #elif ENABLED(AUTO_BED_LEVELING_UBL)
+        SERIAL_ECHOLNPGM("UBL");
+      #endif
+
       if (planner.leveling_active) {
         SERIAL_ECHOLNPGM(" (enabled)");
         #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
@@ -148,7 +160,7 @@ void safe_delay(millis_t ms) {
           SERIAL_ECHOPGM("ABL Adjustment X");
           LOOP_XYZ(a) {
             float v = planner.get_axis_position_mm(AxisEnum(a)) - current_position[a];
-            SERIAL_CHAR(' ', 'X' + char(a));
+            SERIAL_CHAR(' ', XYZ_CHAR(a));
             if (v > 0) SERIAL_CHAR('+');
             SERIAL_ECHO(v);
           }

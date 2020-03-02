@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@
 #line 46
 
 // manually add pins that have names that are macros which don't play well with these macros
-#if (AVR_ATmega2560_FAMILY || AVR_ATmega1284_FAMILY || defined(ARDUINO_ARCH_SAM))
+#if (AVR_ATmega2560_FAMILY || AVR_ATmega1284_FAMILY || defined(ARDUINO_ARCH_SAM) || defined(TARGET_LPC1768))
   #if SERIAL_PORT == 0
     static const char RXD_NAME_0[] PROGMEM = { "RXD0" };
     static const char TXD_NAME_0[] PROGMEM = { "TXD0" };
@@ -116,6 +116,9 @@ const PinInfo pin_array[] PROGMEM = {
     #elif AVR_ATmega1284_FAMILY
       { RXD_NAME_0, 8, true },
       { TXD_NAME_0, 9, true },
+    #elif defined(TARGET_LPC1768)
+      { RXD_NAME_0, 3, true },
+      { TXD_NAME_0, 2, true },
     #endif
   #elif SERIAL_PORT == 1
     #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
@@ -124,49 +127,72 @@ const PinInfo pin_array[] PROGMEM = {
     #elif AVR_ATmega1284_FAMILY
       { RXD_NAME_1, 10, true },
       { TXD_NAME_1, 11, true },
+    #elif defined(TARGET_LPC1768)
+      { RXD_NAME_1, 16, true },
+      { TXD_NAME_1, 15, true },
     #endif
   #elif SERIAL_PORT == 2
     #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
       { RXD_NAME_2, 17, true },
       { TXD_NAME_2, 16, true },
+    #elif defined(TARGET_LPC1768)
+      { RXD_NAME_2, 11, true },
+      { TXD_NAME_2, 10, true },
     #endif
   #elif SERIAL_PORT == 3
     #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
       { RXD_NAME_3, 15, true },
       { TXD_NAME_3, 14, true },
+    #elif defined(TARGET_LPC1768)
+      { RXD_NAME_3, 1, true },
+      { TXD_NAME_3, 0, true },
     #endif
   #endif
 
-  #if SERIAL_PORT_2 == 0
-    #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
-      { RXD_NAME_0, 0, true },
-      { TXD_NAME_0, 1, true },
-    #elif AVR_ATmega1284_FAMILY
-      { RXD_NAME_0, 8, true },
-      { TXD_NAME_0, 9, true },
-    #endif
-  #elif SERIAL_PORT_2 == 1
-    #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
-      { RXD_NAME_1, 19, true },
-      { TXD_NAME_1, 18, true },
-    #elif AVR_ATmega1284_FAMILY
-      { RXD_NAME_1, 10, true },
-      { TXD_NAME_1, 11, true },
-    #endif
-  #elif SERIAL_PORT_2 == 2
-    #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
-      { RXD_NAME_2, 17, true },
-      { TXD_NAME_2, 16, true },
-    #endif
-  #elif SERIAL_PORT_2 == 3
-    #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
-      { RXD_NAME_3, 15, true },
-      { TXD_NAME_3, 14, true },
+  #ifdef SERIAL_PORT_2
+    #if SERIAL_PORT_2 == 0
+      #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
+        { RXD_NAME_0, 0, true },
+        { TXD_NAME_0, 1, true },
+      #elif AVR_ATmega1284_FAMILY
+        { RXD_NAME_0, 8, true },
+        { TXD_NAME_0, 9, true },
+      #elif defined(TARGET_LPC1768)
+        { RXD_NAME_0, 3, true },
+        { TXD_NAME_0, 2, true },
+      #endif
+    #elif SERIAL_PORT_2 == 1
+      #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
+        { RXD_NAME_1, 19, true },
+        { TXD_NAME_1, 18, true },
+      #elif AVR_ATmega1284_FAMILY
+        { RXD_NAME_1, 10, true },
+        { TXD_NAME_1, 11, true },
+      #elif defined(TARGET_LPC1768)
+        { RXD_NAME_1, 16, true },
+        { TXD_NAME_1, 15, true },
+      #endif
+    #elif SERIAL_PORT_2 == 2
+      #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
+        { RXD_NAME_2, 17, true },
+        { TXD_NAME_2, 16, true },
+      #elif defined(TARGET_LPC1768)
+        { RXD_NAME_2, 11, true },
+        { TXD_NAME_2, 10, true },
+      #endif
+    #elif SERIAL_PORT_2 == 3
+      #if (AVR_ATmega2560_FAMILY || defined(ARDUINO_ARCH_SAM))
+        { RXD_NAME_3, 15, true },
+        { TXD_NAME_3, 14, true },
+      #elif defined(TARGET_LPC1768)
+        { RXD_NAME_3, 1, true },
+        { TXD_NAME_3, 0, true },
+      #endif
     #endif
   #endif
 
   #include "pinsDebug_list.h"
-  #line 98
+  #line 172
 
 };
 

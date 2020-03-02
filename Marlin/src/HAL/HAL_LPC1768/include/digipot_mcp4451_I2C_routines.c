@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -36,7 +36,6 @@
 #endif
 
 #include "digipot_mcp4451_I2C_routines.h"
-#include "i2c_util.h"
 
 // These two routines are exact copies of the lpc17xx_i2c.c routines.  Couldn't link to
 // to the lpc17xx_i2c.c routines so had to copy them into this file & rename them.
