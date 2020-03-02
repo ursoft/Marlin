@@ -299,6 +299,9 @@ FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, cons
 
 #endif // DO_DRAW_CHAMBER
 
+#if ENABLED(LCD_SHOW_ENDSTOPS_STATUS)
+ #include "../../module/endstops.h"
+#endif
 //
 // Before homing, blink '123' <-> '???'.
 // Homed but unknown... '123' <-> '   '.
@@ -311,8 +314,13 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
     #endif
     axis
   );
+#if ENABLED(LCD_SHOW_ENDSTOPS_STATUS)
+  uint32_t axisName = (endstops.axis_min(axis) ? L'x' : L'X') + uint8_t(axis);
+#else
+  uint32_t axisName = L'X' + uint8_t(axis);
+#endif
   const uint8_t offs = (XYZ_SPACING) * a;
-  lcd_put_wchar(X_LABEL_POS + offs, XYZ_BASELINE, axis_codes[axis]);
+  lcd_put_wchar(X_LABEL_POS + offs, XYZ_BASELINE, axisName);
   lcd_moveto(X_VALUE_POS + offs, XYZ_BASELINE);
   if (blink)
     lcd_put_u8str(value);

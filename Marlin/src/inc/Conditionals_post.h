@@ -1966,9 +1966,6 @@
   #if ENABLED(BLTOUCH) && !defined(BLTOUCH_DELAY)
     #define BLTOUCH_DELAY 500
   #endif
-  #if SD_CONNECTION_IS(LCD_AND_ONBOARD) && DISABLED(NO_SD_HOST_DRIVE)
-    #define SHARED_SD_CARD
-  #endif
 #endif
 
 #ifndef __SAM3X8E__ //todo: hal: broken hal encapsulation
@@ -2085,6 +2082,9 @@
     // mount/unmount the card and refresh it. So we disable card detect.
     //
     #undef SD_DETECT_PIN
+    #define SHARED_SD_CARD
+  #endif
+  #if SD_CONNECTION_IS(LCD_AND_ONBOARD) && DISABLED(NO_SD_HOST_DRIVE)
     #define SHARED_SD_CARD
   #endif
   #if DISABLED(SHARED_SD_CARD)
