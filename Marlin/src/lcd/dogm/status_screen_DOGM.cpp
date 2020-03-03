@@ -625,7 +625,9 @@ void MarlinUI::draw_status_screen() {
     //
     // SD Card Symbol
     //
-    if (card.isFileOpen() && PAGE_CONTAINS(42, 51)) {
+    if(PAGE_CONTAINS(42, 51)) {
+    #ifndef DOGM_SD_PRESENT
+    if (card.isFileOpen() &&) {
       // Upper box
       u8g.drawBox(42, 42, 8, 7);     // 42-48 (or 41-47)
       // Right edge
@@ -634,6 +636,43 @@ void MarlinUI::draw_status_screen() {
       u8g.drawFrame(42, 49, 10, 4);  // 49-52 (or 48-51)
       // Corner pixel
       u8g.drawPixel(50, 43);         // 43 (or 42)
+    }
+    #else
+    #if SD_CONNECTION_IS(LCD)
+     bool bigCard = true;
+     bool inserted = IS_SD_INSERTED();
+     bool mounted = card.isMounted();
+    #endif
+    #if SD_CONNECTION_IS(ONBOARD)
+     bool bigCard = false;
+     bool inserted = IS_SD_INSERTED();
+     bool mounted = card.isMounted();
+    #endif
+    #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+     bool inserted = IS_EXT_SD_INSERTED();
+     bool bigCard = true;
+     bool mounted = false;
+     if(inserted) {
+       mounted = card.isMounted();
+     } else {
+       bigCard = false;
+       inserted = IS_SD_INSERTED();
+       if(inserted) mounted = card.isMountedOnBoard();
+     }
+    #endif
+    if (mounted || (inserted && blink /* not mounted */)) {
+      u8g.drawBox(42, 42, 8, bigCard ? 11 : 6);
+      u8g.drawBox(50, 44, 2, bigCard ? 9 : 4);
+      if(bigCard) u8g.drawFrame(38, 42, 5, 11);
+      else u8g.drawFrame(42, 48, 10, 5);
+      u8g.drawPixel(50, 43);
+
+      if(card.isFileOpen() && blink) { // printing
+        if(bigCard) u8g.drawVLine(40, 44, 7); 
+        else u8g.drawHLine(44, 50, 6); 
+      }
+    } /* else empty */
+    #endif
     }
   #endif // SDSUPPORT
 
