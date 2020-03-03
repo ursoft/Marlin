@@ -1825,9 +1825,7 @@
 //
 // Note: Usually sold with a white PCB.
 //
-#if (GITHUB_USER!=URSOFT)
-#define REPRAP_DISCOUNT_SMART_CONTROLLER
-#endif
+//#define REPRAP_DISCOUNT_SMART_CONTROLLER
 //
 // Original RADDS LCD Display+Encoder+SDCardReader
 // http://doku.radds.org/dokumentation/lcd-display/
@@ -2036,10 +2034,8 @@
 //#define FYSETC_MINI_12864_X_X    // Type C/D/E/F. No tunable RGB Backlight by default
 //#define FYSETC_MINI_12864_1_2    // Type C/D/E/F. Simple RGB Backlight (always on)
 //#define FYSETC_MINI_12864_2_0    // Type A/B. Discreet RGB Backlight
-#if (GITHUB_USER==URSOFT)
- #define FYSETC_MINI_12864_2_1    // Type A/B. Neopixel RGB Backlight
- #define LCD_CONTRAST_MIN 190
-#endif
+#define FYSETC_MINI_12864_2_1    // Type A/B. Neopixel RGB Backlight
+#define LCD_CONTRAST_MIN 190
 //#define FYSETC_GENERIC_12864_1_1 // Larger display with basic ON/OFF backlight.
 
 //
@@ -2262,10 +2258,8 @@
 #endif
 
 // Support for Adafruit Neopixel LED driver
-#if (GITHUB_USER==URSOFT)
- #define NEOPIXEL_LED
- #define NEOPIXEL_EEPROM_STORE_HACK // store user color to EERPOM (unused area) // https://github.com/ursoft/Marlin/issues/33
-#endif
+#define NEOPIXEL_LED
+#define NEOPIXEL_EEPROM_STORE_HACK // store user color to EERPOM (unused area) // https://github.com/ursoft/Marlin/issues/33
 #if ENABLED(NEOPIXEL_LED)
   #define NEOPIXEL_TYPE   NEO_GRBW // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
   //#define NEOPIXEL_PIN     4       // LED driving pin

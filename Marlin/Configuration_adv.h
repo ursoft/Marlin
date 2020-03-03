@@ -962,9 +962,7 @@
    * LED Control Menu
    * Add LED Control to the LCD menu
    */
-#if (GITHUB_USER==URSOFT)
   #define LED_CONTROL_MENU
-#endif
   #if ENABLED(LED_CONTROL_MENU)
     #define LED_COLOR_PRESETS                 // Enable the Preset Color menu option
     #if ENABLED(LED_COLOR_PRESETS) // UlTi color:
