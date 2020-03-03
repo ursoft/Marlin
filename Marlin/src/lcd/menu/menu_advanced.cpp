@@ -200,6 +200,17 @@ void menu_cancelobject();
 #if ENABLED(PID_EDIT_MENU)
 
   float raw_Ki, raw_Kd; // place-holders for Ki and Kd edits
+  #if ENABLED(PIDTEMPBED)
+   float raw_Ki_bed, raw_Kd_bed; // place-holders for Ki and Kd edits
+   // Helpers for editing PID Ki & Kd values
+   // grab the PID value out of the temp variable; scale it; then update the PID driver
+   void copy_and_scalePIDBED_i() {
+    Temperature::temp_bed.pid.Ki = scalePID_i(raw_Ki_bed);
+   }
+   void copy_and_scalePIDBED_d() {
+    Temperature::temp_bed.pid.Kd = scalePID_d(raw_Kd_bed);
+   }
+  #endif
 
   // Helpers for editing PID Ki & Kd values
   // grab the PID value out of the temp variable; scale it; then update the PID driver
@@ -296,9 +307,21 @@ void menu_cancelobject();
         #define _PID_EDIT_MENU_ITEMS(N) _PID_BASE_MENU_ITEMS(N)
       #endif
 
+      #if ENABLED(PIDTEMPBED)
+        #define _PIDBED_EDIT_MENU_ITEMS \
+          raw_Ki_bed = unscalePID_i(Temperature::temp_bed.pid.Ki); \
+          raw_Kd_bed = unscalePID_d(Temperature::temp_bed.pid.Kd); \
+          EDIT_ITEM_P(float52sign, PSTR("BED PID-P"), &Temperature::temp_bed.pid.Kp, 1, 9990); \
+          EDIT_ITEM_P(float52sign, PSTR("BED PID-I"), &raw_Ki_bed, 0.01f, 9990, []{ copy_and_scalePIDBED_i(); }); \
+          EDIT_ITEM_P(float52sign, PSTR("BED PID-D"), &raw_Kd_bed, 1, 9990, []{ copy_and_scalePIDBED_d(); })
+      #else
+        #define _PIDBED_EDIT_MENU_ITEMS NOOP
+      #endif
+
     #else
 
       #define _PID_EDIT_MENU_ITEMS(N) NOOP
+      #define _PIDBED_EDIT_MENU_ITEMS NOOP
 
     #endif
 
@@ -313,6 +336,13 @@ void menu_cancelobject();
     PID_EDIT_MENU_ITEMS(0);
     #if HOTENDS > 1 && ENABLED(PID_PARAMS_PER_HOTEND)
       REPEAT_S(1, HOTENDS, PID_EDIT_MENU_ITEMS)
+    #endif
+
+    #if ENABLED(PID_AUTOTUNE_MENU)
+     _PIDBED_EDIT_MENU_ITEMS;
+     #if ENABLED(PIDTEMPBED)
+      EDIT_ITEM_FAST_P(int3, PSTR("PID Autotune BED"), &autotune_temp_bed, 40, BED_MAXTEMP - 10, []{ _lcd_autotune(-1); });
+     #endif
     #endif
 
     END_MENU();
