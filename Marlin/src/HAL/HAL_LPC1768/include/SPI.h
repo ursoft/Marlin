@@ -37,6 +37,76 @@ class SPISettings {
 };
 
 #ifdef NEED_SPI_TEMPLATE_CLASS
+
+#if ENABLED(LPC_SOFTWARE_SPI)
+
+  #include <SoftwareSPI.h>
+
+template<int NT_SCK_PIN = SCK_PIN, int NT_MISO_PIN = MISO_PIN, int NT_MOSI_PIN = MOSI_PIN>
+class SPIClass {
+  public:
+    uint8_t SPI_speed;
+
+    static void spiBegin() {
+      swSpiBegin(NT_SCK_PIN, NT_MISO_PIN, NT_MOSI_PIN);
+    }
+
+    void spiInit(uint8_t spiRate) {
+      SPI_speed = swSpiInit(spiRate, NT_SCK_PIN, NT_MOSI_PIN);
+    }
+
+    uint8_t spiTransfer(uint8_t b) {
+      return swSpiTransfer(b, SPI_speed, NT_SCK_PIN, NT_MISO_PIN, NT_MOSI_PIN);
+    }
+
+    uint8_t spiRec() { return spiTransfer(0xFF); }
+
+    void spiRead(uint8_t*buf, uint16_t nbyte) {
+      for (int i = 0; i < nbyte; i++)
+        buf[i] = spiTransfer(0xFF);
+    }
+
+    void spiSend(uint8_t b) { (void)spiTransfer(b); }
+
+    void spiSend(const uint8_t* buf, size_t nbyte) {
+      for (uint16_t i = 0; i < nbyte; i++)
+        (void)spiTransfer(buf[i]);
+    }
+
+    void spiSendBlock(uint8_t token, const uint8_t* buf) {
+      (void)spiTransfer(token);
+      for (uint16_t i = 0; i < 512; i++)
+        (void)spiTransfer(buf[i]);
+    }
+
+  public:
+    void begin() { spiBegin(); }
+    void beginTransaction(SPISettings cfg) {
+      uint8_t spiRate;
+      switch (cfg.spiRate()) {
+        case 8000000: spiRate = 0; break;
+        case 4000000: spiRate = 1; break;
+        case 2000000: spiRate = 2; break;
+        case 1000000: spiRate = 3; break;
+        case  500000: spiRate = 4; break;
+        case  250000: spiRate = 5; break;
+        case  125000: spiRate = 6; break;
+        default: spiRate = 2; break;
+      }
+      spiInit(spiRate);
+    }
+    void endTransaction() {}
+    uint8_t transfer(uint8_t B)  { return spiTransfer(B); }
+    uint16_t transfer16(uint16_t data) {
+      return (transfer((data >> 8) & 0xFF) << 8)
+       | (transfer(data & 0xFF) & 0xFF);
+    }
+};
+
+SPIClass<> SPI_LCD;
+SPIClass<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB> SPI_OB;
+#else
+
 // decide which HW SPI device to use
 #ifndef LPC_HW_SPI_DEV
   #if (SCK_PIN == P0_07 && MISO_PIN == P0_08 && MOSI_PIN == P0_09)
@@ -173,9 +243,9 @@ class SPIClass {
        | (transfer(data & 0xFF) & 0xFF);
     }
 };
-
 SPIClass<> SPI_LCD;
 SPIClass<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB, 1> SPI_OB;
+#endif
 
 #else
 class SPIClass {

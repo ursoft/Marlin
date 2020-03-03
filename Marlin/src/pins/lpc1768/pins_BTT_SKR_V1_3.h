@@ -283,7 +283,7 @@
 
       #define LCD_BACKLIGHT_PIN -1
 
-      //#define FORCE_SOFT_SPI      // Use this if default of hardware SPI causes display problems
+      #define FORCE_SOFT_SPI      // Use this if default of hardware SPI causes display problems
                                   //   results in LCD soft SPI mode 3, SD soft SPI mode 0
 
       #define LCD_RESET_PIN EXPA1_06_PIN   // Must be high or open for LCD to operate normally.

@@ -350,11 +350,7 @@ void MarlinUI::init() {
       SET_INPUT_PULLUP(SD_DETECT_PIN_OB);
     #endif
     #if ENABLED(INIT_SDCARD_ON_BOOT)
-      #ifdef SD_DETECT_PIN_OB
-        lcd_sd_status = 2; // if only internal sd card on boot up, do not mount it
-      #else
-        lcd_sd_status = 255; // UNKNOWN
-      #endif
+      lcd_sd_status = 255; // UNKNOWN
     #endif
   #endif
 
@@ -886,7 +882,7 @@ void MarlinUI::update() {
       uint8_t old_sd_status = lcd_sd_status; // prevent re-entry to this block!
       lcd_sd_status = sd_status;
 
-      if (sd_status) {
+      if (sd_status & 1) {
         safe_delay(500); // Some boards need a delay to get settled
         card.mount();
         if (old_sd_status == 255)
