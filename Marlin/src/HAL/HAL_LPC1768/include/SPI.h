@@ -38,12 +38,10 @@ class SPISettings {
 
 #ifdef NEED_SPI_TEMPLATE_CLASS
 
-#if ENABLED(LPC_SOFTWARE_SPI)
-
-  #include <SoftwareSPI.h>
+#include <SoftwareSPI.h>
 
 template<int NT_SCK_PIN = SCK_PIN, int NT_MISO_PIN = MISO_PIN, int NT_MOSI_PIN = MOSI_PIN>
-class SPIClass {
+class SoftwareSPI {
   public:
     uint8_t SPI_speed;
 
@@ -103,10 +101,6 @@ class SPIClass {
     }
 };
 
-SPIClass<> SPI_LCD;
-SPIClass<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB> SPI_OB;
-#else
-
 // decide which HW SPI device to use
 #ifndef LPC_HW_SPI_DEV
   #if (SCK_PIN == P0_07 && MISO_PIN == P0_08 && MOSI_PIN == P0_09)
@@ -132,7 +126,7 @@ SPIClass<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB> SPI_OB;
 #include <lpc17xx_clkpwr.h>
 
 template<int NT_SCK_PIN = SCK_PIN, int NT_MISO_PIN = MISO_PIN, int NT_MOSI_PIN = MOSI_PIN, int NT_LPC_HW_SPI_DEV = _LPC_HW_SPI_DEV>
-class SPIClass {
+class HardwareSPI {
   public:
     static void spiBegin() {  // setup SCK, MOSI & MISO pins for SSP0
       PINSEL_CFG_Type PinCfg;  // data structure to hold init values
@@ -243,9 +237,6 @@ class SPIClass {
        | (transfer(data & 0xFF) & 0xFF);
     }
 };
-SPIClass<> SPI_LCD;
-SPIClass<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB, 1> SPI_OB;
-#endif
 
 #else
 class SPIClass {

@@ -119,7 +119,7 @@ public:
    *
    * \return true for success or false for failure.
    */
-  bool init(const uint8_t sckRateID, const pin_t chipSelectPin);
+  bool init(const uint8_t sckRateID, const pin_t chipSelectPin, const uint16_t timeout = SD_INIT_TIMEOUT);
 
   bool readBlock(uint32_t block, uint8_t* dst);
 

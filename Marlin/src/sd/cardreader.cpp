@@ -118,7 +118,7 @@ CardReader::CardReader() {
   #if ENABLED(SDCARD_SORT_ALPHA)
     sort_count = 0;
     #if ENABLED(SDSORT_GCODE)
-      sort_alpha = true;
+      sort_alpha = SDSORT_GCODE_DEFAULT_SORT_ALPHA;
       sort_folders = FOLDER_SORTING;
       //sort_reverse = false;
     #endif
@@ -176,6 +176,7 @@ bool CardReader::is_dir_or_gcode(const dir_t &p) {
 // Get the number of (compliant) items in the folder
 //
 int CardReader::countItems(SdFile dir) {
+  //uint32_t start_t = millis();
   dir_t p;
   int c = 0;
   while (dir.readDir(&p, longFilename) > 0)
@@ -185,6 +186,7 @@ int CardReader::countItems(SdFile dir) {
     nrFiles = c;
   #endif
 
+  //SERIAL_ECHOLNPAIR("cI: ", millis() - start_t);
   return c;
 }
 
@@ -366,14 +368,15 @@ void CardReader::mount() {
   flag.mounted = false;
   if (root.isOpen()) root.close();
 
-  if (!sd2card.init(SPI_SPEED, SDSS)
-    #if defined(SS_PIN_OB) && (SS_PIN_OB != SDSS)
-      && !sd2card.init(SPI_SPEED, SS_PIN_OB)
-    #endif
-    #if defined(LCD_SDSS) && (LCD_SDSS != SDSS)
-      && !sd2card.init(SPI_SPEED, LCD_SDSS)
-    #endif
-  ) SERIAL_ECHO_MSG(STR_SD_INIT_FAIL);
+  int inserted = IS_SD_INSERTED();
+  int pin = SDSS;
+  #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+    if((inserted & 1) == 0) {
+      pin = SS_PIN_OB;
+    }
+  #endif
+
+  if (!inserted || !sd2card.init(SPI_SPEED, pin)) SERIAL_ECHO_MSG(STR_SD_INIT_FAIL);
   else if (!volume.init(&sd2card))
     SERIAL_ERROR_MSG(STR_SD_VOL_INIT_FAIL);
   else if (!root.openRoot(&volume))
@@ -910,11 +913,6 @@ void CardReader::cdroot() {
     // Throw away old sort index
     flush_presort();
 
-    // Sorting may be turned off
-    #if ENABLED(SDSORT_GCODE)
-      if (!sort_alpha) return;
-    #endif
-
     // If there are files, sort up to the limit
     uint16_t fileCnt = countFilesInWorkDir();
     if (fileCnt > 0) {
@@ -986,6 +984,13 @@ void CardReader::cdroot() {
         }
 
         // Bubble Sort
+      // Sorting may be turned off
+      #if ENABLED(SDSORT_GCODE)
+        if (!sort_alpha) {
+          for (uint16_t i = 0; i < fileCnt; i++)
+            sort_order[i] = i;
+        } else
+      #endif
         for (uint16_t i = fileCnt; --i;) {
           bool didSwap = false;
           uint8_t o1 = sort_order[0];

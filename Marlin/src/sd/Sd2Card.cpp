@@ -37,6 +37,14 @@
 #if ENABLED(SDSUPPORT) && NONE(USB_FLASH_DRIVE_SUPPORT, SDIO_SUPPORT)
 
 #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+ #if ENABLED(LPC_SOFTWARE_SPI)
+   SoftwareSPI<> SPI_LCD; //slow, but no conflicts with Fysetc Display
+ #else
+   HardwareSPI<> SPI_LCD;
+ #endif
+  SoftwareSPI<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB> SPI_OB;
+  //HardwareSPI<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB, 1> SPI_OB; //much slower!!?
+
  #define spiSend(P) (isOnBoard() ? SPI_OB.spiSend(P) : SPI_LCD.spiSend(P))
  #define spiRead(P1, P2) (isOnBoard() ? SPI_OB.spiRead(P1, P2) : SPI_LCD.spiRead(P1, P2))
  #define spiInit(P) (isOnBoard() ? SPI_OB.spiInit(P) : SPI_LCD.spiInit(P))
@@ -236,15 +244,16 @@ bool Sd2Card::eraseSingleBlockEnable() {
  *
  * \param[in] sckRateID SPI clock rate selector. See setSckRate().
  * \param[in] chipSelectPin SD chip select pin number.
+ * \param[in] timeout in ms.
  *
  * \return true for success, false for failure.
  * The reason for failure can be determined by calling errorCode() and errorData().
  */
-bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin) {
+bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin, const uint16_t timeout /*= SD_INIT_TIMEOUT*/) {
   errorCode_ = type_ = 0;
   chipSelectPin_ = chipSelectPin;
   // 16-bit init start time allows over a minute
-  const millis_t init_timeout = millis() + SD_INIT_TIMEOUT;
+  const millis_t init_timeout = millis() + timeout;
   uint32_t arg;
 
   watchdog_refresh(); // In case init takes too long
