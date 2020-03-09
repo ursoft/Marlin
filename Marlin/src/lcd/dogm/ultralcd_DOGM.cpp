@@ -63,6 +63,10 @@
   #include "../../feature/bedlevel/bedlevel.h"
 #endif
 
+#if ENABLED(NEOPIXEL_LED)
+  #include "../../feature/leds/neopixel.h"
+#endif
+
 /**
  * Include all needed font files
  * (See http://marlinfw.org/docs/development/fonts.html)
@@ -212,6 +216,10 @@ bool MarlinUI::detected() { return true; }
       constexpr millis_t d = MARLIN_BOOTSCREEN_FRAME_TIME;
       LOOP_L_N(f, COUNT(marlin_bootscreen_animation)) {
         draw_bootscreen_bmp((uint8_t*)pgm_read_ptr(&marlin_bootscreen_animation[f]));
+#if ENABLED(NEOPIXEL_LED)
+        neo.set_brightness(LED_USER_PRESET_BRIGHTNESS + (f + 1) * (255 - LED_USER_PRESET_BRIGHTNESS) / COUNT(marlin_bootscreen_animation) );
+        neo.show();
+#endif
         if (d) safe_delay(d);
       }
     #endif
@@ -220,13 +228,15 @@ bool MarlinUI::detected() { return true; }
   // Show the Marlin bootscreen, with the u8g loop and delays
   void MarlinUI::show_marlin_bootscreen() {
     #ifndef BOOTSCREEN_TIMEOUT
-      #define BOOTSCREEN_TIMEOUT 2500
+      #define BOOTSCREEN_TIMEOUT 1500
     #endif
     constexpr uint8_t pages = two_part ? 2 : 1;
     for (uint8_t q = pages; q--;) {
       draw_marlin_bootscreen(q == 0);
       safe_delay((BOOTSCREEN_TIMEOUT) / pages);
     }
+    //clear screen to avoid flicker
+    u8g.firstPage(); do {} while(u8g.nextPage());
   }
 
   void MarlinUI::show_bootscreen() {
