@@ -716,7 +716,7 @@ void MarlinSettings::postprocess() {
     {
       _FIELD_TEST(planner_leveling_active);
 
-      #if EITHER(AUTO_BED_LEVELING_UBL, MESH_BED_LEVELING)
+      #if ANY(AUTO_BED_LEVELING_UBL, MESH_BED_LEVELING,AUTO_BED_LEVELING_BILINEAR)
         EEPROM_WRITE(planner.leveling_active);
       #else
         const bool ubl_active = false;
@@ -1610,7 +1610,7 @@ void MarlinSettings::postprocess() {
       {
         _FIELD_TEST(planner_leveling_active);
 
-        #if EITHER(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL)
+        #if ANY(AUTO_BED_LEVELING_UBL, MESH_BED_LEVELING,AUTO_BED_LEVELING_BILINEAR)
           EEPROM_READ(planner.leveling_active);
         #else
           bool planner_leveling_active;
