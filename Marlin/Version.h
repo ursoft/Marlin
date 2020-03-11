@@ -28,7 +28,7 @@
 /**
  * Marlin release version identifier
  */
-#define SHORT_BUILD_VERSION "bf-2.0.x.4" //last is build No
+#define SHORT_BUILD_VERSION "bf-2.0.x.5" //last is build No
 
 /**
  * Verbose version identifier which should contain a reference to the location

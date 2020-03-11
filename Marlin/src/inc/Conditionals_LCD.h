@@ -497,7 +497,7 @@
   #undef DEACTIVATE_SERVOS_AFTER_MOVE
   #if NUM_SERVOS == 1
     #undef SERVO_DELAY
-    #define SERVO_DELAY { 50 }
+    #define SERVO_DELAY { 750 }
   #endif
 
   // Always disable probe pin inverting for BLTouch

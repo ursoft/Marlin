@@ -820,8 +820,8 @@ void Endstops::update() {
         if (true
           #if ENABLED(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN)
             && z_probe_enabled
-          #elif HAS_CUSTOM_PROBE_PIN
-            && !z_probe_enabled
+          //#elif HAS_CUSTOM_PROBE_PIN /* stop on Zmin also, not only probe */
+          //  && !z_probe_enabled
           #endif
         ) PROCESS_ENDSTOP_Z(MIN);
       #endif

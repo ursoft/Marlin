@@ -53,8 +53,12 @@ void BLTouch::init(const bool set_voltage/*=false*/) {
   //               This mode will stay active until manual SET_OD_MODE or power cycle
   // BLTOUCH V3.1: SET_5V_MODE or SET_OD_MODE (if enabled).
   //               At power on, the probe will default to the eeprom settings configured by the user
+#if (GITHUB_USER==URSOFT)
+  stow_proc();
+#else
   _reset();
   _stow();
+#endif
 
   #if ENABLED(BLTOUCH_FORCE_MODE_SET)
 

@@ -420,7 +420,11 @@
 #define CHAMBER_AUTO_FAN_PIN -1
 
 #define EXTRUDER_AUTO_FAN_TEMPERATURE 50
-#define EXTRUDER_AUTO_FAN_SPEED 200   // 255 == full speed
+#if (GITHUB_USER==URSOFT)
+ #define EXTRUDER_AUTO_FAN_SPEED 100
+#else
+ #define EXTRUDER_AUTO_FAN_SPEED 200   // 255 == full speed
+#endif
 #define EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE
 //#define CHAMBER_AUTO_FAN_TEMPERATURE 30
 //#define CHAMBER_AUTO_FAN_SPEED 255
@@ -1479,11 +1483,13 @@
 
   #define BABYSTEP_DISPLAY_TOTAL          // Display total babysteps since last G28
 
-  //#define BABYSTEP_ZPROBE_OFFSET          // Combine M851 Z and Babystepping
+ #if (GITHUB_USER==URSOFT)
+  #define BABYSTEP_ZPROBE_OFFSET          // Combine M851 Z and Babystepping
   #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
     //#define BABYSTEP_HOTEND_Z_OFFSET      // For multiple hotends, babystep relative Z offsets
-    //#define BABYSTEP_ZPROBE_GFX_OVERLAY   // Enable graphical overlay on Z-offset editor
+    #define BABYSTEP_ZPROBE_GFX_OVERLAY   // Enable graphical overlay on Z-offset editor
   #endif
+ #endif
 #endif
 
 // @section extruder
@@ -3150,7 +3156,9 @@
 //
 // M43 - display pin status, toggle pins, watch pins, watch endstops & toggle LED, test servo probe
 //
-//#define PINS_DEBUGGING
+#if (GITHUB_USER==URSOFT)
+ #define PINS_DEBUGGING
+#endif
 
 // Enable Marlin dev mode which adds some special commands
 //#define MARLIN_DEV_MODE
