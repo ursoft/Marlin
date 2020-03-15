@@ -864,9 +864,9 @@ void CardReader::cdroot() {
    */
   void CardReader::getfilename_sorted(const uint16_t nr) {
     selectFileByIndex(
-      #if ENABLED(SDSORT_GCODE)
-        sort_alpha &&
-      #endif
+      //#if ENABLED(SDSORT_GCODE)
+      //  sort_alpha &&
+      //#endif
       (nr < sort_count) ? sort_order[nr] : nr
     );
   }
@@ -972,9 +972,9 @@ void CardReader::cdroot() {
             selectFileByIndex(i);
             SET_SORTNAME(i);
             SET_SORTSHORT(i);
-            // char out[30];
-            // sprintf_P(out, PSTR("---- %i %s %s"), i, flag.filenameIsDir ? "D" : " ", sortnames[i]);
-            // SERIAL_ECHOLN(out);
+             char out[30];
+             sprintf_P(out, PSTR("---- %i %s %s"), i, flag.filenameIsDir ? "D" : " ", sortnames[i]);
+             SERIAL_ECHOLN(out);
             #if HAS_FOLDER_SORTING
               const uint16_t bit = i & 0x07, ind = i >> 3;
               if (bit == 0) isDir[ind] = 0x00;
@@ -987,8 +987,7 @@ void CardReader::cdroot() {
       // Sorting may be turned off
       #if ENABLED(SDSORT_GCODE)
         if (!sort_alpha) {
-          for (uint16_t i = 0; i < fileCnt; i++)
-            sort_order[i] = i;
+          sort_count = fileCnt;
         } else
       #endif
         for (uint16_t i = fileCnt; --i;) {
