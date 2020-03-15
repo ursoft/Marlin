@@ -346,6 +346,13 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
   }
 }
 
+#if ENABLED(DOGM_SHOW_SPEED)
+ extern int16_t dogmSpeedToShow;
+#endif
+#if ENABLED(DOGM_SHOW_LAYER)
+  extern int dogmLayerCnt, dogmLayer;
+  extern char conv[8];
+#endif
 void MarlinUI::draw_status_screen() {
 
   static char xstring[5
@@ -502,6 +509,22 @@ void MarlinUI::draw_status_screen() {
 
   // Status Menu Font
   set_font(FONT_STATUSMENU);
+  #if ENABLED(DOGM_SHOW_SPEED)
+    u8g.drawHLine(35, 0, 6);
+    u8g.drawHLine(33, 3, 6);
+    u8g.drawHLine(31, 6, 6);
+    lcd_put_u8str(43, 7, i16tostr3(dogmSpeedToShow));
+  #endif
+  #if ENABLED(DOGM_SHOW_LAYER)
+    if(dogmLayer) {
+      sprintf(conv, "L%d", dogmLayer);
+      lcd_put_u8str(32 - 5 * (dogmLayer > 999) - 5 * (dogmLayerCnt > 999), 16, conv);
+      if(dogmLayerCnt) {
+        sprintf(conv, "/%d", dogmLayerCnt);
+        lcd_put_u8str(conv);
+      }
+    }
+  #endif
 
   #if DO_DRAW_LOGO
     if (PAGE_CONTAINS(STATUS_LOGO_Y, STATUS_LOGO_Y + STATUS_LOGO_HEIGHT - 1))

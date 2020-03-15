@@ -76,6 +76,10 @@
   #include "../feature/bedlevel/bedlevel.h"
 #endif
 
+#if ENABLED(DOGM_SHOW_SPEED)
+ int16_t dogmSpeedToShow = 0;
+#endif
+
 #if ENABLED(FILAMENT_WIDTH_SENSOR)
   #include "../feature/filwidth.h"
 #endif
@@ -2506,6 +2510,9 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   // Update previous path unit_vector and nominal speed
   previous_speed = current_speed;
   previous_nominal_speed_sqr = block->nominal_speed_sqr;
+#if ENABLED(DOGM_SHOW_SPEED)
+  dogmSpeedToShow = int16_t(0.5 + SQRT(block->nominal_speed_sqr));
+#endif
 
   // Update the position
   position = target;

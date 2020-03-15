@@ -135,11 +135,45 @@ void GCodeQueue::_commit_command(bool say_ok
  * Return true if the command was successfully added.
  * Return false for a full buffer, or if the 'command' is a comment.
  */
+#if ENABLED(DOGM_SHOW_LAYER)
+  int runLayer = 0, runLayerCnt = 0;
+  int dogmLayerCnt = 0, dogmLayer = 0;
+  bool lastLayerCountEncountered = false;
+  void AnalyzeComment(const char* cmd) {
+    if(*cmd == ';') {
+      int val;
+      if(cmd[1] == 'L' && cmd[2] == 'A' && cmd[3] == 'Y' && cmd[4] == 'E' && cmd[5] == 'R') {
+        if(cmd[6] == ':') {
+          if(1 == sscanf(cmd + 7, "%d", &val)) {
+            dogmLayer = val + 1;
+            if(val == 0 && !lastLayerCountEncountered) {
+              dogmLayerCnt = 0;
+            }
+            lastLayerCountEncountered = false;
+          }
+        } else if(cmd[6] == '_' && cmd[7] == 'C' && cmd[8] == 'O' && cmd[9] == 'U' && cmd[10] == 'N' && cmd[11] == 'T' && cmd[12] == ':') {
+          if(1 == sscanf(cmd + 13, "%d", &val)) {
+            dogmLayer = 0;
+            dogmLayerCnt = val;
+            lastLayerCountEncountered = true;
+          }
+        } else {
+          lastLayerCountEncountered = false;
+        }
+      }
+      return;
+    }
+    lastLayerCountEncountered = false;
+  }
+#endif
 bool GCodeQueue::_enqueue(const char* cmd, bool say_ok/*=false*/
   #if NUM_SERIAL > 1
     , int16_t pn/*=-1*/
   #endif
 ) {
+#if ENABLED(DOGM_SHOW_LAYER)
+  AnalyzeComment(cmd);
+#endif
   if (*cmd == ';' || length >= BUFSIZE) return false;
   strcpy(command_buffer[index_w], cmd);
   _commit_command(say_ok
@@ -314,9 +348,129 @@ FORCE_INLINE bool is_M29(const char * const cmd) {  // matches "M29" & "M29 ", b
 #define PS_QUOTED 2
 #define PS_PAREN  3
 #define PS_ESC    4
+#if ENABLED(DOGM_SHOW_LAYER)
+  #define PS_EOL_SKIP 104
+  #define PS_EOL_L 105
+  #define PS_EOL_A 106
+  #define PS_EOL_Y 107
+  #define PS_EOL_E 108
+  #define PS_EOL_R 109
+  #define PS_EOL_LP 110
+  #define PS_EOL_S 111
+  #define PS_EOL_C 112
+  #define PS_EOL_O 113
+  #define PS_EOL_U 114
+  #define PS_EOL_N 115
+  #define PS_EOL_T 116
+  #define PS_EOL_CP 117
+#endif
 
 inline void process_stream_char(const char c, uint8_t &sis, char (&buff)[MAX_CMD_SIZE], int &ind) {
-
+#if ENABLED(DOGM_SHOW_LAYER)
+  switch(sis) {
+    case PS_EOL:
+      if(c != 'L') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_L;
+      break;
+    case PS_EOL_SKIP:
+        return;
+    case PS_EOL_L:
+      if(c != 'A') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_A;
+      break;
+    case PS_EOL_A:
+      if(c != 'Y') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_Y;
+      break;
+    case PS_EOL_Y:
+      if(c != 'E') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_E;
+      break;
+    case PS_EOL_E:
+      if(c != 'R') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_R;
+      break;
+    case PS_EOL_R:
+      if(c != ':') {
+        if(c != '_') {
+          sis = PS_EOL_SKIP;
+          return;
+        } else {
+          sis = PS_EOL_S;
+        }
+      } else {
+        sis = PS_EOL_LP;
+        runLayer = 0;
+      }
+      break;
+    case PS_EOL_LP:
+      if(c < '0' || c > '9') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else {
+        runLayer = (c - '0') + runLayer * 10;
+      }
+      break;
+    case PS_EOL_S:
+      if(c != 'C') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_C;
+      break;
+    case PS_EOL_C:
+      if(c != 'O') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_O;
+      break;
+    case PS_EOL_O:
+      if(c != 'U') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_U;
+      break;
+    case PS_EOL_U:
+      if(c != 'N') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_N;
+      break;
+    case PS_EOL_N:
+      if(c != 'T') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else sis = PS_EOL_T;
+      break;
+    case PS_EOL_T:
+      if(c != ':') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else {
+        sis = PS_EOL_CP;
+        runLayerCnt = 0;
+      }
+      break;
+    case PS_EOL_CP:
+      if(c < '0' || c > '9') {
+        sis = PS_EOL_SKIP;
+        return;
+      } else {
+        runLayerCnt = (c - '0') + runLayerCnt * 10;
+      }
+      break;
+  }
+  if (sis >= PS_EOL) return;    // EOL comment or overflow
+#endif
   if (sis == PS_EOL) return;    // EOL comment or overflow
 
   #if ENABLED(PAREN_COMMENTS)
@@ -414,7 +568,23 @@ void GCodeQueue::get_serial_commands() {
       const char serial_char = c;
 
       if (serial_char == '\n' || serial_char == '\r') {
-
+#if ENABLED(DOGM_SHOW_LAYER)
+        switch(serial_input_state[i]) {
+          case PS_EOL_LP:
+            dogmLayer = runLayer + 1;
+            if(dogmLayer == 1 && !lastLayerCountEncountered)
+              dogmLayerCnt = 0;
+            lastLayerCountEncountered = false;
+            break;
+          case PS_EOL_CP:
+            dogmLayerCnt = runLayerCnt;
+            lastLayerCountEncountered = true;
+            break;
+          default:
+            if(serial_count[i] > 1) lastLayerCountEncountered = false;
+            break;
+        }
+#endif
         // Reset our state, continue if the line was empty
         if (process_line_done(serial_input_state[i], serial_line_buffer[i], serial_count[i]))
           continue;
@@ -532,6 +702,23 @@ void GCodeQueue::get_serial_commands() {
       const char sd_char = (char)n;
       const bool is_eol = sd_char == '\n' || sd_char == '\r';
       if (is_eol || card_eof) {
+#if ENABLED(DOGM_SHOW_LAYER)
+        switch(sd_input_state) {
+          case PS_EOL_LP:
+            dogmLayer = runLayer + 1;
+            if(dogmLayer == 1 && !lastLayerCountEncountered)
+              dogmLayerCnt = 0;
+            lastLayerCountEncountered = false;
+            break;
+          case PS_EOL_CP:
+            dogmLayerCnt = runLayerCnt;
+            lastLayerCountEncountered = true;
+            break;
+          default:
+            if(sd_count > 1) lastLayerCountEncountered = false;
+            break;
+        }
+#endif
 
         // Reset stream state, terminate the buffer, and commit a non-empty command
         if (!is_eol && sd_count) ++sd_count;          // End of file with no newline
