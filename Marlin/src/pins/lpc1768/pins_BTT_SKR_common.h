@@ -35,7 +35,7 @@
 //
 // Steppers
 //
-#ifndef E1_STEP_PIN
+/*#ifndef E1_STEP_PIN
   #define E1_STEP_PIN      P0_01
 #endif
 #ifndef E1_DIR_PIN
@@ -43,7 +43,7 @@
 #endif
 #ifndef E1_ENABLE_PIN
   #define E1_ENABLE_PIN    P0_10
-#endif
+#endif*/
 
 //
 // Temperature Sensors
