@@ -255,7 +255,7 @@ void _menu_move_distance(const AxisEnum axis, const screenFunc_t func, const int
           + 1
         #endif
       );
-        char tmp[20], numstr[10];
+        char tmp[30], numstr[10];
         // Determine digits needed right of decimal
         const uint8_t digs = !UNEAR_ZERO((SHORT_MANUAL_Z_MOVE) * 1000 - int((SHORT_MANUAL_Z_MOVE) * 1000)) ? 4 :
                              !UNEAR_ZERO((SHORT_MANUAL_Z_MOVE) *  100 - int((SHORT_MANUAL_Z_MOVE) *  100)) ? 3 : 2;
