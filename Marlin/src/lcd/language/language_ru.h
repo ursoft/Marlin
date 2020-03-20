@@ -37,6 +37,7 @@ namespace Language_ru {
   PROGMEM Language_Str LANGUAGE                            = _UxGT("Russian");
 
   PROGMEM Language_Str WELCOME_MSG                         = MACHINE_NAME _UxGT(" готов.");
+#ifndef SUPPRESS_RU_TRANSLATION
   PROGMEM Language_Str MSG_BACK                            = _UxGT("Назад");
   PROGMEM Language_Str MSG_MEDIA_INSERTED                  = _UxGT("Карта вставлена");
   PROGMEM Language_Str MSG_MEDIA_REMOVED                   = _UxGT("Карта извлечена");
@@ -476,7 +477,7 @@ namespace Language_ru {
   PROGMEM Language_Str MSG_TMC_HOMING_THRS                 = _UxGT("Режим без эндстопов");
   PROGMEM Language_Str MSG_TMC_STEPPING_MODE               = _UxGT("Режим шага");
   PROGMEM Language_Str MSG_TMC_STEALTH_ENABLED             = _UxGT("Тихий режим вкл");
-
+#endif
   // TODO: Service
 
   // TODO: Backlash
