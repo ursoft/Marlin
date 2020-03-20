@@ -1088,8 +1088,25 @@ int8_t SdBaseFile::readDir(dir_t* dir, char* longFilename) {
         if (WITHIN(seq, 1, MAX_VFAT_ENTRIES)) {
           // TODO: Store the filename checksum to verify if a long-filename-unaware system modified the file table.
           n = (seq - 1) * (FILENAME_LENGTH);
-          for (uint8_t i = 0; i < FILENAME_LENGTH; i++)
+          for (uint8_t i = 0; i < FILENAME_LENGTH; i++)            
+#ifdef CYRILLIC_FILENAMES // convert u16 to 1251
+          {
+            longFilename[n + i] = '?';
+            uint16_t c16 = (i < 5) ? VFAT->name1[i] : (i < 11) ? VFAT->name2[i - 5] : VFAT->name3[i - 11];
+            uint8_t byte1 = (c16 & 0xFF00) >> 8;
+            if(c16 <= 0x7F) longFilename[n + i] = (char)c16;
+            else if (c16 <= 0x7FF && byte1 == 0x4) { // Two bytes.
+                uint8_t byte2 = (c16 & 0xFF);
+                switch(byte2) {
+                  case 0x01: longFilename[n + i] = (char)0xA8; break;
+                  case 0x51: longFilename[n + i] = (char)0xB8; break;
+                  default: if(byte2 >= 0x10 && byte2 <= 0x4F) longFilename[n + i] = char(0xB0 + byte2); break;
+                }
+            }
+          }
+#else
             longFilename[n + i] = (i < 5) ? VFAT->name1[i] : (i < 11) ? VFAT->name2[i - 5] : VFAT->name3[i - 11];
+#endif
           // If this VFAT entry is the last one, add a NUL terminator at the end of the string
           if (VFAT->sequenceNumber & 0x40) longFilename[n + FILENAME_LENGTH] = '\0';
         }

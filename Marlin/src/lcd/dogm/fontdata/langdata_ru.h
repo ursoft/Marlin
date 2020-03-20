@@ -114,5 +114,5 @@ const u8g_fntpgm_uint8_t fontpage_8_128_255[1677] U8G_FONT_SECTION("fontpage_8_1
 
 #define FONTDATA_ITEM(page, begin, end, data) { page, begin, end, COUNT(data), data }
 static const uxg_fontinfo_t g_fontinfo[] PROGMEM = {
-    FONTDATA_ITEM(8, 129, 255, fontpage_8_128_255), // 'ё' -- 'ё'
+    FONTDATA_ITEM(8, 129, 255, fontpage_8_128_255), // cyr
 };

@@ -1104,6 +1104,7 @@
   #define LONG_FILENAME_HOST_SUPPORT
   #if (GITHUB_USER==URSOFT)
    #define LONG_FILENAME_OVERRIDE_SHORT //https://github.com/ursoft/Marlin/issues/26
+   #define CYRILLIC_FILENAMES
   #endif
  
   // Enable this option to scroll long filenames in the SD card menu
