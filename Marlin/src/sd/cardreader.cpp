@@ -535,11 +535,18 @@ void CardReader::openFileRead(char * const path, const uint8_t subcall_type/*=0*
 #ifndef LONG_FILENAME_OVERRIDE_SHORT
     selectFileByName(fname);
 #endif
+#ifdef CYRILLIC_FILENAMES
+    ui.set_status(longFilename[0] ? longFilenameCyr() : fname);
+#else
     ui.set_status(longFilename[0] ? longFilename : fname);
+#endif
   }
   else
     openFailed(fname);
 }
+#ifdef CYRILLIC_FILENAMES
+  char CardReader::_longFilenameCyr[LONG_FILENAME_LENGTH*3];
+#endif
 
 inline void echo_write_to_file(const char * const fname) {
   SERIAL_ECHOLNPAIR(STR_SD_WRITE_TO_FILE, fname);

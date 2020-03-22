@@ -1225,6 +1225,7 @@
   #define DOGM_SD_PRESENT // https://github.com/ursoft/Marlin/issues/34
   #define DOGM_SHOW_SPEED // https://github.com/ursoft/Marlin/issues/39
   #define DOGM_SHOW_LAYER // https://github.com/ursoft/Marlin/issues/39
+  #define DOGM_SHOW_PERF  // https://github.com/ursoft/Marlin/issues/39
 
   // Enable to save many cycles by drawing a hollow frame on the Info Screen
   #define XYZ_HOLLOW_FRAME

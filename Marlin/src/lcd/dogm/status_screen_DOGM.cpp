@@ -353,6 +353,10 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
   extern int dogmLayerCnt, dogmLayer;
   extern char conv[8];
 #endif
+#if ENABLED(DOGM_SHOW_PERF)
+  extern uint8_t minCpuLoadPercent, maxCpuLoadPercent;
+#endif
+
 void MarlinUI::draw_status_screen() {
 
   static char xstring[5
@@ -510,19 +514,36 @@ void MarlinUI::draw_status_screen() {
   // Status Menu Font
   set_font(FONT_STATUSMENU);
   #if ENABLED(DOGM_SHOW_SPEED)
-    u8g.drawHLine(35, 0, 6);
-    u8g.drawHLine(33, 3, 6);
-    u8g.drawHLine(31, 6, 6);
-    lcd_put_u8str(43, 7, i16tostr3(dogmSpeedToShow));
+    if(PAGE_CONTAINS(0, 8)) {
+      u8g.drawHLine(35, 0, 6);
+      u8g.drawHLine(33, 3, 6);
+      u8g.drawHLine(31, 6, 6);
+      lcd_put_u8str(43, 7, i16tostr3(dogmSpeedToShow));
+    }
   #endif
   #if ENABLED(DOGM_SHOW_LAYER)
-    if(dogmLayer) {
+    if(PAGE_CONTAINS(8, 16) && dogmLayer) {
       sprintf(conv, "L%d", dogmLayer);
       lcd_put_u8str(32 - 5 * (dogmLayer > 999) - 5 * (dogmLayerCnt > 999), 16, conv);
       if(dogmLayerCnt) {
         sprintf(conv, "/%d", dogmLayerCnt);
         lcd_put_u8str(conv);
       }
+    }
+  #endif
+  #if ENABLED(DOGM_SHOW_PERF)
+    if (PAGE_CONTAINS(19, 27)) {
+      u8g.drawFrame(30, 19, 51, 3);
+      int bufferUsage = (int)planner.nonbusy_movesplanned() * 48 / BLOCK_BUFFER_SIZE;
+      u8g.drawHLine(31, 20, bufferUsage);
+      int cpuLoadPercentLen = (int)(maxCpuLoadPercent - minCpuLoadPercent) * 48 / 100;
+      if(cpuLoadPercentLen == 0)
+        cpuLoadPercentLen = 1;
+      int cpuLoadPercentFrom = int(minCpuLoadPercent) * 48 / 100;
+      u8g.drawFrame(30, 24, 51, 3);
+      u8g.drawHLine(31 + cpuLoadPercentFrom, 25, cpuLoadPercentLen);
+      maxCpuLoadPercent = 100;
+      minCpuLoadPercent = 100;
     }
   #endif
 

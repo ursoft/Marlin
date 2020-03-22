@@ -687,6 +687,11 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
 /**
  * Standard idle routine keeps the machine alive
  */
+#if ENABLED(DOGM_SHOW_PERF)
+uint8_t maxCpuLoadPercent = 100, minCpuLoadPercent = 100;
+uint32_t loopTm = micros();
+#endif
+
 void idle(
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
     bool no_stepper_sleep/*=false*/
@@ -770,6 +775,25 @@ void idle(
   #if ENABLED(POLL_JOG)
     joystick.inject_jog_moves();
   #endif
+
+#if ENABLED(DOGM_SHOW_PERF)
+    uint8_t newCpuLoadPercent;
+    uint32_t newLoopTm = micros();
+    uint32_t microsFromPrev = newLoopTm - loopTm;
+    if(int32_t(microsFromPrev) < 0)
+      microsFromPrev = 0; // ???
+    if(microsFromPrev < 5000)
+      newCpuLoadPercent = microsFromPrev / 100; //первые 50% - доли 5 мс
+    else if(microsFromPrev > 30000) //более 30мс - переполнение
+      newCpuLoadPercent = 100;
+    else
+      newCpuLoadPercent = (uint8_t)(50 + (uint8_t)((microsFromPrev - 5000)*49.0/25000.0)); //5...30ms -> 50...99%
+    loopTm = newLoopTm;
+    if(maxCpuLoadPercent == 100 || maxCpuLoadPercent < newCpuLoadPercent)
+      maxCpuLoadPercent = newCpuLoadPercent;
+    if(minCpuLoadPercent == 100 || minCpuLoadPercent > newCpuLoadPercent)
+      minCpuLoadPercent = newCpuLoadPercent;
+#endif
 }
 
 /**
