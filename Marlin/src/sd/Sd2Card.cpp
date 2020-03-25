@@ -95,7 +95,7 @@
   #else
     static uint8_t CRC7(const uint8_t* data, uint8_t n) {
       uint8_t crc = 0;
-      for (uint8_t i = 0; i < n; i++) {
+      LOOP_L_N(i, n) {
         uint8_t d = data[i];
         d ^= crc << 1;
         if (d & 0x80) d ^= 9;
@@ -127,7 +127,7 @@ uint8_t Sd2Card::cardCommand(const uint8_t cmd, const uint32_t arg) {
     d[5] = CRC7(d, 5);
 
     // Send message
-    for (uint8_t k = 0; k < 6; k++) spiSend(d[k]);
+    LOOP_L_N(k, 6) spiSend(d[k]);
 
   #else
     // Send command
@@ -268,7 +268,7 @@ bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin, const uin
   spiInit(spiRate_);
 
   // Must supply min of 74 clock cycles with CS high.
-  for (uint8_t i = 0; i < 10; i++) spiSend(0xFF);
+  LOOP_L_N(i, 10) spiSend(0xFF);
 
   watchdog_refresh(); // In case init takes too long
 
@@ -294,7 +294,7 @@ bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin, const uin
     }
 
     // Get the last byte of r7 response
-    for (uint8_t i = 0; i < 4; i++) status_ = spiRec();
+    LOOP_L_N(i, 4) status_ = spiRec();
     if (status_ == 0xAA) {
       type(SD_CARD_TYPE_SD2);
       break;
@@ -325,7 +325,7 @@ bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin, const uin
     }
     if ((spiRec() & 0xC0) == 0xC0) type(SD_CARD_TYPE_SDHC);
     // Discard rest of ocr - contains allowed voltage range
-    for (uint8_t i = 0; i < 3; i++) spiRec();
+    LOOP_L_N(i, 3) spiRec();
   }
   chipDeselect();
 

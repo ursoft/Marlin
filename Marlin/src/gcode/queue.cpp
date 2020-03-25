@@ -44,7 +44,7 @@ GCodeQueue queue;
 #endif
 
 #if ENABLED(POWER_LOSS_RECOVERY)
-  #include "../feature/power_loss_recovery.h"
+  #include "../feature/powerloss.h"
 #endif
 
 /**
@@ -94,7 +94,7 @@ static PGM_P injected_commands_P = nullptr;
 
 GCodeQueue::GCodeQueue() {
   // Send "ok" after commands by default
-  for (uint8_t i = 0; i < COUNT(send_ok); i++) send_ok[i] = true;
+  LOOP_L_N(i, COUNT(send_ok)) send_ok[i] = true;
 }
 
 /**
@@ -184,6 +184,8 @@ bool GCodeQueue::_enqueue(const char* cmd, bool say_ok/*=false*/
   return true;
 }
 
+#define ISEOL(C) ((C) == '\n' || (C) == '\r')
+
 /**
  * Enqueue with Serial Echo
  * Return true if the command was consumed
@@ -194,7 +196,7 @@ bool GCodeQueue::enqueue_one(const char* cmd) {
   //SERIAL_ECHO(cmd);
   //SERIAL_ECHOPGM("\") \n");
 
-  if (*cmd == 0 || *cmd == '\n' || *cmd == '\r') return true;
+  if (*cmd == 0 || ISEOL(*cmd)) return true;
 
   if (_enqueue(cmd)) {
     SERIAL_ECHO_MSG(STR_ENQUEUEING, cmd, "\"");
@@ -242,6 +244,21 @@ void GCodeQueue::inject_P(PGM_P const pgcode) { injected_commands_P = pgcode; }
  * Never call this from a G-code handler!
  */
 void GCodeQueue::enqueue_one_now(const char* cmd) { while (!enqueue_one(cmd)) idle(); }
+
+/**
+ * Attempt to enqueue a single G-code command
+ * and return 'true' if successful.
+ */
+bool GCodeQueue::enqueue_one_P(PGM_P const pgcode) {
+  size_t i = 0;
+  PGM_P p = pgcode;
+  char c;
+  while ((c = pgm_read_byte(&p[i])) && c != '\n') i++;
+  char cmd[i + 1];
+  memcpy_P(cmd, p, i);
+  cmd[i] = '\0';
+  return _enqueue(cmd);
+}
 
 /**
  * Enqueue from program memory and return only when commands are actually enqueued
@@ -515,6 +532,10 @@ inline void process_stream_char(const char c, uint8_t &sis, char (&buff)[MAX_CMD
     sis = PS_EOL;               // Skip the rest on overflow
 }
 
+/**
+ * Handle a line being completed. For an empty line
+ * keep sensor readings going and watchdog alive.
+ */
 inline bool process_line_done(uint8_t &sis, char (&buff)[MAX_CMD_SIZE], int &ind) {
   sis = PS_NORMAL;
   buff[ind] = 0;
@@ -560,14 +581,14 @@ void GCodeQueue::get_serial_commands() {
    * Loop while serial characters are incoming and the queue is not full
    */
   while (length < BUFSIZE && serial_data_available()) {
-    for (uint8_t i = 0; i < NUM_SERIAL; ++i) {
+    LOOP_L_N(i, NUM_SERIAL) {
 
       const int c = read_serial(i);
       if (c < 0) continue;
 
       const char serial_char = c;
 
-      if (serial_char == '\n' || serial_char == '\r') {
+      if (ISEOL(serial_char)) {
 #if ENABLED(DOGM_SHOW_LAYER)
         switch(serial_input_state[i]) {
           case PS_EOL_LP:
@@ -700,7 +721,7 @@ void GCodeQueue::get_serial_commands() {
       if (n < 0 && !card_eof) { SERIAL_ERROR_MSG(STR_SD_ERR_READ); continue; }
 
       const char sd_char = (char)n;
-      const bool is_eol = sd_char == '\n' || sd_char == '\r';
+      const bool is_eol = ISEOL(sd_char);
       if (is_eol || card_eof) {
 #if ENABLED(DOGM_SHOW_LAYER)
         switch(sd_input_state) {
