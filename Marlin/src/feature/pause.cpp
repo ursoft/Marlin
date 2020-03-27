@@ -409,7 +409,11 @@ bool pause_print(const float &retract, const xyz_pos_t &park_point, const float 
       }
     #endif
 
+#if (GITHUB_USER==URSOFT)
     //return false; // unable to reach safe temperature, but need pause
+#else
+    return false; // unable to reach safe temperature
+#endif
   }
 
   // Indicate that the printer is paused

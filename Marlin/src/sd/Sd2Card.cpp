@@ -42,8 +42,8 @@
  #else
    HardwareSPI<> SPI_LCD;
  #endif
-  SoftwareSPI<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB> SPI_OB;
-  //HardwareSPI<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB, 1> SPI_OB; //much slower!!?
+  //SoftwareSPI<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB> SPI_OB; //much slower because of diff pins for Software SPI
+  HardwareSPI<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB, 1> SPI_OB;
 
  #define spiSend(P) (isOnBoard() ? SPI_OB.spiSend(P) : SPI_LCD.spiSend(P))
  #define spiRead(P1, P2) (isOnBoard() ? SPI_OB.spiRead(P1, P2) : SPI_LCD.spiRead(P1, P2))
