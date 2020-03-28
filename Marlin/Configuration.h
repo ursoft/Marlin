@@ -1396,12 +1396,16 @@
 
 // Add a menu item to move between bed corners for manual bed adjustment
 #define LEVEL_BED_CORNERS
-
 #if ENABLED(LEVEL_BED_CORNERS)
-  #define LEVEL_CORNERS_INSET_LFRB { 30, 30, 30, 30 } // (mm) Left, Front, Right, Back insets
-  #define LEVEL_CORNERS_HEIGHT 0.0  // (mm) Z height of nozzle at leveling points
-  #define LEVEL_CORNERS_Z_HOP       4.0   // (mm) Z height of nozzle between leveling points
-  #define LEVEL_CENTER_TOO              // Move to the center after the last corner
+  #define LEVEL_CORNERS_INSET_LFRB { 5, 5, 5, 5 } // (mm) Left, Front, Right, Back insets
+#if (GITHUB_USER==URSOFT) //не тыкаем в ковер, у меня щуп есть
+  #define LEVEL_CORNERS_HEIGHT     0.5            // (mm) Z height of nozzle at leveling points
+#else
+  #define LEVEL_CORNERS_HEIGHT     0.0            // (mm) Z height of nozzle at leveling points
+#endif
+  #define LEVEL_CORNERS_Z_HOP      4.0            // (mm) Z height of nozzle between leveling points
+  #define LEVEL_CORNERS_3POINT                    // LEVEL_CENTER_TOO ignored https://github.com/ursoft/Marlin/issues/42
+  #define LEVEL_CENTER_TOO                        // Move to the center after the last corner
 #endif
 
 /**
