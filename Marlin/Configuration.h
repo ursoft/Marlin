@@ -723,11 +723,7 @@
 //#define Z2_DRIVER_TYPE A4988
 //#define Z3_DRIVER_TYPE A4988
 //#define Z4_DRIVER_TYPE A4988
-#if (GITHUB_USER==URSOFT)
-#define E0_DRIVER_TYPE LV8729
-#else
 #define E0_DRIVER_TYPE TMC2208_STANDALONE
-#endif
 //#define E1_DRIVER_TYPE A4988
 //#define E2_DRIVER_TYPE A4988
 //#define E3_DRIVER_TYPE A4988
@@ -779,11 +775,7 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#if (GITHUB_USER==URSOFT)
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 148.50 * 2 }
-#else
 #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 148.50 }
-#endif
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
@@ -1127,11 +1119,7 @@
 // @section extruder
 
 // For direct drive extruder v9 set to true, for geared extruder set to false.
-#if (GITHUB_USER==URSOFT)
-#define INVERT_E0_DIR true
-#else
 #define INVERT_E0_DIR false
-#endif
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
 #define INVERT_E3_DIR false
