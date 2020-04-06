@@ -227,9 +227,6 @@ bool MarlinUI::detected() { return true; }
 
   // Show the Marlin bootscreen, with the u8g loop and delays
   void MarlinUI::show_marlin_bootscreen() {
-    #ifndef BOOTSCREEN_TIMEOUT
-      #define BOOTSCREEN_TIMEOUT 1500
-    #endif
     constexpr uint8_t pages = two_part ? 2 : 1;
     for (uint8_t q = pages; q--;) {
       draw_marlin_bootscreen(q == 0);
@@ -257,13 +254,7 @@ void MarlinUI::init_lcd() {
   #if DISABLED(MKS_LCD12864B)
 
     #if PIN_EXISTS(LCD_BACKLIGHT)
-      OUT_WRITE(LCD_BACKLIGHT_PIN, (
-        #if ENABLED(DELAYED_BACKLIGHT_INIT)
-          LOW  // Illuminate after reset
-        #else
-          HIGH // Illuminate right away
-        #endif
-      ));
+      OUT_WRITE(LCD_BACKLIGHT_PIN, DISABLED(DELAYED_BACKLIGHT_INIT)); // Illuminate after reset or right away
     #endif
 
     #if EITHER(MKS_12864OLED, MKS_12864OLED_SSD1306)
@@ -337,11 +328,11 @@ void MarlinUI::clear_lcd() { } // Automatically cleared by Picture Loop
       lcd_put_wchar(LCD_PIXEL_WIDTH - 11 * (MENU_FONT_WIDTH), row_y2, 'E');
       lcd_put_wchar((char)('1' + extruder));
       lcd_put_wchar(' ');
-      lcd_put_u8str(i16tostr3(thermalManager.degHotend(extruder)));
+      lcd_put_u8str(i16tostr3rj(thermalManager.degHotend(extruder)));
       lcd_put_wchar('/');
 
       if (get_blink() || !thermalManager.hotend_idle[extruder].timed_out)
-        lcd_put_u8str(i16tostr3(thermalManager.degTargetHotend(extruder)));
+        lcd_put_u8str(i16tostr3rj(thermalManager.degTargetHotend(extruder)));
     }
 
   #endif // ADVANCED_PAUSE_FEATURE
@@ -487,8 +478,11 @@ void MarlinUI::clear_lcd() { } // Automatically cleared by Picture Loop
 
     void MenuItem_sdbase::draw(const bool sel, const uint8_t row, PGM_P const, CardReader &theCard, const bool isDir) {
       if (mark_as_selected(row, sel)) {
-        if (isDir) lcd_put_wchar(LCD_STR_FOLDER[0]);
-        constexpr uint8_t maxlen = LCD_WIDTH - 1;
+        uint8_t maxlen = LCD_WIDTH;
+        if (isDir) {
+          lcd_put_wchar(LCD_STR_FOLDER[0]);
+          --maxlen;
+        }
         const u8g_uint_t pixw = maxlen * (MENU_FONT_WIDTH);
         u8g_uint_t n = pixw - lcd_put_u8str_max(ui.scrolled_filename(theCard, maxlen, row, sel), pixw);
         while (n > MENU_FONT_WIDTH) n -= lcd_put_wchar(' ');

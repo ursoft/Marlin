@@ -108,7 +108,7 @@
 #define PROGRESS_BAR_WIDTH (LCD_PIXEL_WIDTH - PROGRESS_BAR_X)
 
 FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, const uint8_t ty) {
-  const char *str = i16tostr3(temp);
+  const char *str = i16tostr3rj(temp);
   const uint8_t len = str[0] != ' ' ? 3 : str[1] != ' ' ? 2 : 1;
   lcd_put_u8str(tx - len * (INFO_FONT_WIDTH) / 2 + 1, ty, &str[3-len]);
   lcd_put_wchar(LCD_STR_DEGREE[0]);
@@ -353,6 +353,10 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
   extern int dogmLayerCnt, dogmLayer;
   extern char conv[8];
 #endif
+#if ENABLED(DOGM_SHOW_PERF)
+  extern uint8_t minCpuLoadPercent, maxCpuLoadPercent;
+#endif
+
 void MarlinUI::draw_status_screen() {
 
   static char xstring[5
@@ -429,7 +433,7 @@ void MarlinUI::draw_status_screen() {
 
     #if ENABLED(FILAMENT_LCD_DISPLAY)
       strcpy(wstring, ftostr12ns(filwidth.measured_mm));
-      strcpy(mstring, i16tostr3(planner.volumetric_percent(parser.volumetric_enabled)));
+      strcpy(mstring, i16tostr3rj(planner.volumetric_percent(parser.volumetric_enabled)));
     #endif
 
     // Progress / elapsed / estimation updates and string formatting to avoid float math on each LCD draw
@@ -461,7 +465,7 @@ void MarlinUI::draw_status_screen() {
               #if ENABLED(PRINT_PROGRESS_SHOW_DECIMALS)
                 permyriadtostr4(progress)
               #else
-                ui8tostr3(progress / (PROGRESS_SCALE))
+                ui8tostr3rj(progress / (PROGRESS_SCALE))
               #endif
             ));
           }
@@ -471,10 +475,10 @@ void MarlinUI::draw_status_screen() {
         #endif
       }
 
+      constexpr bool can_show_days = DISABLED(DOGM_SD_PERCENT) || ENABLED(ROTATE_PROGRESS_DISPLAY);
       if (ev != lastElapsed) {
         lastElapsed = ev;
-        const bool has_days = (elapsed.value >= 60*60*24L);
-        const uint8_t len = elapsed.toDigital(elapsed_string, has_days);
+        const uint8_t len = elapsed.toDigital(elapsed_string, can_show_days && elapsed.value >= 60*60*24L);
         elapsed_x_pos = _SD_INFO_X(len);
 
         #if ENABLED(SHOW_REMAINING_TIME)
@@ -491,8 +495,7 @@ void MarlinUI::draw_status_screen() {
             }
             else {
               duration_t estimation = timeval;
-              const bool has_days = (estimation.value >= 60*60*24L);
-              const uint8_t len = estimation.toDigital(estimation_string, has_days);
+              const uint8_t len = estimation.toDigital(estimation_string, can_show_days && estimation.value >= 60*60*24L);
               estimation_x_pos = _SD_INFO_X(len
                 #if !BOTH(DOGM_SD_PERCENT, ROTATE_PROGRESS_DISPLAY)
                   + 1
@@ -510,19 +513,36 @@ void MarlinUI::draw_status_screen() {
   // Status Menu Font
   set_font(FONT_STATUSMENU);
   #if ENABLED(DOGM_SHOW_SPEED)
-    u8g.drawHLine(35, 0, 6);
-    u8g.drawHLine(33, 3, 6);
-    u8g.drawHLine(31, 6, 6);
-    lcd_put_u8str(43, 7, i16tostr3(dogmSpeedToShow));
+    if(PAGE_CONTAINS(0, 8)) {
+      u8g.drawHLine(35, 0, 6);
+      u8g.drawHLine(33, 3, 6);
+      u8g.drawHLine(31, 6, 6);
+      lcd_put_u8str(43, 7, i16tostr3rj(dogmSpeedToShow));
+    }
   #endif
   #if ENABLED(DOGM_SHOW_LAYER)
-    if(dogmLayer) {
+    if(PAGE_CONTAINS(8, 16) && dogmLayer) {
       sprintf(conv, "L%d", dogmLayer);
       lcd_put_u8str(32 - 5 * (dogmLayer > 999) - 5 * (dogmLayerCnt > 999), 16, conv);
       if(dogmLayerCnt) {
         sprintf(conv, "/%d", dogmLayerCnt);
         lcd_put_u8str(conv);
       }
+    }
+  #endif
+  #if ENABLED(DOGM_SHOW_PERF)
+    if (PAGE_CONTAINS(19, 27)) {
+      u8g.drawFrame(30, 19, 51, 3);
+      int bufferUsage = (int)planner.nonbusy_movesplanned() * 48 / BLOCK_BUFFER_SIZE;
+      u8g.drawHLine(31, 20, bufferUsage);
+      int cpuLoadPercentLen = (int)(maxCpuLoadPercent - minCpuLoadPercent) * 48 / 100;
+      if(cpuLoadPercentLen == 0)
+        cpuLoadPercentLen = 1;
+      int cpuLoadPercentFrom = int(minCpuLoadPercent) * 48 / 100;
+      u8g.drawFrame(30, 24, 51, 3);
+      u8g.drawHLine(31 + cpuLoadPercentFrom, 25, cpuLoadPercentLen);
+      maxCpuLoadPercent = 100;
+      minCpuLoadPercent = 100;
     }
   #endif
 
@@ -603,14 +623,14 @@ void MarlinUI::draw_status_screen() {
   if (PAGE_UNDER(6 + 1 + 12 + 1 + 6 + 1)) {
     // Extruders
     #if DO_DRAW_HOTENDS
-      for (uint8_t e = 0; e < MAX_HOTEND_DRAW; ++e)
+      LOOP_L_N(e, MAX_HOTEND_DRAW)
         _draw_hotend_status((heater_ind_t)e, blink);
     #endif
 
     // Laser / Spindle
     #if DO_DRAW_CUTTER
       if (cutter.power && PAGE_CONTAINS(STATUS_CUTTER_TEXT_Y - INFO_FONT_ASCENT, STATUS_CUTTER_TEXT_Y - 1)) {
-        lcd_put_u8str(STATUS_CUTTER_TEXT_X, STATUS_CUTTER_TEXT_Y, i16tostr3(cutter.powerPercent(cutter.power)));
+        lcd_put_u8str(STATUS_CUTTER_TEXT_X, STATUS_CUTTER_TEXT_Y, i16tostr3rj(cutter.powerPercent(cutter.power)));
         lcd_put_wchar('%');
       }
     #endif
@@ -637,7 +657,7 @@ void MarlinUI::draw_status_screen() {
               c = '*';
             }
           #endif
-          lcd_put_u8str(STATUS_FAN_TEXT_X, STATUS_FAN_TEXT_Y, i16tostr3(thermalManager.fanPercent(spd)));
+          lcd_put_u8str(STATUS_FAN_TEXT_X, STATUS_FAN_TEXT_Y, i16tostr3rj(thermalManager.fanPercent(spd)));
           lcd_put_wchar(c);
         }
       }
@@ -846,7 +866,7 @@ void MarlinUI::draw_status_screen() {
     lcd_put_wchar(3, EXTRAS_2_BASELINE, LCD_STR_FEEDRATE[0]);
 
     set_font(FONT_STATUSMENU);
-    lcd_put_u8str(12, EXTRAS_2_BASELINE, i16tostr3(feedrate_percentage));
+    lcd_put_u8str(12, EXTRAS_2_BASELINE, i16tostr3rj(feedrate_percentage));
     lcd_put_wchar('%');
 
     //

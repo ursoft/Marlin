@@ -37,6 +37,7 @@ namespace Language_ru {
   PROGMEM Language_Str LANGUAGE                            = _UxGT("Russian");
 
   PROGMEM Language_Str WELCOME_MSG                         = MACHINE_NAME _UxGT(" готов.");
+#ifndef SUPPRESS_RU_TRANSLATION
   PROGMEM Language_Str MSG_BACK                            = _UxGT("Назад");
   PROGMEM Language_Str MSG_MEDIA_INSERTED                  = _UxGT("Карта вставлена");
   PROGMEM Language_Str MSG_MEDIA_REMOVED                   = _UxGT("Карта извлечена");
@@ -222,6 +223,11 @@ namespace Language_ru {
   PROGMEM Language_Str MSG_FAN_SPEED_N                     = _UxGT("Кулер ~");
   PROGMEM Language_Str MSG_EXTRA_FAN_SPEED                 = _UxGT("Кулер доп.");
   PROGMEM Language_Str MSG_EXTRA_FAN_SPEED_N               = _UxGT("Кулер доп. ~");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN                  = _UxGT("Обдув платы");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_IDLE_SPEED       = _UxGT("Обороты простоя");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_AUTO_ON          = _UxGT("Автовключение");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_SPEED            = _UxGT("Рабочие обороты");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_DURATION         = _UxGT("Простой после");
   PROGMEM Language_Str MSG_FLOW                            = _UxGT("Поток");
   PROGMEM Language_Str MSG_FLOW_N                          = _UxGT("Поток ~");
   PROGMEM Language_Str MSG_CONTROL                         = _UxGT("Настройки");
@@ -476,7 +482,7 @@ namespace Language_ru {
   PROGMEM Language_Str MSG_TMC_HOMING_THRS                 = _UxGT("Режим без эндстопов");
   PROGMEM Language_Str MSG_TMC_STEPPING_MODE               = _UxGT("Режим шага");
   PROGMEM Language_Str MSG_TMC_STEALTH_ENABLED             = _UxGT("Тихий режим вкл");
-
+#endif
   // TODO: Service
 
   // TODO: Backlash

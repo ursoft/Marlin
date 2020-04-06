@@ -27,10 +27,18 @@
   #include "../libs/buzzer.h"
 #endif
 
-#define HAS_ENCODER_ACTION (HAS_LCD_MENU || ENABLED(ULTIPANEL_FEEDMULTIPLY))
-#define HAS_ENCODER_WHEEL  ((!HAS_ADC_BUTTONS && ENABLED(NEWPANEL)) || BUTTONS_EXIST(EN1, EN2))
-#define HAS_DIGITAL_BUTTONS (HAS_ENCODER_WHEEL || ANY_BUTTON(ENC, BACK, UP, DWN, LFT, RT))
-#define HAS_SHIFT_ENCODER   (!HAS_ADC_BUTTONS && (ENABLED(REPRAPWORLD_KEYPAD) || (HAS_SPI_LCD && DISABLED(NEWPANEL))))
+#if HAS_LCD_MENU || ENABLED(ULTIPANEL_FEEDMULTIPLY)
+  #define HAS_ENCODER_ACTION 1
+#endif
+#if (!HAS_ADC_BUTTONS && ENABLED(NEWPANEL)) || BUTTONS_EXIST(EN1, EN2)
+  #define HAS_ENCODER_WHEEL 1
+#endif
+#if HAS_ENCODER_WHEEL || ANY_BUTTON(ENC, BACK, UP, DWN, LFT, RT)
+  #define HAS_DIGITAL_BUTTONS 1
+#endif
+#if !HAS_ADC_BUTTONS && (ENABLED(REPRAPWORLD_KEYPAD) || (HAS_SPI_LCD && DISABLED(NEWPANEL)))
+  #define HAS_SHIFT_ENCODER 1
+#endif
 
 // I2C buttons must be read in the main thread
 #define HAS_SLOW_BUTTONS EITHER(LCD_I2C_VIKI, LCD_I2C_PANELOLU2)
@@ -265,7 +273,16 @@ public:
 
   // LCD implementations
   static void clear_lcd();
-  static void init_lcd();
+
+  #if HAS_SPI_LCD
+    static bool detected();
+    static void init_lcd();
+    FORCE_INLINE static void refresh() { refresh(LCDVIEW_CLEAR_CALL_REDRAW); }
+  #else
+    static inline bool detected() { return true; }
+    static inline void init_lcd() {}
+    static inline void refresh()  {}
+  #endif
 
   #if HAS_DISPLAY
 
@@ -324,12 +341,9 @@ public:
 
       static millis_t next_button_update_ms;
 
-      static bool detected();
-
       static LCDViewAction lcdDrawUpdate;
       FORCE_INLINE static bool should_draw() { return bool(lcdDrawUpdate); }
       FORCE_INLINE static void refresh(const LCDViewAction type) { lcdDrawUpdate = type; }
-      FORCE_INLINE static void refresh() { refresh(LCDVIEW_CLEAR_CALL_REDRAW); }
 
       #if ENABLED(SHOW_CUSTOM_BOOTSCREEN)
         static void draw_custom_bootscreen(const uint8_t frame=0);
@@ -337,6 +351,9 @@ public:
       #endif
 
       #if ENABLED(SHOW_BOOTSCREEN)
+        #ifndef BOOTSCREEN_TIMEOUT
+          #define BOOTSCREEN_TIMEOUT 2500
+        #endif
         static void draw_marlin_bootscreen(const bool line2=false);
         static void show_marlin_bootscreen();
         static void show_bootscreen();
@@ -392,8 +409,6 @@ public:
 
       static void status_screen();
 
-    #else
-      static void refresh() {}
     #endif
 
     static bool get_blink();
@@ -407,13 +422,12 @@ public:
   #else // No LCD
 
     // Send status to host as a notification
-    void set_status(const char* message, const bool=false);
-    void set_status_P(PGM_P message, const int8_t=0);
-    void status_printf_P(const uint8_t, PGM_P message, ...);
+    static void set_status(const char* message, const bool=false);
+    static void set_status_P(PGM_P message, const int8_t=0);
+    static void status_printf_P(const uint8_t, PGM_P message, ...);
 
     static inline void init() {}
     static inline void update() {}
-    static inline void refresh() {}
     static inline void return_to_status() {}
     static inline void set_alert_status_P(PGM_P const) {}
     static inline void reset_status(const bool=false) {}

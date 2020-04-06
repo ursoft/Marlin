@@ -255,7 +255,7 @@ void _menu_move_distance(const AxisEnum axis, const screenFunc_t func, const int
           + 1
         #endif
       );
-        char tmp[20], numstr[10];
+        char tmp[30], numstr[10];
         // Determine digits needed right of decimal
         const uint8_t digs = !UNEAR_ZERO((SHORT_MANUAL_Z_MOVE) * 1000 - int((SHORT_MANUAL_Z_MOVE) * 1000)) ? 4 :
                              !UNEAR_ZERO((SHORT_MANUAL_Z_MOVE) *  100 - int((SHORT_MANUAL_Z_MOVE) *  100)) ? 3 : 2;
@@ -357,7 +357,7 @@ void menu_move() {
     #elif E_MANUAL > 1
 
       // Independent extruders with one E-stepper per hotend
-      for (uint8_t n = 0; n < E_MANUAL; n++) SUBMENU_MOVE_E(n);
+      LOOP_L_N(n, E_MANUAL) SUBMENU_MOVE_E(n);
 
     #endif
 
@@ -393,9 +393,9 @@ void menu_motion() {
   //
   GCODES_ITEM(MSG_AUTO_HOME, G28_STR);
   #if ENABLED(INDIVIDUAL_AXIS_HOMING_MENU)
-    GCODES_ITEM(MSG_AUTO_HOME_X, PSTR("G28 X"));
-    GCODES_ITEM(MSG_AUTO_HOME_Y, PSTR("G28 Y"));
-    GCODES_ITEM(MSG_AUTO_HOME_Z, PSTR("G28 Z"));
+    GCODES_ITEM(MSG_AUTO_HOME_X, PSTR("G28X"));
+    GCODES_ITEM(MSG_AUTO_HOME_Y, PSTR("G28Y"));
+    GCODES_ITEM(MSG_AUTO_HOME_Z, PSTR("G28Z"));
   #endif
 
   //

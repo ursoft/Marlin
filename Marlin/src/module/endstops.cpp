@@ -502,7 +502,7 @@ void _O2 Endstops::report_states() {
       print_es_state(READ(FIL_RUNOUT_PIN) != FIL_RUNOUT_INVERTING, PSTR(STR_FILAMENT_RUNOUT_SENSOR));
     #else
       #define _CASE_RUNOUT(N) case N: pin = FIL_RUNOUT##N##_PIN; break;
-      for (uint8_t i = 1; i <= NUM_RUNOUT_SENSORS; i++) {
+      LOOP_S_LE_N(i, 1, NUM_RUNOUT_SENSORS) {
         pin_t pin;
         switch (i) {
           default: continue;
@@ -820,8 +820,12 @@ void Endstops::update() {
         if (true
           #if ENABLED(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN)
             && z_probe_enabled
-          //#elif HAS_CUSTOM_PROBE_PIN /* stop on Zmin also, not only probe */
-          //  && !z_probe_enabled
+          #elif HAS_CUSTOM_PROBE_PIN
+#if (GITHUB_USER==URSOFT)
+            /* stop on Zmin also, not only probe */
+#else
+            && !z_probe_enabled
+#endif          
           #endif
         ) PROCESS_ENDSTOP_Z(MIN);
       #endif
