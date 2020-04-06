@@ -1523,10 +1523,6 @@ void Planner::check_axes_activity() {
 
       #endif
     }
-
-    #if ENABLED(SKEW_CORRECTION)
-      unskew(raw);
-    #endif
   }
 
 #endif // HAS_LEVELING

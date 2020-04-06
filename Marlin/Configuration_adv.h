@@ -1055,6 +1055,13 @@
 
   #define EVENT_GCODE_SD_STOP "G27 P2"       // G-code to run on Stop Print (e.g., "G28XY" or "G27")
 
+  #if ENABLED(PRINTER_EVENT_LEDS)
+   #if (GITHUB_USER==URSOFT)
+    #define PE_LEDS_COMPLETED_TIME  5       // (seconds) Time to keep the LED "done" color before restoring normal illumination
+   #else
+    #define PE_LEDS_COMPLETED_TIME  (30*60) // (seconds) Time to keep the LED "done" color before restoring normal illumination
+  #endif
+
   /**
    * Continue after Power-Loss (Creality3D)
    *
