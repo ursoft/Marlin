@@ -1060,6 +1060,7 @@
     #define PE_LEDS_COMPLETED_TIME  5       // (seconds) Time to keep the LED "done" color before restoring normal illumination
    #else
     #define PE_LEDS_COMPLETED_TIME  (30*60) // (seconds) Time to keep the LED "done" color before restoring normal illumination
+   #endif
   #endif
 
   /**
