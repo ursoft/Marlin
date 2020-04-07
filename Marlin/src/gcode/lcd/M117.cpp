@@ -33,7 +33,4 @@ void GcodeSuite::M117() {
   else
     ui.reset_status();
 
-  Wire.beginTransmission(0x3C);
-  Wire.write((uint8_t *)parser.string_arg, strlen(parser.string_arg));
-  Wire.endTransmission();
 }
