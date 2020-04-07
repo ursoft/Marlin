@@ -1734,7 +1734,7 @@ void Temperature::init() {
   #if HAS_FAN7
     INIT_FAN_PIN(FAN7_PIN);
   #endif
-  #if ENABLED(USE_CONTROLLER_FAN)
+  #if ENABLED(USE_CONTROLLER_FAN) && !defined(ULTI_STEEL_PWM_EXT_1_0)
     INIT_FAN_PIN(CONTROLLER_FAN_PIN);
   #endif
 

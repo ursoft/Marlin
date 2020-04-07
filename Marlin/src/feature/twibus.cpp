@@ -28,7 +28,9 @@
 
 #include <Wire.h>
 
-#include "../lcd/ultralcd.h"
+#ifdef ULTI_STEEL_PWM_EXT_1_0
+ #include "../lcd/ultralcd.h"
+#endif
 
 TWIBus::TWIBus() {
   #if I2C_SLAVE_ADDRESS == 0
