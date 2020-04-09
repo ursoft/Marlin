@@ -1132,13 +1132,12 @@ void MarlinSettings::postprocess() {
       #endif
       #ifdef NEOPIXEL_EEPROM_STORE_HACK //good bye E4 & E5
         uint8_t *e4 = (uint8_t *)(&tmc_hybrid_threshold.E4);
-        e4[0] = LEDLights::color.r;
-        e4[1] = LEDLights::color.g;
-        e4[2] = LEDLights::color.b;
-        e4[3] = LEDLights::color.w;
-        e4[4] = LEDLights::color.i;
+        e4[0] = LEDLights::defaultLEDColor.r;
+        e4[1] = LEDLights::defaultLEDColor.g;
+        e4[2] = LEDLights::defaultLEDColor.b;
+        e4[3] = LEDLights::defaultLEDColor.w;
+        e4[4] = LEDLights::defaultLEDColor.i;
         e4[5] = ~(e4[0] ^ e4[1] ^ e4[2] ^ e4[3] ^ e4[4]);
-        LEDLights::defaultLEDColor = LEDLights::color;
       #endif
       EEPROM_WRITE(tmc_hybrid_threshold);
     }

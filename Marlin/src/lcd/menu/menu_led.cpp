@@ -39,14 +39,14 @@
       STATIC_ITEM(MSG_LED_PRESETS, SS_CENTER|SS_INVERT);
     #endif
     BACK_ITEM(MSG_LED_CONTROL);
-    ACTION_ITEM(MSG_SET_LEDS_WHITE, leds.set_white);
-    ACTION_ITEM(MSG_SET_LEDS_RED, leds.set_red);
-    ACTION_ITEM(MSG_SET_LEDS_ORANGE, leds.set_orange);
-    ACTION_ITEM(MSG_SET_LEDS_YELLOW,leds.set_yellow);
-    ACTION_ITEM(MSG_SET_LEDS_GREEN, leds.set_green);
-    ACTION_ITEM(MSG_SET_LEDS_BLUE, leds.set_blue);
-    ACTION_ITEM(MSG_SET_LEDS_INDIGO, leds.set_indigo);
-    ACTION_ITEM(MSG_SET_LEDS_VIOLET, leds.set_violet);
+    ACTION_ITEM(MSG_SET_LEDS_WHITE, leds.set_white_all);
+    ACTION_ITEM(MSG_SET_LEDS_RED, leds.set_red_all);
+    ACTION_ITEM(MSG_SET_LEDS_ORANGE, leds.set_orange_all);
+    ACTION_ITEM(MSG_SET_LEDS_YELLOW,leds.set_yellow_all);
+    ACTION_ITEM(MSG_SET_LEDS_GREEN, leds.set_green_all);
+    ACTION_ITEM(MSG_SET_LEDS_BLUE, leds.set_blue_all);
+    ACTION_ITEM(MSG_SET_LEDS_INDIGO, leds.set_indigo_all);
+    ACTION_ITEM(MSG_SET_LEDS_VIOLET, leds.set_violet_all);
     END_MENU();
   }
 
@@ -55,13 +55,13 @@
 void menu_led_custom() {
   START_MENU();
   BACK_ITEM(MSG_LED_CONTROL);
-  EDIT_ITEM(uint8, MSG_INTENSITY_R, &leds.color.r, 0, 255, leds.update, true);
-  EDIT_ITEM(uint8, MSG_INTENSITY_G, &leds.color.g, 0, 255, leds.update, true);
-  EDIT_ITEM(uint8, MSG_INTENSITY_B, &leds.color.b, 0, 255, leds.update, true);
+  EDIT_ITEM(uint8, MSG_INTENSITY_R, &leds.color.r, 0, 255, leds.update_all, true);
+  EDIT_ITEM(uint8, MSG_INTENSITY_G, &leds.color.g, 0, 255, leds.update_all, true);
+  EDIT_ITEM(uint8, MSG_INTENSITY_B, &leds.color.b, 0, 255, leds.update_all, true);
   #if EITHER(RGBW_LED, NEOPIXEL_LED)
-    EDIT_ITEM(uint8, MSG_INTENSITY_W, &leds.color.w, 0, 255, leds.update, true);
+    EDIT_ITEM(uint8, MSG_INTENSITY_W, &leds.color.w, 0, 255, leds.update_all, true);
     #if ENABLED(NEOPIXEL_LED)
-      EDIT_ITEM(uint8, MSG_LED_BRIGHTNESS, &leds.color.i, 0, 255, leds.update, true);
+      EDIT_ITEM(uint8, MSG_LED_BRIGHTNESS, &leds.color.i, 0, 255, leds.update_all, true);
     #endif
   #endif
   END_MENU();
@@ -72,7 +72,7 @@ void menu_led() {
   BACK_ITEM(MSG_MAIN);
   bool led_on = leds.lights_on;
   EDIT_ITEM(bool, MSG_LEDS, &led_on, leds.toggle);
-  ACTION_ITEM(MSG_SET_LEDS_DEFAULT, leds.set_default);
+  ACTION_ITEM(MSG_SET_LEDS_DEFAULT, leds.set_default_all);
   #if ENABLED(LED_COLOR_PRESETS)
     SUBMENU(MSG_LED_PRESETS, menu_led_presets);
   #endif

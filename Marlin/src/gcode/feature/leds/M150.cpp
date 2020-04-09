@@ -46,10 +46,12 @@
  *   M150 W          ; Turn LED white using a white LED
  *   M150 P127       ; Set LED 50% brightness
  *   M150 P          ; Set LED full brightness
+ *   M150 S0         ; Work with pixel #0 only 
+ *   M150 S          ; Work with all pixels (including 0)
  */
 void GcodeSuite::M150() {
   #ifdef ULTI_STEEL_PWM_EXT_1_0
-    if(parser.seen('S') && parser.has_value() && parser.value_byte() == 3 /* 0,1,2 reserved for display */) {
+    if(parser.seen('S') && parser.has_value() && parser.value_byte() == NEOPIXEL_PIXELS /* 0-3 for display */) {
       uint8_t brightness = parser.byteval('P', 255);
       const uint8_t cvt_brightness[] = {0, 16, 32, 34, 36, 38, 40, 43, 45, 47, 49, 51, 54, 56, 58, 60, 62, 
         65, 67, 69, 71, 73, 75, 77, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 99, 101, 103, 105, 107, 108, 110, 
@@ -68,13 +70,29 @@ void GcodeSuite::M150() {
       return;
     }
   #endif
-  leds.set_color(MakeLEDColor(
+  const LEDColor c((MakeLEDColor(
     parser.seen('R') ? (parser.has_value() ? parser.value_byte() : 255) : 0,
     parser.seen('U') ? (parser.has_value() ? parser.value_byte() : 255) : 0,
     parser.seen('B') ? (parser.has_value() ? parser.value_byte() : 255) : 0,
     parser.seen('W') ? (parser.has_value() ? parser.value_byte() : 255) : 0,
     parser.seen('P') ? (parser.has_value() ? parser.value_byte() : 255) : neo.brightness()
-  ));
+  )));
+  if(parser.seen('S')) {
+    uint8_t idx = parser.byteval('S', 0xFF);
+    if(idx < NEOPIXEL_PIXELS || idx == 0xFF) {
+      uint8_t real_idx = (idx == 0xFF) ? 0 : idx;
+      if(real_idx == 0) LEDLights::defaultLEDColor = c;
+      neo.set_pixel_color(real_idx, neo.Color(c.r, c.g, c.b, c.w));
+      neo.set_brightness(c.i);
+      neo.show();
+      if(idx != 0xFF) return;
+    } else {
+      SERIAL_ECHOLNPAIR("pixel index out of range: ", idx);
+      SERIAL_EOL();
+      return;
+    }
+  }
+  leds.set_color(c);
 }
 
 #endif // HAS_COLOR_LEDS
