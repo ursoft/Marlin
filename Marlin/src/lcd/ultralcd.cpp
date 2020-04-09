@@ -795,8 +795,9 @@ void MarlinUI::update() {
       return;
     }
   #endif
-  static millis_t next_lcd_update_ms, last_enc_update_ms, last_activity_ms;
+  static millis_t next_lcd_update_ms = 0, last_enc_update_ms = 0;
   millis_t ms = millis();
+  static millis_t last_activity_ms = ms;
   #if NEOPIXEL_PIXELS == 4 //т.е. возможно полное выключение экрана
     if(!LEDLights::lights_on && int32_t(ms - last_enc_update_ms) >= 3000) { //в таком состоянии помаргиваем кнопкой
       static bool blink = false;
@@ -807,12 +808,14 @@ void MarlinUI::update() {
       blink = !blink;
       last_enc_update_ms = ms;
     }
-    if(last_activity_ms == 0 || encoderDiff || lcd_clicked || card.isPrinting()) {
-      last_activity_ms = ms;
-    }
-    if(LEDLights::lights_on && ELAPSED(ms, last_activity_ms + NEOPIXEL_SAVING_TIMEOUT * 1000)) {
-      LEDLights::toggle();
-    }
+  #endif
+  #if defined(NEOPIXEL_SAVING_TIMEOUT)
+  if(card.isPrinting()) {
+    last_activity_ms = ms;
+  }
+  if(LEDLights::lights_on && int32_t(ms - last_activity_ms) >= NEOPIXEL_SAVING_TIMEOUT * 1000) {
+    LEDLights::toggle();
+  }
   #endif
 
   #if HAS_LCD_MENU && LCD_TIMEOUT_TO_STATUS
@@ -977,6 +980,11 @@ void MarlinUI::update() {
       const float abs_diff = ABS(encoderDiff);
       const bool encoderPastThreshold = (abs_diff >= (ENCODER_PULSES_PER_STEP));
       if (encoderPastThreshold || lcd_clicked) {
+        #if defined(NEOPIXEL_SAVING_TIMEOUT)
+        if(encoderDiff || lcd_clicked) {
+          last_activity_ms = ms;
+        }
+        #endif
         if (encoderPastThreshold) {
 
           #if HAS_LCD_MENU && ENABLED(ENCODER_RATE_MULTIPLIER)
