@@ -54,6 +54,19 @@
     LED_USER_PRESET_BRIGHTNESS
   );
 #endif
+#ifdef NEOPIXEL_BKGD_LED_INDEX
+
+void Marlin_NeoPixel::set_color_background() {
+#ifdef NEOPIXEL_BKGD_COLOR
+    uint8_t background_color[4] = NEOPIXEL_BKGD_COLOR;
+    set_pixel_color(NEOPIXEL_BKGD_LED_INDEX, adaneo1.Color(background_color[0], background_color[1], background_color[2], background_color[3]));
+#else
+    set_pixel_color(NEOPIXEL_BKGD_LED_INDEX, neo.Color(LEDLights::defaultLEDColor.r, LEDLights::defaultLEDColor.g, LEDLights::defaultLEDColor.b, LEDLights::defaultLEDColor.w));
+#endif
+    show();
+  }
+
+#endif
 
 #if EITHER(LED_CONTROL_MENU, PRINTER_EVENT_LEDS)
   LEDColor LEDLights::color;

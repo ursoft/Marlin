@@ -181,6 +181,35 @@ public:
   #if ENABLED(LED_COLOR_PRESETS)
    #ifdef NEOPIXEL_EEPROM_STORE_HACK
     static LEDColor defaultLEDColor;
+    static inline void set_default_all()  { 
+      defaultLEDColor =  MakeLEDColor(
+        LED_USER_PRESET_RED,
+        LED_USER_PRESET_GREEN,
+        LED_USER_PRESET_BLUE,
+        LED_USER_PRESET_WHITE,
+        LED_USER_PRESET_BRIGHTNESS
+      );
+      neo.set_color_background();
+      set_color(defaultLEDColor);
+    }
+    static void set_color_all(const LEDColor &color
+      #if ENABLED(NEOPIXEL_LED)
+        , bool isSequence=false
+      #endif
+    ) {
+      defaultLEDColor = color;
+      neo.set_color_background();
+      set_color(color, isSequence);
+    }
+    static inline void set_red_all()      { set_color_all(LEDColorRed()); }
+    static inline void set_orange_all()   { set_color_all(LEDColorOrange()); }
+    static inline void set_yellow_all()   { set_color_all(LEDColorYellow()); }
+    static inline void set_blue_all()     { set_color_all(LEDColorBlue()); }
+    static inline void set_indigo_all()   { set_color_all(LEDColorIndigo()); }
+    static inline void set_violet_all()   { set_color_all(LEDColorViolet()); }
+    static inline void set_green_all()    { set_color_all(LEDColorGreen()); }
+    static inline void set_white_all()    { set_color_all(LEDColorWhite()); }
+    static inline void update_all()       { set_color_all(color); }
    #else
     static const LEDColor defaultLEDColor;
    #endif

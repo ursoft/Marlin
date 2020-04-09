@@ -634,13 +634,13 @@ void MarlinUI::kill_screen(PGM_P lcd_error, PGM_P lcd_component) {
   #endif
 
   // RED ALERT. RED ALERT.
-  #ifdef LED_BACKLIGHT_TIMEOUT
+  //#ifdef LED_BACKLIGHT_TIMEOUT
     leds.set_color(LEDColorRed());
     #ifdef NEOPIXEL_BKGD_LED_INDEX
-      neo.set_pixel_color(NEOPIXEL_BKGD_LED_INDEX, 255, 0, 0, 0);
+      neo.set_pixel_color(NEOPIXEL_BKGD_LED_INDEX, 0xFF0000);
       neo.show();
     #endif
-  #endif
+  //#endif
 
   draw_kill_screen();
 }
@@ -795,8 +795,25 @@ void MarlinUI::update() {
       return;
     }
   #endif
-  static millis_t next_lcd_update_ms;
+  static millis_t next_lcd_update_ms, last_enc_update_ms, last_activity_ms;
   millis_t ms = millis();
+  #if NEOPIXEL_PIXELS == 4 //т.е. возможно полное выключение экрана
+    if(!LEDLights::lights_on && int32_t(ms - last_enc_update_ms) >= 3000) { //в таком состоянии помаргиваем кнопкой
+      static bool blink = false;
+      uint32_t c = neo.Color(LEDLights::defaultLEDColor.r, LEDLights::defaultLEDColor.g, LEDLights::defaultLEDColor.b, LEDLights::defaultLEDColor.w);
+      neo.set_pixel_color(2, blink ? 0 : c);
+      neo.set_brightness(LEDLights::defaultLEDColor.i);
+      neo.show();
+      blink = !blink;
+      last_enc_update_ms = ms;
+    }
+    if(last_activity_ms == 0 || encoderDiff || lcd_clicked || card.isPrinting()) {
+      last_activity_ms = ms;
+    }
+    if(LEDLights::lights_on && ELAPSED(ms, last_activity_ms + NEOPIXEL_SAVING_TIMEOUT * 1000)) {
+      LEDLights::toggle();
+    }
+  #endif
 
   #if HAS_LCD_MENU && LCD_TIMEOUT_TO_STATUS
     static millis_t return_to_status_ms = 0;
@@ -999,6 +1016,8 @@ void MarlinUI::update() {
           encoderPosition += (encoderDiff * encoderMultiplier) / (ENCODER_PULSES_PER_STEP);
           encoderDiff = 0;
         }
+        if((lcd_clicked || abs_diff) && !LEDLights::lights_on) //wake up display
+          LEDLights::toggle();
 
         RESET_STATUS_TIMEOUT();
 

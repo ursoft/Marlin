@@ -42,15 +42,6 @@ Adafruit_NeoPixel Marlin_NeoPixel::adaneo1(NEOPIXEL_PIXELS, NEOPIXEL_PIN, NEOPIX
   #endif
 ;
 
-#ifdef NEOPIXEL_BKGD_LED_INDEX
-
-  void Marlin_NeoPixel::set_color_background() {
-    uint8_t background_color[4] = NEOPIXEL_BKGD_COLOR;
-    set_pixel_color(NEOPIXEL_BKGD_LED_INDEX, adaneo1.Color(background_color[0], background_color[1], background_color[2], background_color[3]));
-  }
-
-#endif
-
 void Marlin_NeoPixel::set_color(const uint32_t color) {
   for (uint16_t i = 0; i < pixels(); ++i) {
     #ifdef NEOPIXEL_BKGD_LED_INDEX

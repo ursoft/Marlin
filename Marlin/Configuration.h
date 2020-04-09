@@ -2283,17 +2283,20 @@
 #define NEOPIXEL_LED
 #define NEOPIXEL_EEPROM_STORE_HACK // store user color to EERPOM (unused area) // https://github.com/ursoft/Marlin/issues/33
 #if ENABLED(NEOPIXEL_LED)
-  #define NEOPIXEL_TYPE   NEO_GRBW // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
+  //#define NEOPIXEL_TYPE   NEO_GRBW // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
   //#define NEOPIXEL_PIN     4       // LED driving pin
   //#define NEOPIXEL2_TYPE NEOPIXEL_TYPE
   //#define NEOPIXEL2_PIN    5
-  //#define NEOPIXEL_PIXELS 30       // Number of LEDs in the strip, larger of 2 strips if 2 neopixel strips are used
+  // последний светодиод №3: если не задействовать, то при выключении оставляет красную подсветку
+  // если задействовать, то можно его яркостью управлять другими, в т.ч. погасить весь экран (управлять его цветом пока не получается)
+  #define NEOPIXEL_PIXELS 4
+  #define NEOPIXEL_SAVING_TIMEOUT 120 // seconds
   //#define NEOPIXEL_IS_SEQUENTIAL   // Sequential display for temperature change - LED by LED. Disable to change all LEDs at once.
   #define NEOPIXEL_BRIGHTNESS 127  // Initial brightness (0-255)
   //#define NEOPIXEL_STARTUP_TEST  // Cycle through colors at startup
 
   // Use a single Neopixel LED for static (background) lighting
-  //#define NEOPIXEL_BKGD_LED_INDEX  0               // Index of the LED to use
+  #define NEOPIXEL_BKGD_LED_INDEX  0               // Index of the LED to use
   //#define NEOPIXEL_BKGD_COLOR { 0, 255, 0, 0 } // R, G, B, W
 #endif
 
