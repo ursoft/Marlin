@@ -64,7 +64,7 @@ class TWIBus {
      */
     uint8_t buffer[TWIBUS_BUFFER_SIZE];
 
-    #ifdef ULTI_STEEL_PWM_EXT_1_0
+    #ifdef IVI_PWM_EXT_1_0
       /**
        * @brief Output external PWM worker
        * @details Ask external PWM extender to emit output to subAddr once
@@ -229,7 +229,7 @@ class TWIBus {
 
     #endif
 
-    #ifdef ULTI_STEEL_PWM_EXT_1_0
+    #ifdef IVI_PWM_EXT_1_0
       /**
        * @brief Output external PWM
        * @details Ask external PWM extender to emit output to subAddr

@@ -670,7 +670,7 @@ void MarlinUI::draw_status_screen() {
     //
     if(PAGE_CONTAINS(42, 51)) {
     #ifndef DOGM_SD_PRESENT
-    if (card.isFileOpen() &&) {
+    if (card.isFileOpen()) {
       // Upper box
       u8g.drawBox(42, 42, 8, 7);     // 42-48 (or 41-47)
       // Right edge

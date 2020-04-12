@@ -37,6 +37,36 @@
 
 #define PWM_PIN(P)            true // all pins are PWM capable
 
+#ifdef IVI_PWM_EXT_1_0
+#include "../../../feature/twibus.h"
+extern TWIBus i2c;
+
+#define IS_IVI_PWM_EXT(IO)    (((IO) & IVI_PWM_EXT) == IVI_PWM_EXT)
+#define NA_IVI_PWM_EXT(IO, W) if(IS_IVI_PWM_EXT(IO)) { W++; } else 
+#define LPC_PIN(pin)          do{ NA_IVI_PWM_EXT(IO, LPC_PIN) LPC176x::gpio_pin(pin); } while(0)
+#define LPC_GPIO(port)        do{ NA_IVI_PWM_EXT(IO, LPC_GPIO) LPC176x::gpio_port(port) } while(0)
+
+#define SET_DIR_INPUT(IO)     do{ if(!IS_IVI_PWM_EXT(IO)) LPC176x::gpio_set_input(IO); } while(0)
+#define SET_DIR_OUTPUT(IO)    do{ if(!IS_IVI_PWM_EXT(IO)) LPC176x::gpio_set_output(IO); } while(0)
+
+#define SET_MODE(IO, mode)    do{ if(!IS_IVI_PWM_EXT(IO)) pinMode(IO, mode); } while(0) //not required
+
+#define WRITE_PIN_SET(IO)     do{ NA_IVI_PWM_EXT(IO, WRITE_PIN_SET) LPC176x::gpio_set(IO); } while(0)
+#define WRITE_PIN_CLR(IO)     do{ NA_IVI_PWM_EXT(IO, WRITE_PIN_CLR) LPC176x::gpio_clear(IO); } while(0)
+
+template <uint16_t sel> 
+struct PinManager {
+    static uint8_t Read(uint16_t io);
+    static void Write(uint16_t io, uint8_t v);
+};
+template<> inline uint8_t PinManager<IVI_PWM_EXT>::Read(uint16_t) { return 0 /* reading not implemented yet */; }
+template<> inline uint8_t PinManager<0>::Read(uint16_t io) { return LPC176x::gpio_get(io); }
+template<> inline void PinManager<IVI_PWM_EXT>::Write(uint16_t io, uint8_t v) { i2c.WritePwmExt((int8_t)io, v); }
+template<> inline void PinManager<0>::Write(uint16_t io, uint8_t v) { LPC176x::gpio_set(io, v); }
+
+#define READ_PIN(IO)          PinManager<IO & IVI_PWM_EXT>::Read(IO)
+#define WRITE_PIN(IO, V)      PinManager<IO & IVI_PWM_EXT>::Write(IO, V)
+#else
 #define LPC_PIN(pin)          LPC176x::gpio_pin(pin)
 #define LPC_GPIO(port)        LPC176x::gpio_port(port)
 
@@ -50,6 +80,9 @@
 
 #define READ_PIN(IO)          LPC176x::gpio_get(IO)
 #define WRITE_PIN(IO,V)       LPC176x::gpio_set(IO, V)
+
+#define IS_IVI_PWM_EXT(IO)    false
+#endif
 
 /**
  * Magic I/O routines
@@ -75,16 +108,16 @@
 #define _SET_OUTPUT(IO)       SET_DIR_OUTPUT(IO)
 
 /// set pin as input with pullup mode
-#define _PULLUP(IO,V)         pinMode(IO, (V) ? INPUT_PULLUP : INPUT)
+#define _PULLUP(IO,V)         do{ if(!IS_IVI_PWM_EXT(IO)) pinMode(IO, (V) ? INPUT_PULLUP : INPUT); } while(0)
 
 /// set pin as input with pulldown mode
-#define _PULLDOWN(IO,V)       pinMode(IO, (V) ? INPUT_PULLDOWN : INPUT)
+#define _PULLDOWN(IO,V)       do{ if(!IS_IVI_PWM_EXT(IO)) pinMode(IO, (V) ? INPUT_PULLDOWN : INPUT); } while(0)
 
 /// check if pin is an input
-#define _IS_INPUT(IO)         (!LPC176x::gpio_get_dir(IO))
+#define _IS_INPUT(IO)         (IS_IVI_PWM_EXT(IO) ? false : !LPC176x::gpio_get_dir(IO))
 
 /// check if pin is an output
-#define _IS_OUTPUT(IO)        (LPC176x::gpio_get_dir(IO))
+#define _IS_OUTPUT(IO)        (IS_IVI_PWM_EXT(IO) ? true : LPC176x::gpio_get_dir(IO))
 
 /// Read a pin wrapper
 #define READ(IO)              _READ(IO)
@@ -115,5 +148,6 @@
 #define OUT_WRITE(IO,V)       do{ SET_OUTPUT(IO); WRITE(IO,V); }while(0)
 
 // digitalRead/Write wrappers
-#define extDigitalRead(IO)    digitalRead(IO)
-#define extDigitalWrite(IO,V) digitalWrite(IO,V)
+#define extDigitalRead(IO)    (IS_IVI_PWM_EXT(IO) ? 0 /* reading not implemented yet */ : digitalRead(IO))
+#define extDigitalWrite(IO,V) (IS_IVI_PWM_EXT(IO) ? i2c.WritePwmExt((int8_t)(IO), V) : digitalWrite(IO,V))
+#define extAnalogWrite(IO,V)  (IS_IVI_PWM_EXT(IO) ? i2c.WritePwmExt((int8_t)(IO), V) : analogWrite(IO,V))

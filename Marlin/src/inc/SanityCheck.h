@@ -1496,7 +1496,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #error "You cannot set CONTROLLER_FAN_PIN equal to FAN_PIN."
 #endif
 
-#if ENABLED(USE_CONTROLLER_FAN) && !defined(ULTI_STEEL_PWM_EXT_1_0)
+#if ENABLED(USE_CONTROLLER_FAN)
   #if !HAS_CONTROLLER_FAN
     #error "USE_CONTROLLER_FAN requires a CONTROLLER_FAN_PIN. Define in Configuration_adv.h."
   #elif E0_AUTO_FAN_PIN == CONTROLLER_FAN_PIN

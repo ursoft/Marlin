@@ -26,6 +26,9 @@
 
 uint8_t case_light_brightness = CASE_LIGHT_DEFAULT_BRIGHTNESS;
 bool case_light_on = CASE_LIGHT_DEFAULT_ON;
+#ifdef CASE_LIGHT_NATURAL_BRIGHTNESS
+extern const uint8_t cvt_brightness[];
+#endif
 
 #if ENABLED(CASE_LIGHT_USE_NEOPIXEL)
   #include "leds/leds.h"
@@ -73,12 +76,18 @@ void update_case_light() {
 
     #if DISABLED(CASE_LIGHT_NO_BRIGHTNESS)
       if (PWM_PIN(CASE_LIGHT_PIN))
-        analogWrite(pin_t(CASE_LIGHT_PIN), (
+        extAnalogWrite(pin_t(CASE_LIGHT_PIN), (
+#ifdef CASE_LIGHT_NATURAL_BRIGHTNESS
+cvt_brightness[
+#endif
           #if CASE_LIGHT_MAX_PWM == 255
             n10ct
           #else
             map(n10ct, 0, 255, 0, CASE_LIGHT_MAX_PWM)
           #endif
+#ifdef CASE_LIGHT_NATURAL_BRIGHTNESS
+]
+#endif
         ));
       else
     #endif

@@ -27,9 +27,6 @@
 #include "controllerfan.h"
 #include "../module/stepper/indirection.h"
 #include "../module/temperature.h"
-#ifdef ULTI_STEEL_PWM_EXT_1_0
- #include "../../../MarlinCore.h" // for i2c
-#endif
 
 ControllerFan controllerFan;
 
@@ -40,9 +37,7 @@ uint8_t ControllerFan::speed;
 #endif
 
 void ControllerFan::setup() {
-  #if !defined(ULTI_STEEL_PWM_EXT_1_0)
-    SET_OUTPUT(CONTROLLER_FAN_PIN);
-  #endif
+  SET_OUTPUT(CONTROLLER_FAN_PIN);
   init();
 }
 
@@ -101,12 +96,10 @@ void ControllerFan::update() {
     );
 
     // Allow digital or PWM fan output (see M42 handling)
-    #if defined(ULTI_STEEL_PWM_EXT_1_0)
-      i2c.WritePwmExt(1, speed);
-    #else
+    if (PWM_PIN(CONTROLLER_FAN_PIN))
+      extAnalogWrite(pin_t(CONTROLLER_FAN_PIN), speed);
+    else
       WRITE(CONTROLLER_FAN_PIN, speed);
-      analogWrite(pin_t(CONTROLLER_FAN_PIN), speed);
-    #endif
   }
 }
 

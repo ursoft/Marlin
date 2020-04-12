@@ -28,7 +28,7 @@
 
 #include <Wire.h>
 
-#ifdef ULTI_STEEL_PWM_EXT_1_0
+#ifdef IVI_PWM_EXT_1_0
  #include "../lcd/ultralcd.h"
 #endif
 
@@ -108,7 +108,7 @@ bool TWIBus::request(const uint8_t bytes) {
   debug(PSTR("request"), bytes);
 
   // requestFrom() is a blocking function
-  if (Wire.requestFrom(addr, bytes) == 0) {
+  if (Wire.requestFrom(uint8_t(addr << 1 /*bug fix*/), bytes) == 0) {
     debug("request fail", addr);
     return false;
   }
@@ -181,11 +181,11 @@ void TWIBus::flush() {
 
 #endif
 
-#ifdef ULTI_STEEL_PWM_EXT_1_0
+#ifdef IVI_PWM_EXT_1_0
   bool TWIBus::doWritePwmExt(uint8_t subAddr, uint8_t pwm) {
     flush();
     reset();
-    address(ULTI_STEEL_PWM_EXT_1_0);
+    address(IVI_PWM_EXT_1_0);
     addbyte((char)subAddr);
     addbyte((char)pwm);
     addbyte((char)(uint8_t(addr << 1) ^ subAddr ^ pwm));
@@ -213,14 +213,33 @@ void TWIBus::flush() {
   }
   void TWIBus::WritePwmExt(uint8_t subAddr, uint8_t pwm) {
     static bool failure = false;
+    const int cacheSize = 3;
+    static uint8_t cache[cacheSize];
+    static millis_t last_wr[cacheSize];
+    millis_t ms = millis();
+    if(subAddr >= cacheSize) {
+      debug("WritePwmExt", "Cache miss");
+    } else {
+      int elapsed = int(ms - last_wr[subAddr]);
+      if(cache[subAddr] == pwm && last_wr != 0 && elapsed >= 0 && elapsed < 60000) {
+        debug("WritePwmExt", "Cache hit");
+        return;
+      }
+    }
     const char *fail_msg = "I2C WritePwmExt Failed";
     if(!failure) {
       int cnt = 0;
       do {
-        if(doWritePwmExt(subAddr, pwm)) return;
+        if(doWritePwmExt(subAddr, pwm)) {
+          if(subAddr < cacheSize) {
+            last_wr[subAddr] = ms;
+            cache[subAddr] = pwm;
+          }
+          return;
+        }
       } while(cnt++ < 3);
       debug("WritePwmExt", "Failure state: ON");
-      failure = true;
+      //failure = true;
       ui.set_status(fail_msg);
       return;
     }

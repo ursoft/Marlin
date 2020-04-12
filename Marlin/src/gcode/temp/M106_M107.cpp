@@ -21,9 +21,6 @@
  */
 
 #include "../../inc/MarlinConfig.h"
-#ifdef ULTI_STEEL_PWM_EXT_1_0
- #include "../../../MarlinCore.h" // for i2c
-#endif
 
 #if FAN_COUNT > 0
 
@@ -74,7 +71,7 @@ void GcodeSuite::M106() {
     thermalManager.extruder_auto_fan_speed = (uint8_t)s;
   }
 #endif
-#ifdef ULTI_STEEL_PWM_EXT_1_0
+#ifdef IVI_PWM_EXT_1_0
   else {
     #if ENABLED(EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE)
       --p; // P2 -> WirePro1, P3 -> WirePro2 

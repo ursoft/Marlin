@@ -698,7 +698,7 @@ int16_t Temperature::getHeaterPower(const heater_ind_t heater_id) {
 
     #define _UPDATE_AUTO_FAN(P,D,A) do{                  \
       if (PWM_PIN(P##_AUTO_FAN_PIN) && A < 255)          \
-        analogWrite(pin_t(P##_AUTO_FAN_PIN), D ? A : 0); \
+        extAnalogWrite(pin_t(P##_AUTO_FAN_PIN), D ? A : 0); \
       else                                               \
         WRITE(P##_AUTO_FAN_PIN, D);                      \
     }while(0)
@@ -1734,7 +1734,7 @@ void Temperature::init() {
   #if HAS_FAN7
     INIT_FAN_PIN(FAN7_PIN);
   #endif
-  #if ENABLED(USE_CONTROLLER_FAN) && !defined(ULTI_STEEL_PWM_EXT_1_0)
+  #if ENABLED(USE_CONTROLLER_FAN)
     INIT_FAN_PIN(CONTROLLER_FAN_PIN);
   #endif
 

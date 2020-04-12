@@ -344,7 +344,7 @@
  */
 #define USE_CONTROLLER_FAN
 #if ENABLED(USE_CONTROLLER_FAN)
-  //#define CONTROLLER_FAN_PIN -1        // Set a custom pin for the controller fan
+  #define CONTROLLER_FAN_PIN IVI_PWM_EXT_PIN(1)  // Set a custom pin for the controller fan
   //#define CONTROLLER_FAN_USE_Z_ONLY    // With this option only the Z axis is considered
   #define CONTROLLERFAN_SPEED_MIN     20 // (0-255) Minimum speed. (If set below this value the fan is turned off.)
   #define CONTROLLERFAN_SPEED_ACTIVE 100 // (0-255) Active speed, used when any motor is enabled
@@ -426,7 +426,7 @@
 #define E3_AUTO_FAN_PIN -1
 #define E4_AUTO_FAN_PIN -1
 #define E5_AUTO_FAN_PIN -1
-#define CHAMBER_AUTO_FAN_PIN -1
+#define CHAMBER_AUTO_FAN_PIN IVI_PWM_EXT_PIN(2)
 
 #define EXTRUDER_AUTO_FAN_TEMPERATURE 50
 #if (GITHUB_USER==URSOFT)
@@ -435,9 +435,8 @@
  #define EXTRUDER_AUTO_FAN_SPEED 200   // 255 == full speed
 #endif
 #define EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE
-#define ULTI_STEEL_PWM_EXT_1_0 0x55
-//#define CHAMBER_AUTO_FAN_TEMPERATURE 30
-//#define CHAMBER_AUTO_FAN_SPEED 255
+#define CHAMBER_AUTO_FAN_TEMPERATURE 50
+#define CHAMBER_AUTO_FAN_SPEED 255
 
 /**
  * Part-Cooling Fan Multiplexer
@@ -453,14 +452,15 @@
 /**
  * M355 Case Light on-off / brightness
  */
-//#define CASE_LIGHT_ENABLE
+#define CASE_LIGHT_ENABLE
 #if ENABLED(CASE_LIGHT_ENABLE)
-  //#define CASE_LIGHT_PIN 4                  // Override the default pin if needed
+  #define CASE_LIGHT_PIN IVI_PWM_EXT_PIN(0)   // Override the default pin if needed
+  #define CASE_LIGHT_NATURAL_BRIGHTNESS       // Use logarithmic scale
   #define INVERT_CASE_LIGHT false             // Set true if Case Light is ON when pin is LOW
   #define CASE_LIGHT_DEFAULT_ON true          // Set default power-up state on
   #define CASE_LIGHT_DEFAULT_BRIGHTNESS 105   // Set default power-up brightness (0-255, requires PWM pin)
   //#define CASE_LIGHT_MAX_PWM 128            // Limit pwm
-  //#define CASE_LIGHT_MENU                   // Add Case Light options to the LCD menu
+  #define CASE_LIGHT_MENU                   // Add Case Light options to the LCD menu
   //#define CASE_LIGHT_NO_BRIGHTNESS          // Disable brightness control. Enable for non-PWM lighting.
   //#define CASE_LIGHT_USE_NEOPIXEL           // Use Neopixel LED as case light, requires NEOPIXEL_LED.
   #if ENABLED(CASE_LIGHT_USE_NEOPIXEL)
@@ -1252,10 +1252,10 @@
 #if HAS_GRAPHICAL_LCD
   // Show SD percentage next to the progress bar
   #define DOGM_SD_PERCENT
-  #define DOGM_SD_PRESENT // https://github.com/ursoft/Marlin/issues/34
-  #define DOGM_SHOW_SPEED // https://github.com/ursoft/Marlin/issues/39
-  #define DOGM_SHOW_LAYER // https://github.com/ursoft/Marlin/issues/39
-  #define DOGM_SHOW_PERF  // https://github.com/ursoft/Marlin/issues/39
+  //#define DOGM_SD_PRESENT // https://github.com/ursoft/Marlin/issues/34
+  //#define DOGM_SHOW_SPEED // https://github.com/ursoft/Marlin/issues/39
+  //#define DOGM_SHOW_LAYER // https://github.com/ursoft/Marlin/issues/39
+  //#define DOGM_SHOW_PERF  // https://github.com/ursoft/Marlin/issues/39
 
   // Enable to save many cycles by drawing a hollow frame on the Info Screen
   #define XYZ_HOLLOW_FRAME
@@ -1307,7 +1307,7 @@
   #define STATUS_HOTEND_INVERTED      // Show solid nozzle bitmaps when heating (Requires STATUS_HOTEND_ANIM)
   #define STATUS_HOTEND_ANIM          // Use a second bitmap to indicate hotend heating
   #define STATUS_BED_ANIM             // Use a second bitmap to indicate bed heating
-  #define STATUS_CHAMBER_ANIM         // Use a second bitmap to indicate chamber heating
+  //#define STATUS_CHAMBER_ANIM         // Use a second bitmap to indicate chamber heating
   //#define STATUS_CUTTER_ANIM        // Use a second bitmap to indicate spindle / laser active
   //#define STATUS_ALT_BED_BITMAP     // Use the alternative bed bitmap
   //#define STATUS_ALT_FAN_BITMAP     // Use the alternative fan bitmap
