@@ -227,7 +227,7 @@ void TWIBus::flush() {
       }
     }
     const char *fail_msg = "I2C WritePwmExt Failed";
-    if(!failure) {
+    if(true /*!failure*/) {
       int cnt = 0;
       do {
         if(doWritePwmExt(subAddr, pwm)) {
@@ -235,11 +235,17 @@ void TWIBus::flush() {
             last_wr[subAddr] = ms;
             cache[subAddr] = pwm;
           }
+          if(failure) {
+            ui.reset_status();
+            failure = false;
+            for(uint8_t i = 0; i < cacheSize; i++)
+              if(i != subAddr) doWritePwmExt(i, cache[i]);
+          }
           return;
         }
       } while(cnt++ < 3);
       debug("WritePwmExt", "Failure state: ON");
-      //failure = true;
+      failure = true;
       ui.set_status(fail_msg);
       return;
     }
