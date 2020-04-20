@@ -810,10 +810,15 @@ void MarlinUI::update() {
     }
   #endif
   #if defined(NEOPIXEL_SAVING_TIMEOUT)
-  if(card.isPrinting()) {
+  const bool hasActivity = card.isPrinting()
+     || Temperature::degBed() > 50 || Temperature::degTargetBed() != 0
+     || Temperature::degHotend(0) > 50 || Temperature::degTargetHotend(0) != 0;
+  if(hasActivity) {
     last_activity_ms = ms;
   }
   if(LEDLights::lights_on && int32_t(ms - last_activity_ms) >= NEOPIXEL_SAVING_TIMEOUT * 1000) {
+    LEDLights::toggle();
+  } else if(!LEDLights::lights_on && hasActivity) {
     LEDLights::toggle();
   }
   #endif
