@@ -148,11 +148,7 @@
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu
-#if (GITHUB_USER==QTEB)
-  #define CUSTOM_MACHINE_NAME "UlTi Steel QTEB"
-#else
-  #define CUSTOM_MACHINE_NAME "UlTi Steel"
-#endif
+#define CUSTOM_MACHINE_NAME "UlTi Steel"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like http://www.uuidgenerator.net/version4
