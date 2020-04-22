@@ -148,7 +148,11 @@
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu
-#define CUSTOM_MACHINE_NAME "UlTi Steel"
+#if (GITHUB_USER==QTEB)
+  #define CUSTOM_MACHINE_NAME "UlTi Steel QTEB"
+#else
+  #define CUSTOM_MACHINE_NAME "UlTi Steel"
+#endif
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like http://www.uuidgenerator.net/version4
@@ -422,6 +426,19 @@
  *   998 : Dummy Table that ALWAYS reads 25°C or the temperature defined below.
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
  */
+#if (GITHUB_USER==QTEB)
+  #define TEMP_SENSOR_0 1010
+  #define TEMP_SENSOR_1 0
+  #define TEMP_SENSOR_2 0
+  #define TEMP_SENSOR_3 0
+  #define TEMP_SENSOR_4 0
+  #define TEMP_SENSOR_5 0
+  #define TEMP_SENSOR_6 0
+  #define TEMP_SENSOR_7 0
+  #define TEMP_SENSOR_BED 1
+  #define TEMP_SENSOR_PROBE 0
+  #define TEMP_SENSOR_CHAMBER 0
+#else
 #define TEMP_SENSOR_0 1
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
@@ -433,6 +450,7 @@
 #define TEMP_SENSOR_BED 1
 #define TEMP_SENSOR_PROBE 0
 #define TEMP_SENSOR_CHAMBER 0
+#endif
 
 // Dummy thermistor constant temperature readings, for use with 998 and 999
 #define DUMMY_THERMISTOR_998_VALUE 25
@@ -474,6 +492,16 @@
  #define HEATER_4_MAXTEMP 240
  #define HEATER_5_MAXTEMP 240
  #define BED_MAXTEMP      90
+#elif (GITHUB_USER==QTEB)
+  #define HEATER_0_MAXTEMP 300
+  #define HEATER_1_MAXTEMP 275
+  #define HEATER_2_MAXTEMP 275
+  #define HEATER_3_MAXTEMP 275
+  #define HEATER_4_MAXTEMP 275
+  #define HEATER_5_MAXTEMP 275
+  #define HEATER_6_MAXTEMP 275
+  #define HEATER_7_MAXTEMP 275
+  #define BED_MAXTEMP      110
 #else
 #define HEATER_0_MAXTEMP 275
 #define HEATER_1_MAXTEMP 275
@@ -514,6 +542,10 @@
  #define DEFAULT_Kp 26.47
  #define DEFAULT_Ki 3.12
  #define DEFAULT_Kd 56.17
+#elif (GITHUB_USER==QTEB)
+  #define DEFAULT_Kp 21.27
+  #define DEFAULT_Ki 1.36
+  #define DEFAULT_Kd 83.24
 #else
   // Ultimaker
   #define DEFAULT_Kp 22.2
@@ -571,6 +603,10 @@
   #define DEFAULT_bedKp 32.27
   #define DEFAULT_bedKi 6.45
   #define DEFAULT_bedKd 107.67
+#elif (GITHUB_USER==QTEB)
+  #define DEFAULT_bedKp 35.28
+  #define DEFAULT_bedKi 6.59
+  #define DEFAULT_bedKd 125.85
 #else
   #define DEFAULT_bedKp 97.56
   #define DEFAULT_bedKi 8.51
@@ -1388,6 +1424,8 @@
   #define LEVEL_CORNERS_INSET_LFRB { 5, 5, 5, 5 } // (mm) Left, Front, Right, Back insets
 #if (GITHUB_USER==URSOFT) //не тыкаем в ковер, у меня щуп есть
   #define LEVEL_CORNERS_HEIGHT     0.5            // (mm) Z height of nozzle at leveling points
+#elif (GITHUB_USER==QTEB)
+   #define LEVEL_CORNERS_HEIGHT     0.1            // (mm) Z height of nozzle at leveling points
 #else
   #define LEVEL_CORNERS_HEIGHT     0.0            // (mm) Z height of nozzle at leveling points
 #endif
@@ -1542,21 +1580,30 @@
 // Preheat Constants
 #define PREHEAT_1_LABEL       "PLA"
 #if (GITHUB_USER==URSOFT)
- #define PREHEAT_1_TEMP_HOTEND 200
+  #define PREHEAT_1_TEMP_BED     60
+  #define PREHEAT_1_TEMP_HOTEND 200
+#elif (GITHUB_USER==QTEB)
+  #define PREHEAT_1_TEMP_BED     60
+  #define PREHEAT_1_TEMP_HOTEND 210
 #else
- #define PREHEAT_1_TEMP_HOTEND 190
+  #define PREHEAT_1_TEMP_BED     60
+  #define PREHEAT_1_TEMP_HOTEND 190
 #endif
-#define PREHEAT_1_TEMP_BED     60
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
 #if (GITHUB_USER==URSOFT)
- #define PREHEAT_2_LABEL       "SBS"
- #define PREHEAT_2_TEMP_BED    80
+  #define PREHEAT_2_LABEL       "SBS"
+  #define PREHEAT_2_TEMP_BED    80
+  #define PREHEAT_2_TEMP_HOTEND 230
+#elif (GITHUB_USER==QTEB)
+  #define PREHEAT_2_LABEL       "FormaX"
+  #define PREHEAT_2_TEMP_BED    95
+  #define PREHEAT_2_TEMP_HOTEND 274
 #else
- #define PREHEAT_2_LABEL       "ABS"
- #define PREHEAT_2_TEMP_BED    90
+  #define PREHEAT_2_LABEL       "ABS"
+  #define PREHEAT_2_TEMP_BED    90
+  #define PREHEAT_2_TEMP_HOTEND 230
 #endif
-#define PREHEAT_2_TEMP_HOTEND 230
 #define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
 /**
