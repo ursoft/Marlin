@@ -2905,7 +2905,7 @@
   //#define USER_GCODE_5 "G28\nM503"
 
   #define USER_DESC_5 "3-point Z-knobing"
-  if (GITHUB_USER==QTEB)
+  #if (GITHUB_USER==QTEB)
     #define USER_GCODE_5 "G28\nG0 X2 Y2 Z0.1 F3600\nM0 Knob#1\nG0 X198\nM0 Knob#2\nG0 X100 Y198"
   #else
     #define USER_GCODE_5 "G28\nG0 X2 Y2 Z1 F3600\nM0 Knob#1\nG0 X198\nM0 Knob#2\nG0 X100 Y198"
