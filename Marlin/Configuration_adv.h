@@ -1542,6 +1542,8 @@
  */
 #if (GITHUB_USER==URSOFT)
  //#define LIN_ADVANCE
+#elif (GITHUB_USER==QTEB)
+  #define LIN_ADVANCE
 #else
  //#define LIN_ADVANCE //conflicts with stealthChop (UltiSteel stock) mode of TMC2208 (E stops extruding at ~10 layer)
 #endif
