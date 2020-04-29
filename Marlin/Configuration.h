@@ -1421,7 +1421,7 @@
 #if (GITHUB_USER==URSOFT) //не тыкаем в ковер, у меня щуп есть
   #define LEVEL_CORNERS_HEIGHT     0.5            // (mm) Z height of nozzle at leveling points
 #elif (GITHUB_USER==QTEB)
-   #define LEVEL_CORNERS_HEIGHT     0.1            // (mm) Z height of nozzle at leveling points
+  #define LEVEL_CORNERS_HEIGHT     0.1            // (mm) Z height of nozzle at leveling points
 #else
   #define LEVEL_CORNERS_HEIGHT     0.0            // (mm) Z height of nozzle at leveling points
 #endif
