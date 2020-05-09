@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -40,6 +40,7 @@ namespace Language_en {
   PROGMEM Language_Str LANGUAGE                            = _UxGT("English");
 
   PROGMEM Language_Str WELCOME_MSG                         = MACHINE_NAME _UxGT(" Ready.");
+  PROGMEM Language_Str MSG_MARLIN                          = _UxGT("Marlin");
   PROGMEM Language_Str MSG_YES                             = _UxGT("YES");
   PROGMEM Language_Str MSG_NO                              = _UxGT("NO");
   PROGMEM Language_Str MSG_BACK                            = _UxGT("Back");
@@ -246,6 +247,11 @@ namespace Language_en {
   PROGMEM Language_Str MSG_STORED_FAN_N                    = _UxGT("Stored Fan ~");
   PROGMEM Language_Str MSG_EXTRA_FAN_SPEED                 = _UxGT("Extra Fan Speed");
   PROGMEM Language_Str MSG_EXTRA_FAN_SPEED_N               = _UxGT("Extra Fan Speed ~");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN                  = _UxGT("Controller Fan");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_IDLE_SPEED       = _UxGT("Idle Speed");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_AUTO_ON          = _UxGT("Auto Mode");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_SPEED            = _UxGT("Active Speed");
+  PROGMEM Language_Str MSG_CONTROLLER_FAN_DURATION         = _UxGT("Idle Period");
   PROGMEM Language_Str MSG_FLOW                            = _UxGT("Flow");
   PROGMEM Language_Str MSG_FLOW_N                          = _UxGT("Flow ~");
   PROGMEM Language_Str MSG_CONTROL                         = _UxGT("Control");
@@ -265,6 +271,8 @@ namespace Language_en {
   PROGMEM Language_Str MSG_PID_D_E                         = _UxGT("PID-D *");
   PROGMEM Language_Str MSG_PID_C                           = _UxGT("PID-C");
   PROGMEM Language_Str MSG_PID_C_E                         = _UxGT("PID-C *");
+  PROGMEM Language_Str MSG_PID_F                           = _UxGT("PID-F");
+  PROGMEM Language_Str MSG_PID_F_E                         = _UxGT("PID-F *");
   PROGMEM Language_Str MSG_SELECT                          = _UxGT("Select");
   PROGMEM Language_Str MSG_SELECT_E                        = _UxGT("Select *");
   PROGMEM Language_Str MSG_ACC                             = _UxGT("Accel");
@@ -309,8 +317,11 @@ namespace Language_en {
   PROGMEM Language_Str MSG_CONTRAST                        = _UxGT("LCD Contrast");
   PROGMEM Language_Str MSG_STORE_EEPROM                    = _UxGT("Store Settings");
   PROGMEM Language_Str MSG_LOAD_EEPROM                     = _UxGT("Load Settings");
-  PROGMEM Language_Str MSG_RESTORE_FAILSAFE                = _UxGT("Restore failsafe");
+  PROGMEM Language_Str MSG_RESTORE_DEFAULTS                = _UxGT("Restore Defaults");
   PROGMEM Language_Str MSG_INIT_EEPROM                     = _UxGT("Initialize EEPROM");
+  PROGMEM Language_Str MSG_ERR_EEPROM_CRC                  = _UxGT("Err: EEPROM CRC");
+  PROGMEM Language_Str MSG_ERR_EEPROM_INDEX                = _UxGT("Err: EEPROM Index");
+  PROGMEM Language_Str MSG_ERR_EEPROM_VERSION              = _UxGT("Err: EEPROM Version");
   PROGMEM Language_Str MSG_MEDIA_UPDATE                    = _UxGT("Media Update");
   PROGMEM Language_Str MSG_RESET_PRINTER                   = _UxGT("Reset Printer");
   PROGMEM Language_Str MSG_REFRESH                         = LCD_STR_REFRESH  _UxGT("Refresh");
@@ -341,6 +352,7 @@ namespace Language_en {
   PROGMEM Language_Str MSG_PRINT_PAUSED                    = _UxGT("Print Paused");
   PROGMEM Language_Str MSG_PRINTING                        = _UxGT("Printing...");
   PROGMEM Language_Str MSG_PRINT_ABORTED                   = _UxGT("Print Aborted");
+  PROGMEM Language_Str MSG_PRINT_DONE                      = _UxGT("Print Done");
   PROGMEM Language_Str MSG_NO_MOVE                         = _UxGT("No Move.");
   PROGMEM Language_Str MSG_KILLED                          = _UxGT("KILLED. ");
   PROGMEM Language_Str MSG_STOPPED                         = _UxGT("STOPPED. ");
@@ -394,9 +406,9 @@ namespace Language_en {
   PROGMEM Language_Str MSG_MANUAL_STOW                     = _UxGT("Stow Z-Probe");
   PROGMEM Language_Str MSG_HOME_FIRST                      = _UxGT("Home %s%s%s First");
   PROGMEM Language_Str MSG_ZPROBE_OFFSETS                  = _UxGT("Probe Offsets");
-  PROGMEM Language_Str MSG_ZPROBE_XOFFSET                  = _UxGT("Probe X Offset");
-  PROGMEM Language_Str MSG_ZPROBE_YOFFSET                  = _UxGT("Probe Y Offset");
-  PROGMEM Language_Str MSG_ZPROBE_ZOFFSET                  = _UxGT("Probe Z Offset");
+  PROGMEM Language_Str MSG_ZPROBE_XOFFSET                  = _UxGT("Probe Xoffset");
+  PROGMEM Language_Str MSG_ZPROBE_YOFFSET                  = _UxGT("Probe Yoffset");
+  PROGMEM Language_Str MSG_ZPROBE_ZOFFSET                  = _UxGT("Probe Zoffset");
   PROGMEM Language_Str MSG_BABYSTEP_X                      = _UxGT("Babystep X");
   PROGMEM Language_Str MSG_BABYSTEP_Y                      = _UxGT("Babystep Y");
   PROGMEM Language_Str MSG_BABYSTEP_Z                      = _UxGT("Babystep Z");
@@ -590,6 +602,9 @@ namespace Language_en {
   PROGMEM Language_Str MSG_BACKLASH_C                      = LCD_STR_C;
   PROGMEM Language_Str MSG_BACKLASH_CORRECTION             = _UxGT("Correction");
   PROGMEM Language_Str MSG_BACKLASH_SMOOTHING              = _UxGT("Smoothing");
+  
+  PROGMEM Language_Str MSG_LEVEL_X_AXIS                    = _UxGT("Level X Axis");
+  PROGMEM Language_Str MSG_AUTO_CALIBRATE                  = _UxGT("Auto Calibrate");
 }
 
 #if FAN_COUNT == 1

@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -128,12 +128,16 @@ class MenuItem_sdfolder : public MenuItem_sdbase {
 void menu_media() {
   ui.encoder_direction_menus();
 
-  #if HAS_GRAPHICAL_LCD
-    static uint16_t fileCnt;
-    if (ui.first_page) fileCnt = card.get_num_Files();
-  #else
+  //#if HAS_GRAPHICAL_LCD
+  //  static uint16_t fileCnt;
+  //  if (ui.first_page) fileCnt = card.get_num_Files();
+  //#else
     const uint16_t fileCnt = card.get_num_Files();
-  #endif
+    if(encoderTopLine >= fileCnt) {
+      encoderTopLine = 0;
+      ui.encoderPosition = 0;
+    }
+  //#endif
 
   START_MENU();
   #if ENABLED(SD_MENU_MEDIA_SHOW_LAST_PRINT_DURATION)

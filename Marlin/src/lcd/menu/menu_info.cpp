@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -269,7 +269,7 @@ void menu_info_board() {
     STATIC_ITEM_P(PSTR(DETAILED_BUILD_VERSION));             // Branch-x.x.x.build (User)
     STATIC_ITEM_P(PSTR(STRING_BUILD_DATE));                  // YYYY-MM-DD HH:MM
     STATIC_ITEM_P(PSTR(SOURCE_CODE_URL));                    // www.my3dprinter.com
-    STATIC_ITEM_P(PSTR(MSG_MARLIN " @ " STRING_DISTRIBUTION_DATE), SS_CENTER|SS_INVERT);    // Marlin YYYY-MM-DD
+    STATIC_ITEM_P(PSTR("Marlin @ " STRING_DISTRIBUTION_DATE), SS_CENTER|SS_INVERT);    // Marlin YYYY-MM-DD
     char buffer[21];
     VALUE_ITEM_P(MSG_INFO_EXTRUDERS, STRINGIFY(EXTRUDERS), SS_CENTER); // Extruders: 2
     #if ENABLED(AUTO_BED_LEVELING_3POINT)

@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -43,15 +43,33 @@
  *   M150 W          ; Turn LED white using a white LED
  *   M150 P127       ; Set LED 50% brightness
  *   M150 P          ; Set LED full brightness
+ *   M150 S0         ; Work with pixel #0 only 
+ *   M150 S          ; Work with all pixels (including 0)
  */
 void GcodeSuite::M150() {
-  leds.set_color(MakeLEDColor(
+  const LEDColor c((MakeLEDColor(
     parser.seen('R') ? (parser.has_value() ? parser.value_byte() : 255) : 0,
     parser.seen('U') ? (parser.has_value() ? parser.value_byte() : 255) : 0,
     parser.seen('B') ? (parser.has_value() ? parser.value_byte() : 255) : 0,
     parser.seen('W') ? (parser.has_value() ? parser.value_byte() : 255) : 0,
     parser.seen('P') ? (parser.has_value() ? parser.value_byte() : 255) : neo.brightness()
-  ));
+  )));
+  if(parser.seen('S')) {
+    uint8_t idx = parser.byteval('S', 0xFF);
+    if(idx < NEOPIXEL_PIXELS || idx == 0xFF) {
+      uint8_t real_idx = (idx == 0xFF) ? 0 : idx;
+      if(real_idx == 0) LEDLights::defaultLEDColor = c;
+      neo.set_pixel_color(real_idx, neo.Color(c.r, c.g, c.b, c.w));
+      neo.set_brightness(c.i);
+      neo.show();
+      if(idx != 0xFF) return;
+    } else {
+      SERIAL_ECHOLNPAIR("pixel index out of range: ", idx);
+      SERIAL_EOL();
+      return;
+    }
+  }
+  leds.set_color(c);
 }
 
 #endif // HAS_COLOR_LEDS

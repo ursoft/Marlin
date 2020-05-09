@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -52,6 +52,43 @@ public:
   static card_flags_t flag;                         // Flags (above)
   static char filename[FILENAME_LENGTH],            // DOS 8.3 filename of the selected item
               longFilename[LONG_FILENAME_LENGTH];   // Long name of the selected item
+#ifdef CYRILLIC_FILENAMES // convert 1251 to  utf8
+  static char _longFilenameCyr[LONG_FILENAME_LENGTH*3];
+  static const char *longFilenameCyr() {
+    static const int table[128] = {                    
+        0x82D0,0x83D0,0x9A80E2,0x93D1,0x9E80E2,0xA680E2,0xA080E2,0xA180E2,
+        0xAC82E2,0xB080E2,0x89D0,0xB980E2,0x8AD0,0x8CD0,0x8BD0,0x8FD0,    
+        0x92D1,0x9880E2,0x9980E2,0x9C80E2,0x9D80E2,0xA280E2,0x9380E2,0x9480E2,
+        0,0xA284E2,0x99D1,0xBA80E2,0x9AD1,0x9CD1,0x9BD1,0x9FD1,               
+        0xA0C2,0x8ED0,0x9ED1,0x88D0,0xA4C2,0x90D2,0xA6C2,0xA7C2,              
+        0x81D0,0xA9C2,0x84D0,0xABC2,0xACC2,0xADC2,0xAEC2,0x87D0,              
+        0xB0C2,0xB1C2,0x86D0,0x96D1,0x91D2,0xB5C2,0xB6C2,0xB7C2,              
+        0x91D1,0x9684E2,0x94D1,0xBBC2,0x98D1,0x85D0,0x95D1,0x97D1,            
+        0x90D0,0x91D0,0x92D0,0x93D0,0x94D0,0x95D0,0x96D0,0x97D0,
+        0x98D0,0x99D0,0x9AD0,0x9BD0,0x9CD0,0x9DD0,0x9ED0,0x9FD0,
+        0xA0D0,0xA1D0,0xA2D0,0xA3D0,0xA4D0,0xA5D0,0xA6D0,0xA7D0,
+        0xA8D0,0xA9D0,0xAAD0,0xABD0,0xACD0,0xADD0,0xAED0,0xAFD0,
+        0xB0D0,0xB1D0,0xB2D0,0xB3D0,0xB4D0,0xB5D0,0xB6D0,0xB7D0,
+        0xB8D0,0xB9D0,0xBAD0,0xBBD0,0xBCD0,0xBDD0,0xBED0,0xBFD0,
+        0x80D1,0x81D1,0x82D1,0x83D1,0x84D1,0x85D1,0x86D1,0x87D1,
+        0x88D1,0x89D1,0x8AD1,0x8BD1,0x8CD1,0x8DD1,0x8ED1,0x8FD1
+    };
+    int n = 0;
+    for(int i = 0; i < LONG_FILENAME_LENGTH && n < (int)sizeof(_longFilenameCyr); i++) {
+      char c1251 = longFilename[i];
+      if(c1251 >= 0 && c1251 <= 0x7f) _longFilenameCyr[n++] = c1251; else {
+        int v = table[(int)(0x7f & c1251)];
+        _longFilenameCyr[n++] = (char)v;
+        _longFilenameCyr[n++] = (char)(v >> 8);
+        if (v >>= 16)
+            _longFilenameCyr[n++] = (char)v;
+      }
+      if(c1251 == 0) break;
+    }
+    _longFilenameCyr[sizeof(_longFilenameCyr) - 1] = '\0';
+    return _longFilenameCyr;
+  }
+#endif
 
   // Fast! binary file transfer
   #if ENABLED(BINARY_FILE_TRANSFER)
@@ -109,11 +146,11 @@ public:
 
   // Print job
   static void openAndPrintFile(const char *name);   // (working directory)
-  static void printingHasFinished();
+  static void fileHasFinished();
   static void getAbsFilename(char *dst);
-  static void startFileprint();
   static void printFilename();
-  static void stopSDPrint(
+  static void startFileprint();
+  static void endFilePrint(
     #if SD_RESORT
       const bool re_sort=false
     #endif
@@ -128,7 +165,7 @@ public:
   static inline uint8_t percentDone() { return (isFileOpen() && filesize) ? sdpos / ((filesize + 99) / 100) : 0; }
 
   // Helper for open and remove
-  static const char* diveToFile(SdFile*& curDir, const char * const path, const bool echo=false);
+  static const char* diveToFile(const bool update_cwd, SdFile*& curDir, const char * const path, const bool echo=false);
 
   #if ENABLED(SDCARD_SORT_ALPHA)
     static void presort();
@@ -281,15 +318,11 @@ private:
 #if ENABLED(USB_FLASH_DRIVE_SUPPORT)
   #define IS_SD_INSERTED() Sd2Card::isInserted()
 #elif PIN_EXISTS(SD_DETECT)
-  #if ENABLED(SD_DETECT_INVERTED)
-    #define IS_SD_INSERTED()  READ(SD_DETECT_PIN)
+  #ifdef SD_DETECT_PIN_OB
+    #define IS_SD_INSERTED() ((READ(SD_DETECT_PIN)==SD_DETECT_STATE?1:0)+(READ(SD_DETECT_PIN_OB)==SD_DETECT_STATE?2:0))
+    #define IS_EXT_SD_INSERTED() (READ(SD_DETECT_PIN) == SD_DETECT_STATE)
   #else
-    #ifdef SD_DETECT_PIN_OB
-      #define IS_SD_INSERTED() ((READ(SD_DETECT_PIN)?0:1)+(READ(SD_DETECT_PIN_OB)?0:2))
-      #define IS_EXT_SD_INSERTED() !READ(SD_DETECT_PIN)
-    #else
-      #define IS_SD_INSERTED() !READ(SD_DETECT_PIN)
-    #endif
+    #define IS_SD_INSERTED() !READ(SD_DETECT_PIN)
   #endif
 #else
   // No card detect line? Assume the card is inserted.

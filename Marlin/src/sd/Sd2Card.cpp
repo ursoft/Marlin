@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -37,6 +37,14 @@
 #if ENABLED(SDSUPPORT) && NONE(USB_FLASH_DRIVE_SUPPORT, SDIO_SUPPORT)
 
 #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+ #if ENABLED(LPC_SOFTWARE_SPI)
+   SoftwareSPI<> SPI_LCD; //slow, but no conflicts with Fysetc Display
+ #else
+   HardwareSPI<> SPI_LCD;
+ #endif
+  //SoftwareSPI<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB> SPI_OB; //much slower because of diff pins for Software SPI
+  HardwareSPI<SCK_PIN_OB, MISO_PIN_OB, MOSI_PIN_OB, 1> SPI_OB;
+
  #define spiSend(P) (isOnBoard() ? SPI_OB.spiSend(P) : SPI_LCD.spiSend(P))
  #define spiRead(P1, P2) (isOnBoard() ? SPI_OB.spiRead(P1, P2) : SPI_LCD.spiRead(P1, P2))
  #define spiInit(P) (isOnBoard() ? SPI_OB.spiInit(P) : SPI_LCD.spiInit(P))
@@ -87,7 +95,7 @@
   #else
     static uint8_t CRC7(const uint8_t* data, uint8_t n) {
       uint8_t crc = 0;
-      for (uint8_t i = 0; i < n; i++) {
+      LOOP_L_N(i, n) {
         uint8_t d = data[i];
         d ^= crc << 1;
         if (d & 0x80) d ^= 9;
@@ -119,7 +127,7 @@ uint8_t Sd2Card::cardCommand(const uint8_t cmd, const uint32_t arg) {
     d[5] = CRC7(d, 5);
 
     // Send message
-    for (uint8_t k = 0; k < 6; k++) spiSend(d[k]);
+    LOOP_L_N(k, 6) spiSend(d[k]);
 
   #else
     // Send command
@@ -236,15 +244,16 @@ bool Sd2Card::eraseSingleBlockEnable() {
  *
  * \param[in] sckRateID SPI clock rate selector. See setSckRate().
  * \param[in] chipSelectPin SD chip select pin number.
+ * \param[in] timeout in ms.
  *
  * \return true for success, false for failure.
  * The reason for failure can be determined by calling errorCode() and errorData().
  */
-bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin) {
+bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin, const uint16_t timeout /*= SD_INIT_TIMEOUT*/) {
   errorCode_ = type_ = 0;
   chipSelectPin_ = chipSelectPin;
   // 16-bit init start time allows over a minute
-  const millis_t init_timeout = millis() + SD_INIT_TIMEOUT;
+  const millis_t init_timeout = millis() + timeout;
   uint32_t arg;
 
   watchdog_refresh(); // In case init takes too long
@@ -259,7 +268,7 @@ bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin) {
   spiInit(spiRate_);
 
   // Must supply min of 74 clock cycles with CS high.
-  for (uint8_t i = 0; i < 10; i++) spiSend(0xFF);
+  LOOP_L_N(i, 10) spiSend(0xFF);
 
   watchdog_refresh(); // In case init takes too long
 
@@ -285,7 +294,7 @@ bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin) {
     }
 
     // Get the last byte of r7 response
-    for (uint8_t i = 0; i < 4; i++) status_ = spiRec();
+    LOOP_L_N(i, 4) status_ = spiRec();
     if (status_ == 0xAA) {
       type(SD_CARD_TYPE_SD2);
       break;
@@ -316,7 +325,7 @@ bool Sd2Card::init(const uint8_t sckRateID, const pin_t chipSelectPin) {
     }
     if ((spiRec() & 0xC0) == 0xC0) type(SD_CARD_TYPE_SDHC);
     // Discard rest of ocr - contains allowed voltage range
-    for (uint8_t i = 0; i < 3; i++) spiRec();
+    LOOP_L_N(i, 3) spiRec();
   }
   chipDeselect();
 

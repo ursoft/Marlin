@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -37,6 +37,7 @@
 
 #include "../../module/motion.h"
 #include "../../module/temperature.h"
+#include "../../module/planner.h"
 
 #if ENABLED(FILAMENT_LCD_DISPLAY)
   #include "../../feature/filwidth.h"
@@ -107,7 +108,7 @@
 #define PROGRESS_BAR_WIDTH (LCD_PIXEL_WIDTH - PROGRESS_BAR_X)
 
 FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, const uint8_t ty) {
-  const char *str = i16tostr3(temp);
+  const char *str = i16tostr3rj(temp);
   const uint8_t len = str[0] != ' ' ? 3 : str[1] != ' ' ? 2 : 1;
   lcd_put_u8str(tx - len * (INFO_FONT_WIDTH) / 2 + 1, ty, &str[3-len]);
   lcd_put_wchar(LCD_STR_DEGREE[0]);
@@ -188,21 +189,6 @@ FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, cons
             u8g.drawBitmapP(hx, STATUS_HEATERS_Y, bw, STATUS_HEATERS_HEIGHT, HOTEND_BITMAP(heater, isHeat));
       #endif
 
-      // Draw a heating progress bar, if specified
-      #if DO_DRAW_BED && ENABLED(STATUS_HEAT_PERCENT)
-
-        if (STATIC_HOTEND && isHeat) {
-          const uint8_t bx = STATUS_HOTEND_X(heater) + STATUS_HOTEND_WIDTH(heater) + 1;
-          u8g.drawFrame(bx, STATUS_HEATERS_Y, 3, STATUS_HEATERS_HEIGHT);
-          if (tall) {
-            const uint8_t ph = STATUS_HEATERS_HEIGHT - 1 - tall;
-            if (PAGE_OVER(STATUS_HEATERS_Y + ph))
-              u8g.drawVLine(bx + 1, STATUS_HEATERS_Y + ph, tall);
-          }
-        }
-
-      #endif
-
     } // PAGE_CONTAINS
 
     if (PAGE_UNDER(7)) {
@@ -240,11 +226,11 @@ FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, cons
     const float temp = thermalManager.degBed(),
               target = thermalManager.degTargetBed();
 
-    #if ENABLED(STATUS_HEAT_PERCENT) || (DO_DRAW_BED && DISABLED(STATUS_BED_ANIM))
+    #if ENABLED(STATUS_HEAT_PERCENT) || DISABLED(STATUS_BED_ANIM)
       const bool isHeat = BED_ALT();
     #endif
 
-    #if DO_DRAW_BED && DISABLED(STATUS_BED_ANIM)
+    #if DISABLED(STATUS_BED_ANIM)
       #define STATIC_BED    true
       #define BED_DOT       isHeat
     #else
@@ -295,6 +281,13 @@ FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, cons
       u8g.drawBox(tx, 20 - 2, 2, 2);
       u8g.setColorIndex(1); // restore black on white
     }
+    #if HAS_LEVELING
+      if(planner.leveling_active) { 
+        if(blink) u8g.setColorIndex(0); // set to white on black
+        u8g.drawHLine(STATUS_BED_X + 3, STATUS_HEATERS_Y + 10, STATUS_BED_WIDTH - 3);
+        if(blink) u8g.setColorIndex(1); // restore black on white
+      }
+    #endif
 
   }
 
@@ -314,6 +307,9 @@ FORCE_INLINE void _draw_centered_temp(const int16_t temp, const uint8_t tx, cons
 
 #endif // DO_DRAW_CHAMBER
 
+#if ENABLED(LCD_SHOW_ENDSTOPS_STATUS)
+ #include "../../module/endstops.h"
+#endif
 //
 // Before homing, blink '123' <-> '???'.
 // Homed but unknown... '123' <-> '   '.
@@ -326,8 +322,13 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
     #endif
     axis
   );
+#if ENABLED(LCD_SHOW_ENDSTOPS_STATUS)
+  uint32_t axisName = (endstops.axis_min(axis) ? L'x' : L'X') + uint8_t(axis);
+#else
+  uint32_t axisName = L'X' + uint8_t(axis);
+#endif
   const uint8_t offs = (XYZ_SPACING) * a;
-  lcd_put_wchar(X_LABEL_POS + offs, XYZ_BASELINE, axis_codes[axis]);
+  lcd_put_wchar(X_LABEL_POS + offs, XYZ_BASELINE, axisName);
   lcd_moveto(X_VALUE_POS + offs, XYZ_BASELINE);
   if (blink)
     lcd_put_u8str(value);
@@ -344,6 +345,17 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
     }
   }
 }
+
+#if ENABLED(DOGM_SHOW_SPEED)
+ extern int16_t dogmSpeedToShow;
+#endif
+#if ENABLED(DOGM_SHOW_LAYER)
+  extern int dogmLayerCnt, dogmLayer;
+  extern char conv[8];
+#endif
+#if ENABLED(DOGM_SHOW_PERF)
+  extern uint8_t minCpuLoadPercent, maxCpuLoadPercent;
+#endif
 
 void MarlinUI::draw_status_screen() {
 
@@ -421,7 +433,7 @@ void MarlinUI::draw_status_screen() {
 
     #if ENABLED(FILAMENT_LCD_DISPLAY)
       strcpy(wstring, ftostr12ns(filwidth.measured_mm));
-      strcpy(mstring, i16tostr3(planner.volumetric_percent(parser.volumetric_enabled)));
+      strcpy(mstring, i16tostr3rj(planner.volumetric_percent(parser.volumetric_enabled)));
     #endif
 
     // Progress / elapsed / estimation updates and string formatting to avoid float math on each LCD draw
@@ -453,7 +465,7 @@ void MarlinUI::draw_status_screen() {
               #if ENABLED(PRINT_PROGRESS_SHOW_DECIMALS)
                 permyriadtostr4(progress)
               #else
-                ui8tostr3(progress / (PROGRESS_SCALE))
+                ui8tostr3rj(progress / (PROGRESS_SCALE))
               #endif
             ));
           }
@@ -463,10 +475,10 @@ void MarlinUI::draw_status_screen() {
         #endif
       }
 
+      constexpr bool can_show_days = DISABLED(DOGM_SD_PERCENT) || ENABLED(ROTATE_PROGRESS_DISPLAY);
       if (ev != lastElapsed) {
         lastElapsed = ev;
-        const bool has_days = (elapsed.value >= 60*60*24L);
-        const uint8_t len = elapsed.toDigital(elapsed_string, has_days);
+        const uint8_t len = elapsed.toDigital(elapsed_string, can_show_days && elapsed.value >= 60*60*24L);
         elapsed_x_pos = _SD_INFO_X(len);
 
         #if ENABLED(SHOW_REMAINING_TIME)
@@ -483,8 +495,7 @@ void MarlinUI::draw_status_screen() {
             }
             else {
               duration_t estimation = timeval;
-              const bool has_days = (estimation.value >= 60*60*24L);
-              const uint8_t len = estimation.toDigital(estimation_string, has_days);
+              const uint8_t len = estimation.toDigital(estimation_string, can_show_days && estimation.value >= 60*60*24L);
               estimation_x_pos = _SD_INFO_X(len
                 #if !BOTH(DOGM_SD_PERCENT, ROTATE_PROGRESS_DISPLAY)
                   + 1
@@ -501,6 +512,39 @@ void MarlinUI::draw_status_screen() {
 
   // Status Menu Font
   set_font(FONT_STATUSMENU);
+  #if ENABLED(DOGM_SHOW_SPEED)
+    if(PAGE_CONTAINS(0, 8)) {
+      u8g.drawHLine(35, 0, 6);
+      u8g.drawHLine(33, 3, 6);
+      u8g.drawHLine(31, 6, 6);
+      lcd_put_u8str(43, 7, i16tostr3rj(dogmSpeedToShow));
+    }
+  #endif
+  #if ENABLED(DOGM_SHOW_LAYER)
+    if(PAGE_CONTAINS(8, 16) && dogmLayer) {
+      sprintf(conv, "L%d", dogmLayer);
+      lcd_put_u8str(32 - 5 * (dogmLayer > 999) - 5 * (dogmLayerCnt > 999), 16, conv);
+      if(dogmLayerCnt) {
+        sprintf(conv, "/%d", dogmLayerCnt);
+        lcd_put_u8str(conv);
+      }
+    }
+  #endif
+  #if ENABLED(DOGM_SHOW_PERF)
+    if (PAGE_CONTAINS(19, 27)) {
+      u8g.drawFrame(30, 19, 51, 3);
+      int bufferUsage = (int)planner.nonbusy_movesplanned() * 48 / BLOCK_BUFFER_SIZE;
+      u8g.drawHLine(31, 20, bufferUsage);
+      int cpuLoadPercentLen = (int)(maxCpuLoadPercent - minCpuLoadPercent) * 48 / 100;
+      if(cpuLoadPercentLen == 0)
+        cpuLoadPercentLen = 1;
+      int cpuLoadPercentFrom = int(minCpuLoadPercent) * 48 / 100;
+      u8g.drawFrame(30, 24, 51, 3);
+      u8g.drawHLine(31 + cpuLoadPercentFrom, 25, cpuLoadPercentLen);
+      maxCpuLoadPercent = 100;
+      minCpuLoadPercent = 100;
+    }
+  #endif
 
   #if DO_DRAW_LOGO
     if (PAGE_CONTAINS(STATUS_LOGO_Y, STATUS_LOGO_Y + STATUS_LOGO_HEIGHT - 1))
@@ -513,7 +557,7 @@ void MarlinUI::draw_status_screen() {
       u8g.drawBitmapP(STATUS_HEATERS_X, STATUS_HEATERS_Y, STATUS_HEATERS_BYTEWIDTH, STATUS_HEATERS_HEIGHT, status_heaters_bmp);
   #endif
 
-  #if DO_DRAW_CUTTER
+  #if DO_DRAW_CUTTER && DISABLED(STATUS_COMBINE_HEATERS)
     #if ANIM_CUTTER
       #define CUTTER_BITMAP(S) ((S) ? status_cutter_on_bmp : status_cutter_bmp)
     #else
@@ -537,7 +581,7 @@ void MarlinUI::draw_status_screen() {
       u8g.drawBitmapP(STATUS_BED_X, bedy, STATUS_BED_BYTEWIDTH, bedh, BED_BITMAP(BED_ALT()));
   #endif
 
-  #if DO_DRAW_CHAMBER
+  #if DO_DRAW_CHAMBER && DISABLED(STATUS_COMBINE_HEATERS)
     #if ANIM_CHAMBER
       #define CHAMBER_BITMAP(S) ((S) ? status_chamber_on_bmp : status_chamber_bmp)
     #else
@@ -579,14 +623,14 @@ void MarlinUI::draw_status_screen() {
   if (PAGE_UNDER(6 + 1 + 12 + 1 + 6 + 1)) {
     // Extruders
     #if DO_DRAW_HOTENDS
-      for (uint8_t e = 0; e < MAX_HOTEND_DRAW; ++e)
+      LOOP_L_N(e, MAX_HOTEND_DRAW)
         _draw_hotend_status((heater_ind_t)e, blink);
     #endif
 
     // Laser / Spindle
     #if DO_DRAW_CUTTER
       if (cutter.power && PAGE_CONTAINS(STATUS_CUTTER_TEXT_Y - INFO_FONT_ASCENT, STATUS_CUTTER_TEXT_Y - 1)) {
-        lcd_put_u8str(STATUS_CUTTER_TEXT_X, STATUS_CUTTER_TEXT_Y, i16tostr3(cutter.powerPercent(cutter.power)));
+        lcd_put_u8str(STATUS_CUTTER_TEXT_X, STATUS_CUTTER_TEXT_Y, i16tostr3rj(cutter.powerPercent(cutter.power)));
         lcd_put_wchar('%');
       }
     #endif
@@ -613,7 +657,7 @@ void MarlinUI::draw_status_screen() {
               c = '*';
             }
           #endif
-          lcd_put_u8str(STATUS_FAN_TEXT_X, STATUS_FAN_TEXT_Y, i16tostr3(thermalManager.fanPercent(spd)));
+          lcd_put_u8str(STATUS_FAN_TEXT_X, STATUS_FAN_TEXT_Y, i16tostr3rj(thermalManager.fanPercent(spd)));
           lcd_put_wchar(c);
         }
       }
@@ -624,7 +668,9 @@ void MarlinUI::draw_status_screen() {
     //
     // SD Card Symbol
     //
-    if (card.isFileOpen() && PAGE_CONTAINS(42, 51)) {
+    if(PAGE_CONTAINS(42, 51)) {
+    #ifndef DOGM_SD_PRESENT
+    if (card.isFileOpen()) {
       // Upper box
       u8g.drawBox(42, 42, 8, 7);     // 42-48 (or 41-47)
       // Right edge
@@ -633,6 +679,43 @@ void MarlinUI::draw_status_screen() {
       u8g.drawFrame(42, 49, 10, 4);  // 49-52 (or 48-51)
       // Corner pixel
       u8g.drawPixel(50, 43);         // 43 (or 42)
+    }
+    #else
+    #if SD_CONNECTION_IS(LCD)
+     bool bigCard = true;
+     bool inserted = IS_SD_INSERTED();
+     bool mounted = card.isMounted();
+    #endif
+    #if SD_CONNECTION_IS(ONBOARD)
+     bool bigCard = false;
+     bool inserted = IS_SD_INSERTED();
+     bool mounted = card.isMounted();
+    #endif
+    #if SD_CONNECTION_IS(LCD_AND_ONBOARD)
+     bool inserted = IS_EXT_SD_INSERTED();
+     bool bigCard = true;
+     bool mounted = false;
+     if(inserted) {
+       mounted = card.isMounted();
+     } else {
+       bigCard = false;
+       inserted = IS_SD_INSERTED();
+       if(inserted) mounted = card.isMountedOnBoard();
+     }
+    #endif
+    if (mounted || (inserted && blink /* not mounted */)) {
+      u8g.drawBox(42, 42, 8, bigCard ? 11 : 6);
+      u8g.drawBox(50, 44, 2, bigCard ? 9 : 4);
+      if(bigCard) u8g.drawFrame(38, 42, 5, 11);
+      else u8g.drawFrame(42, 48, 10, 5);
+      u8g.drawPixel(50, 43);
+
+      if(card.isFileOpen() && blink) { // printing
+        if(bigCard) u8g.drawVLine(40, 44, 7); 
+        else u8g.drawHLine(44, 50, 6); 
+      }
+    } /* else empty */
+    #endif
     }
   #endif // SDSUPPORT
 
@@ -667,11 +750,11 @@ void MarlinUI::draw_status_screen() {
           }
         }
         else if (progress_state == 2 && estimation_string[0]) {
-          lcd_put_u8str(PROGRESS_BAR_X, EXTRAS_BASELINE, "R:");
+          lcd_put_u8str_P(PROGRESS_BAR_X, EXTRAS_BASELINE, PSTR("R:"));
           lcd_put_u8str(estimation_x_pos, EXTRAS_BASELINE, estimation_string);
         }
         else if (elapsed_string[0]) {
-          lcd_put_u8str(PROGRESS_BAR_X, EXTRAS_BASELINE, "E:");
+          lcd_put_u8str_P(PROGRESS_BAR_X, EXTRAS_BASELINE, E_LBL);
           lcd_put_u8str(elapsed_x_pos, EXTRAS_BASELINE, elapsed_string);
         }
 
@@ -783,7 +866,7 @@ void MarlinUI::draw_status_screen() {
     lcd_put_wchar(3, EXTRAS_2_BASELINE, LCD_STR_FEEDRATE[0]);
 
     set_font(FONT_STATUSMENU);
-    lcd_put_u8str(12, EXTRAS_2_BASELINE, i16tostr3(feedrate_percentage));
+    lcd_put_u8str(12, EXTRAS_2_BASELINE, i16tostr3rj(feedrate_percentage));
     lcd_put_wchar('%');
 
     //

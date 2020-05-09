@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -41,15 +41,6 @@ Adafruit_NeoPixel Marlin_NeoPixel::adaneo1(NEOPIXEL_PIXELS, NEOPIXEL_PIN, NEOPIX
     , Marlin_NeoPixel::adaneo2(NEOPIXEL_PIXELS, NEOPIXEL2_PIN, NEOPIXEL2_TYPE + NEO_KHZ800)
   #endif
 ;
-
-#ifdef NEOPIXEL_BKGD_LED_INDEX
-
-  void Marlin_NeoPixel::set_color_background() {
-    uint8_t background_color[4] = NEOPIXEL_BKGD_COLOR;
-    set_pixel_color(NEOPIXEL_BKGD_LED_INDEX, adaneo1.Color(background_color[0], background_color[1], background_color[2], background_color[3]));
-  }
-
-#endif
 
 void Marlin_NeoPixel::set_color(const uint32_t color) {
   for (uint16_t i = 0; i < pixels(); ++i) {
