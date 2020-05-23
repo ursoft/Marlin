@@ -874,7 +874,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-//#define ADAPTIVE_STEP_SMOOTHING
+#define ADAPTIVE_STEP_SMOOTHING
 
 /**
  * Custom Microstepping
@@ -1540,7 +1540,7 @@
  * See http://marlinfw.org/docs/features/lin_advance.html for full instructions.
  * Mention @Sebastianv650 on GitHub to alert the author of any issues.
  */
-#define LIN_ADVANCE
+//#define LIN_ADVANCE
 #if ENABLED(LIN_ADVANCE)
   //#define EXTRA_LIN_ADVANCE_K // Enable for second linear advance constants
   #define LIN_ADVANCE_K 0       // Unit: mm compression per 1mm/s extruder speed
@@ -1711,7 +1711,7 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-#define MINIMUM_STEPPER_PULSE 2 // если не работает 2, ставим 4 Если выше включили Linear Advance, необходимо также изменить значение MINIMUM_STEPPER_PULSE для работоспособности экструдера
+#define MINIMUM_STEPPER_PULSE 0 // если не работает 2, ставим 4 Если выше включили Linear Advance, необходимо также изменить значение MINIMUM_STEPPER_PULSE для работоспособности экструдера
 
 /**
  * Maximum stepping rate (in Hz) the stepper driver allows
@@ -1725,7 +1725,7 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-#define MAXIMUM_STEPPER_RATE 400000
+#define MAXIMUM_STEPPER_RATE 5000000
 
 // @section temperature
 
