@@ -393,7 +393,7 @@ bool MarlinUI::detected() {
   }
 #endif
 
-void MarlinUI::clear_lcd() { lcd.clear(); }
+void MarlinUI::clear_lcd(bool) { lcd.clear(); }
 
 #if ENABLED(SHOW_BOOTSCREEN)
 

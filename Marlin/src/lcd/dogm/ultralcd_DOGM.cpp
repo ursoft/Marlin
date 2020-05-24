@@ -231,10 +231,10 @@ bool MarlinUI::detected() { return true; }
     constexpr uint8_t pages = two_part ? 2 : 1;
     for (uint8_t q = pages; q--;) {
       draw_marlin_bootscreen(q == 0);
-      safe_delay((BOOTSCREEN_TIMEOUT) / pages);
+      //safe_delay((BOOTSCREEN_TIMEOUT) / pages);
     }
     //clear screen to avoid flicker
-    u8g.firstPage(); do {} while(u8g.nextPage());
+    //u8g.firstPage(); do {} while(u8g.nextPage());
   }
 
   void MarlinUI::show_bootscreen() {
@@ -300,7 +300,12 @@ void MarlinUI::draw_kill_screen() {
   } while (u8g.nextPage());
 }
 
-void MarlinUI::clear_lcd() { } // Automatically cleared by Picture Loop
+// Automatically cleared by Picture Loop
+void MarlinUI::clear_lcd(bool reallyClear /*= false*/) { 
+  if(reallyClear) {
+    u8g.firstPage(); do {} while(u8g.nextPage());
+  }
+} 
 
 #if HAS_LCD_MENU
 

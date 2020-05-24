@@ -272,7 +272,7 @@ public:
   #endif
 
   // LCD implementations
-  static void clear_lcd();
+  static void clear_lcd(bool reallyClear = false);
 
   #if ENABLED(SDSUPPORT)
     static void media_changed(const uint8_t old_stat, const uint8_t stat);

@@ -1177,6 +1177,9 @@ void setup() {
   marlin_state = MF_RUNNING;
 
   SETUP_LOG("setup() completed.");
+  
+  //clear screen to avoid flicker
+  ui.clear_lcd(true);  
 }
 
 /**
