@@ -23,9 +23,15 @@
 
 #include "../inc/MarlinConfig.h"
 
+#define IFSD(A,B) TERN(SDSUPPORT,A,B)
+
 #if ENABLED(SDSUPPORT)
 
-#define SD_RESORT BOTH(SDCARD_SORT_ALPHA, SDSORT_DYNAMIC_RAM)
+#if BOTH(SDCARD_SORT_ALPHA, SDSORT_DYNAMIC_RAM)
+  #define SD_RESORT 1
+#endif
+
+#define SD_ORDER(N,C) (TERN(SDCARD_RATHERRECENTFIRST, C - 1 - (N), N))
 
 #define MAX_DIR_DEPTH     10       // Maximum folder depth
 #define MAXDIRNAMELENGTH   8       // DOS folder name size
@@ -113,6 +119,9 @@ public:
   static inline bool isMounted() { return flag.mounted; }
   static void ls();
 
+  // Handle media insert/remove
+  static void manage_media();
+
   // SD Card Logging
   static void openLogFile(char * const path);
   static void write_command(char * const buf);
@@ -150,11 +159,7 @@ public:
   static void getAbsFilename(char *dst);
   static void printFilename();
   static void startFileprint();
-  static void endFilePrint(
-    #if SD_RESORT
-      const bool re_sort=false
-    #endif
-  );
+  static void endFilePrint(TERN_(SD_RESORT, const bool re_sort=false));
   static void report_status();
   static inline void pauseSDPrint() { flag.sdprinting = false; }
   static inline bool isPaused() { return isFileOpen() && !flag.sdprinting; }
@@ -322,7 +327,7 @@ private:
     #define IS_SD_INSERTED() ((READ(SD_DETECT_PIN)==SD_DETECT_STATE?1:0)+(READ(SD_DETECT_PIN_OB)==SD_DETECT_STATE?2:0))
     #define IS_EXT_SD_INSERTED() (READ(SD_DETECT_PIN) == SD_DETECT_STATE)
   #else
-    #define IS_SD_INSERTED() !READ(SD_DETECT_PIN)
+    #define IS_SD_INSERTED() (READ(SD_DETECT_PIN) == SD_DETECT_STATE)
   #endif
 #else
   // No card detect line? Assume the card is inserted.
