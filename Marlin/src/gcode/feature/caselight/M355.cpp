@@ -49,6 +49,10 @@
       ++args, case_light_on = parser.value_bool();
       case_light_arg_flag = true;
     }
+    if (parser.seen('T')) {
+      ++args, case_light_on = !case_light_on;
+      case_light_arg_flag = true;
+    }
     if (args) update_case_light();
 
     // always report case light status
