@@ -28,6 +28,10 @@
 
 #include <Wire.h>
 
+#ifdef IVI_PWM_EXT_1_0
+ #include "../lcd/ultralcd.h"
+#endif
+
 TWIBus::TWIBus() {
   #if I2C_SLAVE_ADDRESS == 0
     Wire.begin();                  // No address joins the BUS as the master
@@ -105,7 +109,7 @@ bool TWIBus::request(const uint8_t bytes) {
 
   // requestFrom() is a blocking function
   if (Wire.requestFrom(I2C_ADDRESS(addr), bytes) == 0) {
-    debug("request fail", I2C_ADDRESS(addr));
+    debug("request fail", addr);
     return false;
   }
 
@@ -171,10 +175,86 @@ void TWIBus::flush() {
   void TWIBus::debug(const char func[], char c) {
     if (DEBUGGING(INFO)) { prefix(func); SERIAL_ECHOLN(c); }
   }
-  void TWIBus::debug(const char func[], char str[]) {
+  void TWIBus::debug(const char func[], const char str[]) {
     if (DEBUGGING(INFO)) { prefix(func); SERIAL_ECHOLN(str); }
   }
 
+#endif
+
+#ifdef IVI_PWM_EXT_1_0
+  bool TWIBus::doWritePwmExt(uint8_t subAddr, uint8_t pwm) {
+    flush();
+    reset();
+    address(IVI_PWM_EXT_1_0);
+    addbyte((char)subAddr);
+    addbyte((char)pwm);
+    addbyte((char)(uint8_t(addr << 1) ^ subAddr ^ pwm));
+    send();
+    if(request(2)) {
+      if(Wire.available()) {
+        int sa = Wire.read();
+        if(sa != subAddr) {
+          debug("doWritePwmExtSa", uint32_t(sa));
+          return false;
+        }
+        if(Wire.available()) {
+          int p = Wire.read();
+          if(p != pwm) {
+            debug("doWritePwmExtP", uint32_t(p));
+            return false;
+          }
+        }
+      }
+      debug("doWritePwmExtOK", uint32_t((subAddr << 8) | pwm));
+      return true;
+    }
+    debug("doWritePwmExt", "request(2) failed");
+    return false;
+  }
+  void TWIBus::WritePwmExt(uint8_t subAddr, uint8_t pwm) {
+    static bool failure = false;
+    const int cacheSize = 3;
+    static uint8_t cache[cacheSize];
+    static millis_t last_wr[cacheSize];
+    millis_t ms = millis();
+    if(subAddr >= cacheSize) {
+      debug("WritePwmExt", "Cache miss");
+    } else {
+      int elapsed = int(ms - last_wr[subAddr]);
+      if(cache[subAddr] == pwm && last_wr != 0 && elapsed >= 0 && elapsed < 60000) {
+        debug("WritePwmExt", "Cache hit");
+        return;
+      }
+    }
+    const char *fail_msg = "I2C WritePwmExt Failed";
+    if(true /*!failure*/) {
+      int cnt = 0;
+      do {
+        if(doWritePwmExt(subAddr, pwm)) {
+          if(subAddr < cacheSize) {
+            last_wr[subAddr] = ms;
+            cache[subAddr] = pwm;
+          }
+          if(failure) {
+            ui.reset_status();
+            failure = false;
+            for(uint8_t i = 0; i < cacheSize; i++)
+              if(i != subAddr) doWritePwmExt(i, cache[i]);
+          }
+          return;
+        }
+      } while(cnt++ < 3);
+      debug("WritePwmExt", "Failure state: ON");
+      failure = true;
+      ui.set_status(fail_msg);
+      return;
+    }
+#if ENABLED(HOST_PROMPT_SUPPORT)
+    if(failure) {
+        host_action_notify(fail_msg);
+    }
+#endif
+  }
 #endif
 
 #endif // EXPERIMENTAL_I2CBUS

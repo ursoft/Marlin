@@ -50,7 +50,7 @@
  *           3-255 = Set the speed for use with T2
  */
 void GcodeSuite::M106() {
-  const uint8_t p = parser.byteval('P', _ALT_P);
+  uint8_t p = parser.byteval('P', _ALT_P);
 
   if (p < _CNT_P) {
 
@@ -65,10 +65,23 @@ void GcodeSuite::M106() {
     thermalManager.set_fan_speed(p, s);
   }
 #if ENABLED(EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE)
-  if (p == _CNT_P) {
+  else if (p == _CNT_P) {
     uint16_t s = parser.ushortval('S', EXTRUDER_AUTO_FAN_SPEED);
     NOMORE(s, 255U);
     thermalManager.extruder_auto_fan_speed = (uint8_t)s;
+  }
+#endif
+#ifdef IVI_PWM_EXT_1_0
+  else {
+    #if ENABLED(EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE)
+      --p; // P2 -> WirePro1, P3 -> WirePro2 
+    #endif // else P1 -> WirePro1, P2 -> WirePro2 
+    p -= (_CNT_P - 1);
+    if (p <= 2) {
+      uint16_t s = parser.ushortval('S', 255);
+      NOMORE(s, 255U);
+      i2c.WritePwmExt(p, (uint8_t)s);
+    }
   }
 #endif
 }

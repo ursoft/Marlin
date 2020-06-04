@@ -42,6 +42,10 @@
  //TODO: #define NEWUSER 3
 #endif
 
+#define IVI_PWM_EXT_1_0 0x55
+#define IVI_PWM_EXT           0x5000 // Ivilol PWM extender number pin mask
+#define IVI_PWM_EXT_PIN(NR)   (IVI_PWM_EXT | NR) // make Ivilol pin number
+
 /* User specific setting example (ensure set PLATFORMIO_BUILD_FLAGS=-DGITHUB_USER=YOURLOGIN):
 #if (GITHUB_USER==URSOFT)
  #define SOME_PARAMETER SOME_URSOFT_VALUE
@@ -441,7 +445,8 @@
 #define TEMP_SENSOR_7 0
 #define TEMP_SENSOR_BED 1
 #define TEMP_SENSOR_PROBE 0
-#define TEMP_SENSOR_CHAMBER 0
+#define TEMP_SENSOR_CHAMBER 1
+#define TEMP_CHAMBER_PIN TEMP_1_PIN
 
 // Dummy thermistor constant temperature readings, for use with 998 and 999
 #define DUMMY_THERMISTOR_998_VALUE 25
