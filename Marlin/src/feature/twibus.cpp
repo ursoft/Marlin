@@ -59,7 +59,7 @@ void TWIBus::address(const uint8_t adr) {
 void TWIBus::addbyte(const char c) {
   if (buffer_s >= COUNT(buffer)) return;
   buffer[buffer_s++] = c;
-  debug(PSTR("addbyte"), c);
+  debug(PSTR("addbyte"), (uint32_t)c);
 }
 
 void TWIBus::addbytes(char src[], uint8_t bytes) {
@@ -190,6 +190,8 @@ void TWIBus::flush() {
     addbyte((char)pwm);
     addbyte((char)(uint8_t(addr << 1) ^ subAddr ^ pwm));
     send();
+    uint32_t time = millis() + 2;
+    while (PENDING(millis(), time)) idle(); //без этого Марлин зависает, возможно есть проблемы в б-ке Wire в связи с ушедшим в задумчивость клиентом
     if(request(2)) {
       if(Wire.available()) {
         int sa = Wire.read();
