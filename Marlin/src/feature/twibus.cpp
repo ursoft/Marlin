@@ -190,8 +190,12 @@ void TWIBus::flush() {
     addbyte((char)pwm);
     addbyte((char)(uint8_t(addr << 1) ^ subAddr ^ pwm));
     send();
+
+    //без этого Марлин при 100кБодах зависает, возможно есть проблемы в б-ке Wire или драйвере lpc17xx_i2c.c (на 400кБодах ОК,
+    // но поставить 400 можно лишь через правку б-ки wire, которая вне Марлина обитает)
     uint32_t time = millis() + 2;
-    while (PENDING(millis(), time)) idle(); //без этого Марлин зависает, возможно есть проблемы в б-ке Wire в связи с ушедшим в задумчивость клиентом
+    while (PENDING(millis(), time)) idle(); 
+
     if(request(2)) {
       if(Wire.available()) {
         int sa = Wire.read();
