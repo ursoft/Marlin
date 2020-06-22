@@ -28,7 +28,7 @@
 /**
  * Marlin release version identifier
  */
-#define SHORT_BUILD_VERSION "bf-2.0.5.3u4" //last is build No, maxwidth now
+#define SHORT_BUILD_VERSION "bf-2.0.5.3u5" //last is build No, maxwidth now
 
 /**
  * Verbose version identifier which should contain a reference to the location
