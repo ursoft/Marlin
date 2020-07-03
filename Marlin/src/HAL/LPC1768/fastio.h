@@ -149,5 +149,10 @@ template<> inline void PinManager<0>::Write(uint16_t io, uint8_t v) { LPC176x::g
 
 // digitalRead/Write wrappers
 #define extDigitalRead(IO)    (IS_IVI_PWM_EXT(IO) ? 0 /* reading not implemented yet */ : digitalRead(IO))
+#ifdef IVI_PWM_EXT_1_0
 #define extDigitalWrite(IO,V) (IS_IVI_PWM_EXT(IO) ? i2c.WritePwmExt((int8_t)(IO), V) : digitalWrite(IO,V))
 #define extAnalogWrite(IO,V)  (IS_IVI_PWM_EXT(IO) ? i2c.WritePwmExt((int8_t)(IO), V) : analogWrite(IO,V))
+#else
+#define extDigitalWrite(IO,V) (digitalWrite(IO,V))
+#define extAnalogWrite(IO,V)  (analogWrite(IO,V))
+#endif
