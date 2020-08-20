@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -34,6 +34,9 @@
  * Always sets all 3 or 4 components. If a component is left out, set to 0.
  *                                    If brightness is left out, no value changed
  *
+ * With NEOPIXEL_LED:
+ *  I<index>  Set the Neopixel index to affect. Default: All
+ *
  * Examples:
  *
  *   M150 R255       ; Turn LED red
@@ -43,8 +46,9 @@
  *   M150 W          ; Turn LED white using a white LED
  *   M150 P127       ; Set LED 50% brightness
  *   M150 P          ; Set LED full brightness
- *   M150 S0         ; Work with pixel #0 only 
- *   M150 S          ; Work with all pixels (including 0)
+ *   M150 I0         ; Work with pixel #0 only 
+ *   M150 I          ; Work with all pixels (including 0)
+ *   M150 I1 R       ; Set NEOPIXEL index 1 to red
  */
 #ifdef CASE_LIGHT_NATURAL_BRIGHTNESS
 extern const uint8_t cvt_brightness[] = {0, 16, 32, 34, 36, 38, 40, 43, 45, 47, 49, 51, 54, 56, 58, 60, 62, 
@@ -63,7 +67,7 @@ extern const uint8_t cvt_brightness[] = {0, 16, 32, 34, 36, 38, 40, 43, 45, 47, 
 #endif
 void GcodeSuite::M150() {
   #ifdef IVI_PWM_EXT_1_0
-    if(parser.seen('S') && parser.has_value() && parser.value_byte() == NEOPIXEL_PIXELS /* 0-3 for display */) {
+    if(parser.seen('I') && parser.has_value() && parser.value_byte() == NEOPIXEL_PIXELS /* 0-3 for display */) {
       uint8_t brightness = parser.byteval('P', 255);
       i2c.WritePwmExt(0, 
 #ifdef CASE_LIGHT_NATURAL_BRIGHTNESS

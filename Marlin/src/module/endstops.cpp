@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -480,7 +480,7 @@ void _O2 Endstops::report_states() {
   #endif
   #if HAS_FILAMENT_SENSOR
     #if NUM_RUNOUT_SENSORS == 1
-      print_es_state(READ(FIL_RUNOUT_PIN) != FIL_RUNOUT_INVERTING, PSTR(STR_FILAMENT_RUNOUT_SENSOR));
+      print_es_state(READ(FIL_RUNOUT_PIN) != FIL_RUNOUT_STATE, PSTR(STR_FILAMENT_RUNOUT_SENSOR));
     #else
       #define _CASE_RUNOUT(N) case N: pin = FIL_RUNOUT##N##_PIN; break;
       LOOP_S_LE_N(i, 1, NUM_RUNOUT_SENSORS) {
@@ -491,7 +491,7 @@ void _O2 Endstops::report_states() {
         }
         SERIAL_ECHOPGM(STR_FILAMENT_RUNOUT_SENSOR);
         if (i > 1) SERIAL_CHAR(' ', '0' + i);
-        print_es_state(extDigitalRead(pin) != FIL_RUNOUT_INVERTING);
+        print_es_state(extDigitalRead(pin) != FIL_RUNOUT_STATE);
       }
       #undef _CASE_RUNOUT
     #endif
@@ -890,10 +890,6 @@ void Endstops::update() {
 
 #if ENABLED(SPI_ENDSTOPS)
 
-  #define X_STOP (X_HOME_DIR < 0 ? X_MIN : X_MAX)
-  #define Y_STOP (Y_HOME_DIR < 0 ? Y_MIN : Y_MAX)
-  #define Z_STOP (Z_HOME_DIR < 0 ? Z_MIN : Z_MAX)
-
   bool Endstops::tmc_spi_homing_check() {
     bool hit = false;
     #if X_SPI_SENSORLESS
@@ -904,7 +900,7 @@ void Endstops::update() {
           || stepperZ.test_stall_status()
         #endif
       )) {
-        SBI(live_state, X_STOP);
+        SBI(live_state, X_ENDSTOP);
         hit = true;
       }
     #endif
@@ -916,7 +912,7 @@ void Endstops::update() {
           || stepperZ.test_stall_status()
         #endif
       )) {
-        SBI(live_state, Y_STOP);
+        SBI(live_state, Y_ENDSTOP);
         hit = true;
       }
     #endif
@@ -928,7 +924,7 @@ void Endstops::update() {
           || stepperY.test_stall_status()
         #endif
       )) {
-        SBI(live_state, Z_STOP);
+        SBI(live_state, Z_ENDSTOP);
         hit = true;
       }
     #endif
@@ -936,9 +932,9 @@ void Endstops::update() {
   }
 
   void Endstops::clear_endstop_state() {
-    TERN_(X_SPI_SENSORLESS, CBI(live_state, X_STOP));
-    TERN_(Y_SPI_SENSORLESS, CBI(live_state, Y_STOP));
-    TERN_(Z_SPI_SENSORLESS, CBI(live_state, Z_STOP));
+    TERN_(X_SPI_SENSORLESS, CBI(live_state, X_ENDSTOP));
+    TERN_(Y_SPI_SENSORLESS, CBI(live_state, Y_ENDSTOP));
+    TERN_(Z_SPI_SENSORLESS, CBI(live_state, Z_ENDSTOP));
   }
 
 #endif // SPI_ENDSTOPS

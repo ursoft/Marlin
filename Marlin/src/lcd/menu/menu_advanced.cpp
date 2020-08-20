@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -43,17 +43,20 @@
   #include "../../module/temperature.h"
 #endif
 
-#if ENABLED(FILAMENT_RUNOUT_SENSOR) && FILAMENT_RUNOUT_DISTANCE_MM
+#if HAS_FILAMENT_RUNOUT_DISTANCE
   #include "../../feature/runout.h"
 #endif
 
 #if ENABLED(SD_FIRMWARE_UPDATE)
-  #include "../../module/configuration_store.h"
+  #include "../../module/settings.h"
+#endif
+
+#if ENABLED(PASSWORD_FEATURE)
+  #include "../../feature/password/password.h"
 #endif
 
 void menu_tmc();
 void menu_backlash();
-void menu_cancelobject();
 
 #if ENABLED(DAC_STEPPER_CURRENT)
 
@@ -117,6 +120,14 @@ void menu_cancelobject();
     #if DISABLED(NO_VOLUMETRICS)
       EDIT_ITEM(bool, MSG_VOLUMETRIC_ENABLED, &parser.volumetric_enabled, planner.calculate_volumetric_multipliers);
 
+      #if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
+        EDIT_ITEM_FAST(float42_52, MSG_VOLUMETRIC_LIMIT, &planner.volumetric_extruder_limit[active_extruder], 0.0f, 20.0f, planner.calculate_volumetric_extruder_limits);
+        #if EXTRUDERS > 1
+          LOOP_L_N(n, EXTRUDERS)
+            EDIT_ITEM_FAST_N(float42_52, n, MSG_VOLUMETRIC_LIMIT_E, &planner.volumetric_extruder_limit[n], 0.0f, 20.00f, planner.calculate_volumetric_extruder_limits);
+        #endif
+      #endif
+
       if (parser.volumetric_enabled) {
         EDIT_ITEM_FAST(float43, MSG_FILAMENT_DIAM, &planner.filament_size[active_extruder], 1.5f, 3.25f, planner.calculate_volumetric_multipliers);
         #if EXTRUDERS > 1
@@ -142,9 +153,9 @@ void menu_cancelobject();
       #endif
     #endif
 
-    #if ENABLED(FILAMENT_RUNOUT_SENSOR) && FILAMENT_RUNOUT_DISTANCE_MM
+    #if HAS_FILAMENT_RUNOUT_DISTANCE
       editable.decimal = runout.runout_distance();
-      EDIT_ITEM(float3, MSG_RUNOUT_DISTANCE_MM, &editable.decimal, 1, 30,
+      EDIT_ITEM(float3, MSG_RUNOUT_DISTANCE_MM, &editable.decimal, 1, float(FILAMENT_RUNOUT_DISTANCE_MM) * 1.5f,
         []{ runout.set_runout_distance(editable.decimal); }, true
       );
     #endif
@@ -161,11 +172,10 @@ void menu_cancelobject();
 #if ENABLED(PID_AUTOTUNE_MENU)
 
   #if ENABLED(PIDTEMP)
-    int16_t autotune_temp[HOTENDS] = ARRAY_BY_HOTENDS1(150);
+    int16_t autotune_temp[HOTENDS] = ARRAY_BY_HOTENDS1(PREHEAT_1_TEMP_HOTEND);
   #endif
-
   #if ENABLED(PIDTEMPBED)
-    int16_t autotune_temp_bed = 70;
+    int16_t autotune_temp_bed = PREHEAT_1_TEMP_BED;
   #endif
 
   #include "../../gcode/queue.h"
@@ -182,7 +192,7 @@ void menu_cancelobject();
     queue.enqueue_one_now("M117 PID Autotune started");
     queue.enqueue_one_now(cmd);
     queue.enqueue_one_now("M117 PID Autotune done");
-    MarlinUI::return_to_status();
+    ui.return_to_status();
   }
 
 #endif // PID_AUTOTUNE_MENU
@@ -205,16 +215,12 @@ void menu_cancelobject();
   // Helpers for editing PID Ki & Kd values
   // grab the PID value out of the temp variable; scale it; then update the PID driver
   void copy_and_scalePID_i(int16_t e) {
-    #if DISABLED(PID_PARAMS_PER_HOTEND) || HOTENDS == 1
-      UNUSED(e);
-    #endif
+    TERN(PID_PARAMS_PER_HOTEND,,UNUSED(e));
     PID_PARAM(Ki, e) = scalePID_i(raw_Ki);
     thermalManager.updatePID();
   }
   void copy_and_scalePID_d(int16_t e) {
-    #if DISABLED(PID_PARAMS_PER_HOTEND) || HOTENDS == 1
-      UNUSED(e);
-    #endif
+    TERN(PID_PARAMS_PER_HOTEND,,UNUSED(e));
     PID_PARAM(Kd, e) = scalePID_d(raw_Kd);
     thermalManager.updatePID();
   }
@@ -239,7 +245,7 @@ void menu_cancelobject();
 
 #if HAS_HOTEND
   DEFINE_PIDTEMP_FUNCS(0);
-  #if BOTH(HAS_MULTI_HOTEND, PID_PARAMS_PER_HOTEND)
+  #if ENABLED(PID_PARAMS_PER_HOTEND)
     REPEAT_S(1, HOTENDS, DEFINE_PIDTEMP_FUNCS)
   #endif
 #endif
@@ -277,11 +283,11 @@ void menu_cancelobject();
 
     #if ENABLED(PID_EDIT_MENU)
       #define __PID_BASE_MENU_ITEMS(N) \
-        raw_Ki = unscalePID_i(PID_PARAM(Ki, N)); \
-        raw_Kd = unscalePID_d(PID_PARAM(Kd, N)); \
-        EDIT_ITEM_N(float52sign, N, MSG_PID_P_E, &PID_PARAM(Kp, N), 1, 9990); \
-        EDIT_ITEM_N(float52sign, N, MSG_PID_I_E, &raw_Ki, 0.01f, 9990, []{ copy_and_scalePID_i(N); }); \
-        EDIT_ITEM_N(float52sign, N, MSG_PID_D_E, &raw_Kd, 1, 9990, []{ copy_and_scalePID_d(N); })
+        raw_Ki = unscalePID_i(TERN(PID_BED_MENU_SECTION, thermalManager.temp_bed.pid.Ki, PID_PARAM(Ki, N))); \
+        raw_Kd = unscalePID_d(TERN(PID_BED_MENU_SECTION, thermalManager.temp_bed.pid.Kd, PID_PARAM(Kd, N))); \
+        EDIT_ITEM_FAST_N(float41sign, N, MSG_PID_P_E, &TERN(PID_BED_MENU_SECTION, thermalManager.temp_bed.pid.Kp, PID_PARAM(Kp, N)), 1, 9990); \
+        EDIT_ITEM_FAST_N(float52sign, N, MSG_PID_I_E, &raw_Ki, 0.01f, 9990, []{ copy_and_scalePID_i(N); }); \
+        EDIT_ITEM_FAST_N(float41sign, N, MSG_PID_D_E, &raw_Kd, 1, 9990, []{ copy_and_scalePID_d(N); })
 
       #if ENABLED(PID_EXTRUSION_SCALING)
         #define _PID_BASE_MENU_ITEMS(N) \
@@ -326,15 +332,19 @@ void menu_cancelobject();
     #endif
 
     PID_EDIT_MENU_ITEMS(0);
-    #if BOTH(HAS_MULTI_HOTEND, PID_PARAMS_PER_HOTEND)
+    #if ENABLED(PID_PARAMS_PER_HOTEND)
       REPEAT_S(1, HOTENDS, PID_EDIT_MENU_ITEMS)
     #endif
 
-    #if ENABLED(PID_AUTOTUNE_MENU)
-     _PIDBED_EDIT_MENU_ITEMS;
-     #if ENABLED(PIDTEMPBED)
-      EDIT_ITEM_FAST_P(int3, PSTR("PID Autotune BED"), &autotune_temp_bed, 40, BED_MAXTEMP - 10, []{ _lcd_autotune(-1); });
-     #endif
+    #if ENABLED(PIDTEMPBED)
+      #if ENABLED(PID_EDIT_MENU)
+        #define PID_BED_MENU_SECTION
+        __PID_BASE_MENU_ITEMS(-1);
+        #undef PID_BED_MENU_SECTION
+      #endif
+      #if ENABLED(PID_AUTOTUNE_MENU)
+        EDIT_ITEM_FAST_N(int3, -1, MSG_PID_AUTOTUNE_E, &autotune_temp_bed, PREHEAT_1_TEMP_BED, BED_MAX_TARGET, []{ _lcd_autotune(-1); });
+      #endif
     #endif
 
     END_MENU();
@@ -451,21 +461,22 @@ void menu_cancelobject();
     END_MENU();
   }
 
-  // M205 Jerk
-  void menu_advanced_jerk() {
-    START_MENU();
-    BACK_ITEM(MSG_ADVANCED_SETTINGS);
+  #if HAS_CLASSIC_JERK
 
-    #if HAS_JUNCTION_DEVIATION
-      #if ENABLED(LIN_ADVANCE)
-        EDIT_ITEM(float43, MSG_JUNCTION_DEVIATION, &planner.junction_deviation_mm, 0.001f, 0.3f, planner.recalculate_max_e_jerk);
-      #else
-        EDIT_ITEM(float43, MSG_JUNCTION_DEVIATION, &planner.junction_deviation_mm, 0.001f, 0.5f);
+    void menu_advanced_jerk() {
+      START_MENU();
+      BACK_ITEM(MSG_ADVANCED_SETTINGS);
+
+      #if HAS_JUNCTION_DEVIATION
+        #if ENABLED(LIN_ADVANCE)
+          EDIT_ITEM(float43, MSG_JUNCTION_DEVIATION, &planner.junction_deviation_mm, 0.001f, 0.3f, planner.recalculate_max_e_jerk);
+        #else
+          EDIT_ITEM(float43, MSG_JUNCTION_DEVIATION, &planner.junction_deviation_mm, 0.001f, 0.5f);
+        #endif
       #endif
-    #endif
-    #if HAS_CLASSIC_JERK
+
       constexpr xyze_float_t max_jerk_edit =
-        #ifdef MAX_ACCEL_EDIT_VALUES
+        #ifdef MAX_JERK_EDIT_VALUES
           MAX_JERK_EDIT_VALUES
         #elif ENABLED(LIMITED_JERK_EDITING)
           { (DEFAULT_XJERK) * 2, (DEFAULT_YJERK) * 2, (DEFAULT_ZJERK) * 2, (DEFAULT_EJERK) * 2 }
@@ -484,10 +495,11 @@ void menu_cancelobject();
       #if HAS_CLASSIC_E_JERK
         EDIT_ITEM_FAST(float52sign, MSG_VE_JERK, &planner.max_jerk.e, 0.1f, max_jerk_edit.e);
       #endif
-    #endif
 
-    END_MENU();
-  }
+      END_MENU();
+    }
+
+  #endif
 
   // M851 - Z Probe Offsets
   #if HAS_BED_PROBE
@@ -495,8 +507,8 @@ void menu_cancelobject();
       START_MENU();
       BACK_ITEM(MSG_ADVANCED_SETTINGS);
       #if HAS_PROBE_XY_OFFSET
-        EDIT_ITEM(float41sign, MSG_ZPROBE_XOFFSET, &probe.offset.x, -(X_BED_SIZE), X_BED_SIZE);
-        EDIT_ITEM(float41sign, MSG_ZPROBE_YOFFSET, &probe.offset.y, -(Y_BED_SIZE), Y_BED_SIZE);
+        EDIT_ITEM(float31sign, MSG_ZPROBE_XOFFSET, &probe.offset.x, -(X_BED_SIZE), X_BED_SIZE);
+        EDIT_ITEM(float31sign, MSG_ZPROBE_YOFFSET, &probe.offset.y, -(Y_BED_SIZE), Y_BED_SIZE);
       #endif
       EDIT_ITEM(LCD_Z_OFFSET_TYPE, MSG_ZPROBE_ZOFFSET, &probe.offset.z, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
       END_MENU();
@@ -516,7 +528,6 @@ void menu_advanced_steps_per_mm() {
   EDIT_QSTEPS(C);
 
   #if ENABLED(DISTINCT_E_FACTORS)
-    EDIT_ITEM_FAST(float51, MSG_E_STEPS, &planner.settings.axis_steps_per_mm[E_AXIS_N(active_extruder)], 5, 9999, []{ planner.refresh_positioning(); });
     LOOP_L_N(n, E_STEPPERS)
       EDIT_ITEM_FAST_N(float51, n, MSG_EN_STEPS, &planner.settings.axis_steps_per_mm[E_AXIS_N(n)], 5, 9999, []{ _planner_refresh_e_positioning(MenuItemBase::itemIndex); });
   #elif E_STEPPERS
@@ -551,8 +562,16 @@ void menu_advanced_settings() {
     // M201 - Acceleration items
     SUBMENU(MSG_ACCELERATION, menu_advanced_acceleration);
 
-    // M205 - Max Jerk
-    SUBMENU(MSG_JERK, menu_advanced_jerk);
+    #if HAS_CLASSIC_JERK
+      // M205 - Max Jerk
+      SUBMENU(MSG_JERK, menu_advanced_jerk);
+    #elif HAS_JUNCTION_DEVIATION
+      EDIT_ITEM(float43, MSG_JUNCTION_DEVIATION, &planner.junction_deviation_mm, 0.001f, 0.3f
+        #if ENABLED(LIN_ADVANCE)
+          , planner.recalculate_max_e_jerk
+        #endif
+      );
+    #endif
 
     // M851 - Z Probe Offsets
     #if HAS_BED_PROBE
@@ -567,10 +586,6 @@ void menu_advanced_settings() {
 
   #if ENABLED(BACKLASH_GCODE)
     SUBMENU(MSG_BACKLASH, menu_backlash);
-  #endif
-
-  #if ENABLED(CANCEL_OBJECTS)
-    SUBMENU(MSG_CANCEL_OBJECT, []{ editable.int8 = -1; ui.goto_screen(menu_cancelobject); });
   #endif
 
   #if ENABLED(DAC_STEPPER_CURRENT)
@@ -615,6 +630,10 @@ void menu_advanced_settings() {
       ui.return_to_status();
       if (new_state) LCD_MESSAGEPGM(MSG_RESET_PRINTER); else ui.reset_status();
     });
+  #endif
+
+  #if ENABLED(PASSWORD_FEATURE)
+    SUBMENU(MSG_PASSWORD_SETTINGS, password.access_menu_password);
   #endif
 
   #if ENABLED(EEPROM_SETTINGS) && DISABLED(SLIM_LCD_MENUS)

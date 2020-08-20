@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -205,7 +205,7 @@ void menu_info_board() {
   if (ui.use_click()) return ui.go_back();
 
   START_SCREEN();
-  STATIC_ITEM_P(PSTR(BOARD_INFO_NAME), SS_CENTER|SS_INVERT);       // MyPrinterController
+  STATIC_ITEM_P(PSTR(BOARD_INFO_NAME), SS_DEFAULT|SS_INVERT);      // MyPrinterController
   #ifdef BOARD_WEBSITE_URL
     STATIC_ITEM_P(PSTR(BOARD_WEBSITE_URL), SS_LEFT);               // www.my3dprinter.com
   #endif
@@ -243,7 +243,7 @@ void menu_info_board() {
     STATIC_ITEM_P(PSTR(SOURCE_CODE_URL));                    // www.my3dprinter.com
     STATIC_ITEM_P(PSTR("Marlin @ " STRING_DISTRIBUTION_DATE), SS_CENTER|SS_INVERT);    // Marlin YYYY-MM-DD
     VALUE_ITEM_P(MSG_INFO_EXTRUDERS, STRINGIFY(EXTRUDERS), SS_CENTER); // Extruders: 2
-    #if HAS_BED_LEVELING
+    #if HAS_LEVELING
       STATIC_ITEM(
         TERN_(AUTO_BED_LEVELING_3POINT, MSG_3POINT_LEVELING)      // 3-Point Leveling
         TERN_(AUTO_BED_LEVELING_LINEAR, MSG_LINEAR_LEVELING)      // Linear Leveling

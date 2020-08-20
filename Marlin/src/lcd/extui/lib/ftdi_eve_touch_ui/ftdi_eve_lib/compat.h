@@ -12,7 +12,7 @@
  *   GNU General Public License for more details.                           *
  *                                                                          *
  *   To view a copy of the GNU General Public License, go to the following  *
- *   location: <http://www.gnu.org/licenses/>.                              *
+ *   location: <https://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
 #pragma once
@@ -109,13 +109,13 @@
     template<uint8_t p>
     struct arduino_digital_pin {
       static constexpr uint8_t pin = p;
-      static inline void set_high()          {digitalWrite(p, HIGH);}
-      static inline void set_low()           {digitalWrite(p, LOW);}
+      static inline void set_high()          {extDigitalWrite(p, HIGH);}
+      static inline void set_low()           {extDigitalWrite(p, LOW);}
       static inline void set_input()         {pinMode(p, INPUT);}
       static inline void set_input_pullup()  {pinMode(p, INPUT_PULLUP);}
       static inline void set_output()        {pinMode(p, OUTPUT);}
       static inline uint8_t read()           {return digitalRead(p);}
-      static inline void write(bool v)       {digitalWrite(p, v ? HIGH : LOW);}
+      static inline void write(bool v)       {extDigitalWrite(p, v ? HIGH : LOW);}
     };
 
     #define MAKE_ARDUINO_PINS(ID) typedef arduino_digital_pin<ID> ARDUINO_DIGITAL_##ID;

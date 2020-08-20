@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 #pragma once
@@ -33,9 +33,15 @@
 #define hal_timer_t uint32_t
 #define HAL_TIMER_TYPE_MAX 0xFFFFFFFF // Timers can be 16 or 32 bit
 
-#define STEP_TIMER_NUM 0  // index of timer to use for stepper
-#define TEMP_TIMER_NUM 1  // index of timer to use for temperature
-#define PULSE_TIMER_NUM STEP_TIMER_NUM
+#ifndef STEP_TIMER_NUM
+  #define STEP_TIMER_NUM        0  // Timer Index for Stepper
+#endif
+#ifndef PULSE_TIMER_NUM
+  #define PULSE_TIMER_NUM       STEP_TIMER_NUM
+#endif
+#ifndef TEMP_TIMER_NUM
+  #define TEMP_TIMER_NUM        1  // Timer Index for Temperature
+#endif
 
 #define TEMP_TIMER_FREQUENCY 1000   // Temperature::isr() is expected to be called at around 1kHz
 
@@ -57,8 +63,13 @@
 
 extern void Step_Handler(HardwareTimer *htim);
 extern void Temp_Handler(HardwareTimer *htim);
-#define HAL_STEP_TIMER_ISR() void Step_Handler(HardwareTimer *htim)
-#define HAL_TEMP_TIMER_ISR() void Temp_Handler(HardwareTimer *htim)
+
+#ifndef HAL_STEP_TIMER_ISR
+  #define HAL_STEP_TIMER_ISR() void Step_Handler(HardwareTimer *htim)
+#endif
+#ifndef HAL_TEMP_TIMER_ISR
+  #define HAL_TEMP_TIMER_ISR() void Temp_Handler(HardwareTimer *htim)
+#endif
 
 // ------------------------
 // Public Variables
@@ -75,8 +86,9 @@ void HAL_timer_enable_interrupt(const uint8_t timer_num);
 void HAL_timer_disable_interrupt(const uint8_t timer_num);
 bool HAL_timer_interrupt_enabled(const uint8_t timer_num);
 
+// Configure timer priorities for peripherals such as Software Serial or Servos.
 // Exposed here to allow all timer priority information to reside in timers.cpp
-void SetSoftwareSerialTimerInterruptPriority();
+void SetTimerInterruptPriorities();
 
 //TIM_TypeDef* HAL_timer_device(const uint8_t timer_num); no need to be public for now. not public = not used externally
 

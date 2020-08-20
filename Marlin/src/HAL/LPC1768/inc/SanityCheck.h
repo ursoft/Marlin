@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 #pragma once
@@ -58,6 +58,10 @@
  * fallback software channels, FAST_PWM_FAN is incompatible with Servos.
  */
 static_assert(!(NUM_SERVOS && ENABLED(FAST_PWM_FAN)), "BLTOUCH and Servos are incompatible with FAST_PWM_FAN on LPC176x boards.");
+
+#if SPINDLE_LASER_FREQUENCY
+  static_assert(!NUM_SERVOS, "BLTOUCH and Servos are incompatible with SPINDLE_LASER_FREQUENCY on LPC176x boards.");
+#endif
 
 /**
  * Test LPC176x-specific configuration values for errors at compile-time.
@@ -250,4 +254,10 @@ static_assert(DISABLED(BAUD_RATE_GCODE), "BAUD_RATE_GCODE is not yet supported o
   #endif
 
   #undef USEDI2CDEV_M
+#endif
+
+#if ENABLED(SERIAL_STATS_MAX_RX_QUEUED)
+  #error "SERIAL_STATS_MAX_RX_QUEUED is not supported on this platform."
+#elif ENABLED(SERIAL_STATS_DROPPED_RX)
+  #error "SERIAL_STATS_DROPPED_RX is not supported on this platform."
 #endif

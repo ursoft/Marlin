@@ -17,7 +17,7 @@
  *   GNU General Public License for more details.                           *
  *                                                                          *
  *   To view a copy of the GNU General Public License, go to the following  *
- *   location: <http://www.gnu.org/licenses/>.                              *
+ *   location: <https://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
 #include "../config.h"
@@ -380,7 +380,8 @@ bool StatusScreen::onTouchEnd(uint8_t tag) {
     case 4:
       if (isPrinting()) {
         GOTO_SCREEN(TuneMenu);
-      } else {
+      }
+      else {
         GOTO_SCREEN(MainMenu);
       }
       break;
@@ -394,7 +395,8 @@ bool StatusScreen::onTouchEnd(uint8_t tag) {
         #else
           return false;
         #endif
-      } else {
+      }
+      else {
         GOTO_SCREEN(MoveAxisScreen);
       }
       break;

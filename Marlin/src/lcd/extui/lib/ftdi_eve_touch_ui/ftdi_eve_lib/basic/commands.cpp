@@ -17,7 +17,7 @@
  *   GNU General Public License for more details.                           *
  *                                                                          *
  *   To view a copy of the GNU General Public License, go to the following  *
- *   location: <http://www.gnu.org/licenses/>.                              *
+ *   location: <https://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
 #include "ftdi_basic.h"
@@ -932,7 +932,8 @@ template <class T> bool CLCD::CommandFifo::_write_unaligned(T data, uint16_t len
     if (command_read_ptr <= command_write_ptr) {
       bytes_tail = 4096U - command_write_ptr;
       bytes_head = command_read_ptr;
-    } else {
+    }
+    else {
       bytes_tail = command_read_ptr - command_write_ptr;
       bytes_head = 0;
     }

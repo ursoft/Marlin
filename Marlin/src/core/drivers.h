@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 #pragma once
@@ -176,12 +176,12 @@
   #define HAS_TMC_SPI 1
 #endif
 
-#define _SDCARD_LCD          1
-#define _SDCARD_ONBOARD      2
-#define _SDCARD_CUSTOM_CABLE 3
-#define _SDCARD_LCD_AND_ONBOARD 4
-#define _SDCARD_ID(V) _CAT(_SDCARD_, V)
-#define SD_CONNECTION_IS(V) (_SDCARD_ID(SDCARD_CONNECTION) == _SDCARD_ID(V))
+//
+// TMC26XX Stepper Drivers
+//
+#if HAS_DRIVER(TMC26X)
+  #define HAS_TMC26X 1
+#endif
 
 //
 // L64XX Stepper Drivers

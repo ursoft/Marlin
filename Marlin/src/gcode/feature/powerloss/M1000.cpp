@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -41,7 +41,7 @@ inline void plr_error(PGM_P const prefix) {
   #if ENABLED(DEBUG_POWER_LOSS_RECOVERY)
     DEBUG_ECHO_START();
     serialprintPGM(prefix);
-    DEBUG_ECHOLNPGM(" Power-Loss Recovery Data");
+    DEBUG_ECHOLNPGM(" Job Recovery Data");
   #else
     UNUSED(prefix);
   #endif
