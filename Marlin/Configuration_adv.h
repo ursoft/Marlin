@@ -1631,12 +1631,17 @@
  *
  * See https://marlinfw.org/docs/features/lin_advance.html for full instructions.
  */
+//#if (GITHUB_USER==URSOFT)
+// //#define LIN_ADVANCE
+//#else
+// //#define LIN_ADVANCE //conflicts with stealthChop (UltiSteel stock) mode of TMC2208 (E stops extruding at ~10 layer)
+//#endif
 #define LIN_ADVANCE
 #if ENABLED(LIN_ADVANCE)
   //#define EXTRA_LIN_ADVANCE_K // Enable for second linear advance constants
   #define LIN_ADVANCE_K 0       // Unit: mm compression per 1mm/s extruder speed
   //#define LA_DEBUG            // If enabled, this will generate debug information output over USB.
-  //#define EXPERIMENTAL_SCURVE // Enable this option to permit S-Curve Acceleration
+  #define EXPERIMENTAL_SCURVE // Enable this option to permit S-Curve Acceleration  #error "LIN_ADVANCE and S_CURVE_ACCELERATION may not play well together! Enable EXPERIMENTAL_SCURVE to continue."
 #endif
 
 // @section leveling
