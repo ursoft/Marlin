@@ -371,16 +371,22 @@
  * The fan turns on automatically whenever any driver is enabled and turns
  * off (or reduces to idle speed) shortly after drivers are turned off.
  */
-//#define USE_CONTROLLER_FAN
+#if (GITHUB_USER==URSOFT)
+#define USE_CONTROLLER_FAN
+#endif
 #if ENABLED(USE_CONTROLLER_FAN)
-  //#define CONTROLLER_FAN_PIN -1        // Set a custom pin for the controller fan
+  #ifdef IVI_PWM_EXT_1_0
+    #define CONTROLLER_FAN_PIN IVI_PWM_EXT_PIN(1)  // Set a custom pin for the controller fan
+  #else
+    #define CONTROLLER_FAN_PIN -1
+  #endif
   //#define CONTROLLER_FAN_USE_Z_ONLY    // With this option only the Z axis is considered
   //#define CONTROLLER_FAN_IGNORE_Z      // Ignore Z stepper. Useful when stepper timeout is disabled.
   #define CONTROLLERFAN_SPEED_MIN      20 // (0-255) Minimum speed. (If set below this value the fan is turned off.)
   #define CONTROLLERFAN_SPEED_ACTIVE 100 // (0-255) Active speed, used when any motor is enabled
   #define CONTROLLERFAN_SPEED_IDLE     30 // (0-255) Idle speed, used when motors are disabled
   #define CONTROLLERFAN_IDLE_TIME     60 // (seconds) Extra time to keep the fan running after disabling motors
-  //#define CONTROLLER_FAN_EDITABLE      // Enable M710 configurable settings
+  #define CONTROLLER_FAN_EDITABLE      // Enable M710 configurable settings
   #if ENABLED(CONTROLLER_FAN_EDITABLE)
     #define CONTROLLER_FAN_MENU          // Enable the Controller Fan submenu
   #endif
@@ -458,17 +464,21 @@
 #define E5_AUTO_FAN_PIN -1
 #define E6_AUTO_FAN_PIN -1
 #define E7_AUTO_FAN_PIN -1
-#define CHAMBER_AUTO_FAN_PIN -1
+#if defined(IVI_PWM_EXT_1_0) && (TEMP_SENSOR_CHAMBER == 1)
+  #define CHAMBER_AUTO_FAN_PIN IVI_PWM_EXT_PIN(2)
+#else
+  #define CHAMBER_AUTO_FAN_PIN -1
+#endif
 
 #define EXTRUDER_AUTO_FAN_TEMPERATURE 50
 #if (GITHUB_USER==URSOFT)
  #define EXTRUDER_AUTO_FAN_SPEED 100
+ #define CHAMBER_AUTO_FAN_TEMPERATURE 50
+ #define CHAMBER_AUTO_FAN_SPEED 255
 #else
- #define EXTRUDER_AUTO_FAN_SPEED 150   // 255 == full speed было 200
+ #define EXTRUDER_AUTO_FAN_SPEED 200   // 255 == full speed
 #endif
 #define EXTRUDER_AUTO_FAN_SPEED_CONFIGURABLE
-//#define CHAMBER_AUTO_FAN_TEMPERATURE 30
-//#define CHAMBER_AUTO_FAN_SPEED 255
 
 /**
  * Part-Cooling Fan Multiplexer
@@ -484,15 +494,22 @@
 /**
  * M355 Case Light on-off / brightness
  */
-#define CASE_LIGHT_ENABLE
+//#if (GITHUB_USER==URSOFT)
+  #define CASE_LIGHT_ENABLE
+//#endif
 #if ENABLED(CASE_LIGHT_ENABLE)
-  #define CASE_LIGHT_PIN P1_26                  // включение подсветки кейса с экрана Override the default pin if needed //SKR 1.3 PIN Y+ SWITCH 
+  #ifdef IVI_PWM_EXT_1_0
+    #define CASE_LIGHT_PIN IVI_PWM_EXT_PIN(0)   // Override the default pin if needed
+  #else
+    #define CASE_LIGHT_PIN P1_26   // Override the default pin if needed
+  #endif
+  #define CASE_LIGHT_NATURAL_BRIGHTNESS       // Use logarithmic scale
   #define INVERT_CASE_LIGHT false             // Set true if Case Light is ON when pin is LOW
   #define CASE_LIGHT_DEFAULT_ON true          // Set default power-up state on
   #define CASE_LIGHT_DEFAULT_BRIGHTNESS 255   // Set default power-up brightness (0-255, requires PWM pin)
   //#define CASE_LIGHT_MAX_PWM 128            // Limit pwm
   #define CASE_LIGHT_MENU                   // Add Case Light options to the LCD menu
-  #define CASE_LIGHT_NO_BRIGHTNESS          // Disable brightness control. Enable for non-PWM lighting.
+  //#define CASE_LIGHT_NO_BRIGHTNESS          // Disable brightness control. Enable for non-PWM lighting.
   //#define CASE_LIGHT_USE_NEOPIXEL           // Use Neopixel LED as case light, requires NEOPIXEL_LED.
   #if ENABLED(CASE_LIGHT_USE_NEOPIXEL)
     #define CASE_LIGHT_NEOPIXEL_COLOR { 255, 255, 255, 255 } // { Red, Green, Blue, White }
@@ -1339,10 +1356,11 @@
   // Show SD percentage next to the progress bar
   #define DOGM_SD_PERCENT
   #define DOGM_SD_PRESENT // https://github.com/ursoft/Marlin/issues/34
-  #define DOGM_SHOW_SPEED // https://github.com/ursoft/Marlin/issues/39
-  #define DOGM_SHOW_LAYER // https://github.com/ursoft/Marlin/issues/39
-  #define DOGM_SHOW_PERF  // https://github.com/ursoft/Marlin/issues/39
-
+  #if (TEMP_SENSOR_CHAMBER == 0)
+    #define DOGM_SHOW_SPEED // https://github.com/ursoft/Marlin/issues/39
+    #define DOGM_SHOW_LAYER // https://github.com/ursoft/Marlin/issues/39
+    #define DOGM_SHOW_PERF  // https://github.com/ursoft/Marlin/issues/39
+  #endif
   // Save many cycles by drawing a hollow frame or no frame on the Info Screen
   //#define XYZ_NO_FRAME
   #define XYZ_HOLLOW_FRAME
@@ -1394,7 +1412,7 @@
   #define STATUS_HOTEND_INVERTED      // Show solid nozzle bitmaps when heating (Requires STATUS_HOTEND_ANIM)
   #define STATUS_HOTEND_ANIM          // Use a second bitmap to indicate hotend heating
   #define STATUS_BED_ANIM             // Use a second bitmap to indicate bed heating
-  #define STATUS_CHAMBER_ANIM         // Use a second bitmap to indicate chamber heating
+  //#define STATUS_CHAMBER_ANIM         // Use a second bitmap to indicate chamber heating
   //#define STATUS_CUTTER_ANIM        // Use a second bitmap to indicate spindle / laser active
   //#define STATUS_ALT_BED_BITMAP     // Use the alternative bed bitmap
   //#define STATUS_ALT_FAN_BITMAP     // Use the alternative fan bitmap
@@ -2814,7 +2832,12 @@
  * echo:i2c-reply: from:99 bytes:5 data:hello
  */
 
-//#define EXPERIMENTAL_I2CBUS
+#ifdef IVI_PWM_EXT_1_0
+  #define EXPERIMENTAL_I2CBUS
+#endif
+#if (GITHUB_USER==URSOFT)
+  #define DEBUG_TWIBUS
+#endif
 #if ENABLED(EXPERIMENTAL_I2CBUS)
   #define I2C_SLAVE_ADDRESS  0  // Set a value from 8 to 127 to act as a slave
 #endif
