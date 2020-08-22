@@ -536,9 +536,9 @@
  #define DEFAULT_Kd 56.17
 #else
   //M303 E0 S225 C8
-  #define DEFAULT_Kp 23.00
-  #define DEFAULT_Ki 1.62
-  #define DEFAULT_Kd 81.86
+  #define DEFAULT_Kp 17.19
+  #define DEFAULT_Ki 1.14
+  #define DEFAULT_Kd 64.80
 #endif
 
   // MakerGear
