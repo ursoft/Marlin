@@ -972,7 +972,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-#define ADAPTIVE_STEP_SMOOTHING
+//#define ADAPTIVE_STEP_SMOOTHING
 
 /**
  * Custom Microstepping
@@ -1649,17 +1649,17 @@
  *
  * See https://marlinfw.org/docs/features/lin_advance.html for full instructions.
  */
-//#if (GITHUB_USER==URSOFT)
-// //#define LIN_ADVANCE
-//#else
-// //#define LIN_ADVANCE //conflicts with stealthChop (UltiSteel stock) mode of TMC2208 (E stops extruding at ~10 layer)
-//#endif
-#define LIN_ADVANCE
+#if (GITHUB_USER==URSOFT)
+ //#define LIN_ADVANCE
+#else
+ //#define LIN_ADVANCE //conflicts with stealthChop (UltiSteel stock) mode of TMC2208 (E stops extruding at ~10 layer)
+#endif
+
 #if ENABLED(LIN_ADVANCE)
   //#define EXTRA_LIN_ADVANCE_K // Enable for second linear advance constants
   #define LIN_ADVANCE_K 0       // Unit: mm compression per 1mm/s extruder speed
   //#define LA_DEBUG            // If enabled, this will generate debug information output over USB.
-  #define EXPERIMENTAL_SCURVE // Enable this option to permit S-Curve Acceleration  #error "LIN_ADVANCE and S_CURVE_ACCELERATION may not play well together! Enable EXPERIMENTAL_SCURVE to continue."
+  //#define EXPERIMENTAL_SCURVE // Enable this option to permit S-Curve Acceleration  #error "LIN_ADVANCE and S_CURVE_ACCELERATION may not play well together! Enable EXPERIMENTAL_SCURVE to continue."
 #endif
 
 // @section leveling
@@ -2264,11 +2264,11 @@
  */
 #if HAS_TRINAMIC_CONFIG
 
-  #define HOLD_MULTIPLIER    0.6  // Scales down the holding current from run current Множитель тока в режиме удержания ШД
+  #define HOLD_MULTIPLIER    0.5  // Scales down the holding current from run current Множитель тока в режиме удержания ШД
   #define INTERPOLATE       true  // Interpolate X/Y/Z_MICROSTEPS to 256 Включает или выключает интерполяцию по ВСЕМ осям
 
   #if AXIS_IS_TMC(X)
-    #define X_CURRENT       850        // (mA) RMS current. Multiply by 1.414 for peak current. сюда пишем наш ток Irms, который мы посчитали ранее
+    #define X_CURRENT       800        // (mA) RMS current. Multiply by 1.414 for peak current. сюда пишем наш ток Irms, который мы посчитали ранее
     #define X_CURRENT_HOME  X_CURRENT  // (mA) RMS current for sensorless homing
     #define X_MICROSTEPS     16    // 0..256 количество микрошагов, поддерживается нативно до 256, не забываем изменить число шагов на мм
     #define X_RSENSE          0.11  // Если на Ваших драйверах резистор Rsense отличается от стандартного R110, сюда вписываем номинал
@@ -2284,7 +2284,7 @@
   #endif
 
   #if AXIS_IS_TMC(Y)
-    #define Y_CURRENT       850
+    #define Y_CURRENT       800
     #define Y_CURRENT_HOME  Y_CURRENT
     #define Y_MICROSTEPS     16
     #define Y_RSENSE          0.11
@@ -2332,7 +2332,7 @@
   #endif
 
   #if AXIS_IS_TMC(E0)
-    #define E0_CURRENT      600
+    #define E0_CURRENT      800
     #define E0_MICROSTEPS    16
     #define E0_RSENSE         0.11
     #define E0_CHAIN_POS     -1
@@ -2515,7 +2515,8 @@
   #define Z_HYBRID_THRESHOLD      10
   #define Z2_HYBRID_THRESHOLD      3
   #define Z3_HYBRID_THRESHOLD      3
-  #define E0_HYBRID_THRESHOLD     15
+  #define Z4_HYBRID_THRESHOLD      3
+  #define E0_HYBRID_THRESHOLD     30
   #define E1_HYBRID_THRESHOLD     30
   #define E2_HYBRID_THRESHOLD     30
   #define E3_HYBRID_THRESHOLD     30
