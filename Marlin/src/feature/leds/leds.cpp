@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -39,7 +39,7 @@
 #endif
 
 #if ENABLED(PCA9533)
-  #include <SailfishRGB_LED.h>
+  #include "pca9533.h"
 #endif
 
 #if ENABLED(LED_COLOR_PRESETS)
@@ -84,15 +84,9 @@ void LEDLights::setup() {
       if (PWM_PIN(RGB_LED_W_PIN)) SET_PWM(RGB_LED_W_PIN); else SET_OUTPUT(RGB_LED_W_PIN);
     #endif
   #endif
-  #if ENABLED(NEOPIXEL_LED)
-    neo.init();
-  #endif
-  #if ENABLED(PCA9533)
-    RGBinit();
-  #endif
-  #if ENABLED(LED_USER_PRESET_STARTUP)
-    set_default();
-  #endif
+  TERN_(NEOPIXEL_LED, neo.init());
+  TERN_(PCA9533, PCA9533_init());
+  TERN_(LED_USER_PRESET_STARTUP, set_default());
 }
 
 void LEDLights::set_color(const LEDColor &incol
@@ -140,7 +134,7 @@ void LEDLights::set_color(const LEDColor &incol
     // This variant uses 3-4 separate pins for the RGB(W) components.
     // If the pins can do PWM then their intensity will be set.
     #define UPDATE_RGBW(C,c) do { if (PWM_PIN(RGB_LED_##C##_PIN)) \
-        analogWrite(pin_t(RGB_LED_##C##_PIN), incol.c); \
+        extAnalogWrite(pin_t(RGB_LED_##C##_PIN), incol.c); \
       else WRITE(RGB_LED_##C##_PIN, incol.c ? HIGH : LOW); }while(0)
     UPDATE_RGBW(R,r);
     UPDATE_RGBW(G,g);
@@ -156,9 +150,7 @@ void LEDLights::set_color(const LEDColor &incol
     pca9632_set_led_color(incol);
   #endif
 
-  #if ENABLED(PCA9533)
-    RGBsetColor(incol.r, incol.g, incol.b, true);
-  #endif
+  TERN_(PCA9533, PCA9533_setColor(incol.r, incol.g, incol.b));
 
   #if EITHER(LED_CONTROL_MENU, PRINTER_EVENT_LEDS)
     // Don't update the color when OFF

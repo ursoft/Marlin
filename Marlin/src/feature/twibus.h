@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 #pragma once
@@ -46,8 +46,8 @@ typedef void (*twiRequestFunc_t)();
  * for the host to interpret.
  *
  *  For more information see
- *    - http://marlinfw.org/docs/gcode/M260.html
- *    - http://marlinfw.org/docs/gcode/M261.html
+ *    - https://marlinfw.org/docs/gcode/M260.html
+ *    - https://marlinfw.org/docs/gcode/M261.html
  *
  */
 class TWIBus {
@@ -64,6 +64,13 @@ class TWIBus {
      */
     uint8_t buffer[TWIBUS_BUFFER_SIZE];
 
+    #ifdef IVI_PWM_EXT_1_0
+      /**
+       * @brief Output external PWM worker
+       * @details Ask external PWM extender to emit output to subAddr once
+       */
+      bool doWritePwmExt(uint8_t subAddr, uint8_t pwm);
+    #endif
 
   public:
     /**
@@ -222,6 +229,14 @@ class TWIBus {
 
     #endif
 
+    #ifdef IVI_PWM_EXT_1_0
+      /**
+       * @brief Output external PWM
+       * @details Ask external PWM extender to emit output to subAddr
+       */
+      void WritePwmExt(uint8_t subAddr, uint8_t pwm);
+    #endif
+
     #if ENABLED(DEBUG_TWIBUS)
       /**
        * @brief Prints a debug message
@@ -230,12 +245,12 @@ class TWIBus {
       static void prefix(const char func[]);
       static void debug(const char func[], uint32_t adr);
       static void debug(const char func[], char c);
-      static void debug(const char func[], char adr[]);
+      static void debug(const char func[], const char adr[]);
       static inline void debug(const char func[], uint8_t v) { debug(func, (uint32_t)v); }
     #else
       static inline void debug(const char[], uint32_t) {}
       static inline void debug(const char[], char) {}
-      static inline void debug(const char[], char[]) {}
+      static inline void debug(const char[], const char[]) {}
       static inline void debug(const char[], uint8_t) {}
     #endif
 };

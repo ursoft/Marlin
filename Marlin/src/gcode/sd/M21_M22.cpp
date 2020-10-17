@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -41,8 +41,10 @@ void GcodeSuite::M22() {
       SERIAL_ERROR_MSG("No M22 while print");
     } else {
       card.release();
+#if HAS_LCD_MENU
       void menu_media();
       if(MarlinUI::currentScreen == menu_media) MarlinUI::return_to_status();
+#endif
     }
 }
 
