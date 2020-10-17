@@ -3103,5 +3103,9 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
   #endif
 #endif
 
+#if SD_CONNECTION_IS(LCD_AND_ONBOARD) && !defined(HAS_GRAPHICAL_LCD)
+#error "LCD_AND_ONBOARD requires a graphical LCD with SD card (e.g. FYSETC_MINI_12864_2_1)"
+#endif
+
 // Misc. Cleanup
 #undef _TEST_PWM

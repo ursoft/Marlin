@@ -41,8 +41,10 @@ void GcodeSuite::M22() {
       SERIAL_ERROR_MSG("No M22 while print");
     } else {
       card.release();
+#if HAS_LCD_MENU
       void menu_media();
       if(MarlinUI::currentScreen == menu_media) MarlinUI::return_to_status();
+#endif
     }
 }
 
