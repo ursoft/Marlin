@@ -372,7 +372,7 @@
  * off (or reduces to idle speed) shortly after drivers are turned off.
  */
 #if (GITHUB_USER==URSOFT)
-#define USE_CONTROLLER_FAN
+//#define USE_CONTROLLER_FAN
 #endif
 #if ENABLED(USE_CONTROLLER_FAN)
   #ifdef IVI_PWM_EXT_1_0

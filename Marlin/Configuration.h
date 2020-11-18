@@ -53,7 +53,7 @@
 */
 
 #if (GITHUB_USER==URSOFT)
-  #define IVI_PWM_EXT_1_0 0x55
+  //#define IVI_PWM_EXT_1_0 0x55
 #endif
 
 #ifdef IVI_PWM_EXT_1_0
