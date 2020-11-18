@@ -1254,8 +1254,10 @@ void setup() {
 
   SETUP_LOG("setup() completed.");
   
+  #if HAS_LCD_MENU
   //clear screen to avoid flicker
   ui.clear_lcd(true);  
+  #endif
 }
 
 /**

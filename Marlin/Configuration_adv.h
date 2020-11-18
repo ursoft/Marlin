@@ -1157,7 +1157,9 @@
   #define SDCARD_RATHERRECENTFIRST
 
   //#define SD_MENU_CONFIRM_START             // Confirm the selected SD file before printing
+  #ifdef HAS_LCD_MENU
   #define SD_SHOW_FILES_ON_MEDIA_INSERTED   // https://github.com/ursoft/Marlin/issues/3
+  #endif
   //#define MENU_ADDAUTOSTART               // Add a menu option to run auto#.g files
 
   #define EVENT_GCODE_SD_ABORT "G27 P2"      // G-code to run on SD Abort Print (e.g., "G28XY" or "G27")
@@ -1262,7 +1264,9 @@
   /**
    * https://github.com/ursoft/Marlin/issues/4#issuecomment-555858393
    */
+  #if HAS_LCD_MENU
   #define SD_MENU_MEDIA_SHOW_LAST_PRINT_DURATION
+  #endif
 
   /**
    * Auto-report SdCard status with M27 S<seconds>
