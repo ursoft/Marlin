@@ -135,8 +135,14 @@ void MenuItem_gcode::action(PGM_P const, PGM_P const pgcode) { queue.inject_P(pg
 void MenuEditItemBase::edit_screen(strfunc_t strfunc, loadfunc_t loadfunc) {
   TERN_(HAS_TOUCH_XPT2046, ui.repeat_delay = BUTTON_DELAY_EDIT);
   #if ENABLED(WRAP_EDITORS)
-    if (int32_t(ui.encoderPosition) < 0) ui.encoderPosition = maxEditValue;
-    if (int32_t(ui.encoderPosition) > maxEditValue) ui.encoderPosition = 0;
+    if (int32_t(ui.encoderPosition) < 0) {
+      ui.encoderPosition = TERN(ENCODER_RATE_MULTIPLIER, ui.encoderMultiplierUsed ? 0 : maxEditValue, maxEditValue);
+      ui.quick_feedback(false);
+    }
+    if (int32_t(ui.encoderPosition) > maxEditValue) {
+      ui.encoderPosition = TERN(ENCODER_RATE_MULTIPLIER, ui.encoderMultiplierUsed ? maxEditValue : 0, 0);
+      ui.quick_feedback(false);
+    }
   #else
     if (int32_t(ui.encoderPosition) < 0) ui.encoderPosition = 0;
     if (int32_t(ui.encoderPosition) > maxEditValue) ui.encoderPosition = maxEditValue;

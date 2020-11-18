@@ -227,6 +227,9 @@ millis_t MarlinUI::next_button_update_ms; // = 0
       lastEncoderMovementMillis = 0;
     }
   #endif
+  #if BOTH(ENCODER_RATE_MULTIPLIER, WRAP_EDITORS)
+    bool MarlinUI::encoderMultiplierUsed = false;
+  #endif
 
   #if EITHER(REVERSE_MENU_DIRECTION, REVERSE_SELECT_DIRECTION)
     int8_t MarlinUI::encoderDirection = ENCODERBASE;
@@ -1034,6 +1037,9 @@ void MarlinUI::update() {
 
               lastEncoderMovementMillis = ms;
             } // encoderRateMultiplierEnabled
+            #if ENABLED(WRAP_EDITORS)
+              ui.encoderMultiplierUsed = (encoderMultiplier > 1);
+            #endif
 
           #else
 

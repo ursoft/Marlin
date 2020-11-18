@@ -515,6 +515,9 @@ public:
       static millis_t lastEncoderMovementMillis;
       static void enable_encoder_multiplier(const bool onoff);
     #endif
+    #if BOTH(ENCODER_RATE_MULTIPLIER, WRAP_EDITORS)
+      static bool encoderMultiplierUsed;
+    #endif
 
     // Manual Movement
     static ManualMove manual_move;
