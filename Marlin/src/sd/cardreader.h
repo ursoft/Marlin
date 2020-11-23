@@ -31,10 +31,14 @@
   #define SD_RESORT 1
 #endif
 
+#if defined(SDSORT_GCODE_DEFAULT_SORT_ALPHA) && true != SDSORT_GCODE_DEFAULT_SORT_ALPHA
+  #define SD_ORDER(N,C) (CardReader::getSortAlpha() ? (N) : ((C) - 1 - (N)))
+#else
 #if ENABLED(SDCARD_RATHERRECENTFIRST) && DISABLED(SDCARD_SORT_ALPHA)
   #define SD_ORDER(N,C) ((C) - 1 - (N))
 #else
   #define SD_ORDER(N,C) N
+#endif
 #endif
 
 #define MAX_DIR_DEPTH     10       // Maximum folder depth
@@ -217,6 +221,9 @@ public:
   #endif
   #if ENABLED(LONGCLICK_FOR_IDLE)
     static bool on_event(const char *file_name81);
+  #endif
+  #if BOTH(SDCARD_SORT_ALPHA,SDSORT_GCODE)
+    static bool getSortAlpha() { return sort_alpha; }
   #endif
 
 private:
