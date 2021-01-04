@@ -1862,7 +1862,7 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-#define MINIMUM_STEPPER_PULSE 0 // если не работает 2, ставим 4 Если выше включили Linear Advance, необходимо также изменить значение MINIMUM_STEPPER_PULSE для работоспособности экструдера
+//#define MINIMUM_STEPPER_PULSE 0 // если не работает 2, ставим 4 Если выше включили Linear Advance, необходимо также изменить значение MINIMUM_STEPPER_PULSE для работоспособности экструдера
 
 /**
  * Maximum stepping rate (in Hz) the stepper driver allows
@@ -1876,7 +1876,7 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-#define MAXIMUM_STEPPER_RATE 5000000
+//#define MAXIMUM_STEPPER_RATE 5000000
 
 // @section temperature
 
