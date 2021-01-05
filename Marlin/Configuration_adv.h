@@ -972,7 +972,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-//#define ADAPTIVE_STEP_SMOOTHING
+#define ADAPTIVE_STEP_SMOOTHING
 
 /**
  * Custom Microstepping
@@ -1848,8 +1848,8 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-//#define MINIMUM_STEPPER_POST_DIR_DELAY 20
-//#define MINIMUM_STEPPER_PRE_DIR_DELAY 20
+#define MINIMUM_STEPPER_POST_DIR_DELAY 20
+#define MINIMUM_STEPPER_PRE_DIR_DELAY 20
 
 /**
  * Minimum stepper driver pulse width (in µs)
@@ -1862,7 +1862,7 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-//#define MINIMUM_STEPPER_PULSE 0 // если не работает 2, ставим 4 Если выше включили Linear Advance, необходимо также изменить значение MINIMUM_STEPPER_PULSE для работоспособности экструдера
+#define MINIMUM_STEPPER_PULSE 0 // если не работает 2, ставим 4 Если выше включили Linear Advance, необходимо также изменить значение MINIMUM_STEPPER_PULSE для работоспособности экструдера
 
 /**
  * Maximum stepping rate (in Hz) the stepper driver allows
@@ -1876,7 +1876,7 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-//#define MAXIMUM_STEPPER_RATE 5000000
+#define MAXIMUM_STEPPER_RATE 5000000
 
 // @section temperature
 
