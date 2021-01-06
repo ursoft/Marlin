@@ -2332,7 +2332,7 @@
   #endif
 
   #if AXIS_IS_TMC(E0)
-    #define E0_CURRENT      800
+    #define E0_CURRENT      900
     #define E0_MICROSTEPS    16
     #define E0_RSENSE         0.11
     #define E0_CHAIN_POS     -1
@@ -2461,7 +2461,7 @@
    */
   #define STEALTHCHOP_XY
   #define STEALTHCHOP_Z
-  #define STEALTHCHOP_E // https://3dtoday.ru/blogs/nayuch/linear-advance-skr-13-tmc2208-21301/
+  //#define STEALTHCHOP_E //отключил, так как  на tmc2209 BMG с высокой скоростью и частотой ретрактов (3/50) получал затягивание прутка, https://3dtoday.ru/blogs/nayuch/linear-advance-skr-13-tmc2208-21301/
 
   /**
    * Optimize spreadCycle chopper parameters by using predefined parameter sets

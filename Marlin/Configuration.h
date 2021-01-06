@@ -536,9 +536,9 @@
  #define DEFAULT_Kd 56.17
 #else
   //M303 E0 S225 C8
-  #define DEFAULT_Kp 17.19
-  #define DEFAULT_Ki 1.14
-  #define DEFAULT_Kd 64.80
+  #define DEFAULT_Kp 14.85
+  #define DEFAULT_Ki 0.85
+  #define DEFAULT_Kd 64.67
 #endif
 
   // MakerGear
@@ -592,9 +592,9 @@
   #define DEFAULT_bedKi 6.45
   #define DEFAULT_bedKd 107.67
 #else //M303 E-1 C8 S60
-  #define DEFAULT_bedKp 12.19
-  #define DEFAULT_bedKi 0.64
-  #define DEFAULT_bedKd 58.03
+  #define DEFAULT_bedKp 45.96
+  #define DEFAULT_bedKi 8.13
+  #define DEFAULT_bedKd 173.14
 #endif
 
   //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
