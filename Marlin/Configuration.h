@@ -807,8 +807,8 @@
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
 //#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 148.50 } //default Ulti Extruder
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 409.87 } //BMG EXTRUDER откалибровано  формула=(значениевпрошивке * сколькодолжнобыловыйти) / скольковышло
-//#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 640 } //Sherpa Mini extruder direct редуктор 5:1
+//#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 409.87 } //BMG EXTRUDER откалибровано  формула=(значениевпрошивке * сколькодолжнобыловыйти) / скольковышло
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 640 } //Sherpa Mini extruder direct редуктор 5:1
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
@@ -1596,7 +1596,7 @@
 #if (GITHUB_USER==URSOFT)
  #define PREHEAT_1_TEMP_HOTEND 200
 #else
- #define PREHEAT_1_TEMP_HOTEND 190
+ #define PREHEAT_1_TEMP_HOTEND 200
 #endif
 #define PREHEAT_1_TEMP_BED     60
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
@@ -1606,9 +1606,9 @@
  #define PREHEAT_2_TEMP_BED    80
 #else
  #define PREHEAT_2_LABEL       "ABS"
- #define PREHEAT_2_TEMP_BED    90
+ #define PREHEAT_2_TEMP_BED    110
 #endif
-#define PREHEAT_2_TEMP_HOTEND 230
+#define PREHEAT_2_TEMP_HOTEND 235
 #define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
 /**
