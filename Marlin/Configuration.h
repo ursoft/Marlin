@@ -808,7 +808,7 @@
  */
 //#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 148.50 } //default Ulti Extruder
 //#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 409.87 } //BMG EXTRUDER откалибровано  формула=(значениевпрошивке * сколькодолжнобыловыйти) / скольковышло
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 685.71 } //Sherpa Mini extruder direct редуктор 5:1
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 1600, 696,71 } //Sherpa Mini extruder direct редуктор 5:1
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
